@@ -1,0 +1,32 @@
+# OS files
+Thumbs.db
+.DS_Store
+# Android Studio IDE files
+*.iml
+.idea/*
+!.idea/modules.xml
+!.idea/runConfigurations/
+# Android build outputs and intermediates
+.gradle/
+build/
+app/build/
+# Local machine-specific files
+local.properties
+keystore.properties
+# Firebase config file
+google-services.json
+# Keystore and signing files
+*.keystore
+*.jks
+# Capture and profiling output folders
+/captures
+/profiling-data
+# Any .env files
+.env
+*.env
+# Kotlin Coroutines, Room, and Hilt generated files
+/kapt
+/kapt-cache
+/generated
+# Do NOT ignore Room schema exports
+!app/schemas/
