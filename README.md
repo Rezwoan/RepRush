@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="app_icon.png" width="192" height="192" style="border-radius: 40px;">
+  <img src="app_icon.png" width="256" height="256" style="border-radius: 40px;">
 </p>
 
 <h1 align="center">RepRush</h1>
