@@ -1,20 +1,23 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     alias(libs.plugins.google.services)
     alias(libs.plugins.crashlytics)
+    //id("com.android.application")
+    //id("com.google.gms.google-services")
 }
 
 android {
     namespace = "com.reprush.app"
-    compileSdk = 35
+    @Suppress("EditedTargetSdkVersion")
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.reprush.app"
         minSdk = 26
-        targetSdk = 35
+        @Suppress("EditedTargetSdkVersion")
+        targetSdk = 37
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -35,17 +38,14 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlinOptions {
-        jvmTarget = "17"
-    }
-
     buildFeatures {
         viewBinding = true
     }
+    compileSdkMinor = 0
+}
 
-    kapt {
-        correctErrorTypes = true
-    }
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
 }
 
 dependencies {
@@ -64,7 +64,7 @@ dependencies {
     implementation(libs.androidx.navigation.ui)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
-    kapt(libs.androidx.room.compiler)
+    ksp(libs.androidx.room.compiler)
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
@@ -72,7 +72,7 @@ dependencies {
     implementation(libs.firebase.crashlytics)
     implementation(libs.play.services.auth)
     implementation(libs.hilt.android)
-    kapt(libs.hilt.compiler)
+    ksp(libs.hilt.compiler)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.coroutines.play.services)
@@ -81,4 +81,12 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    //implementation(platform("com.google.firebase:firebase-bom:34.12.0"))
+    //implementation("com.google.firebase:firebase-analytics")
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+    }
 }
