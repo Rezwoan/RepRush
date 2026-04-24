@@ -1,6 +1,12 @@
-# <img src="app_icon.png" width="48" height="48" align="center" style="border-radius: 12px; margin-right: 10px;"> RepRush
+<p align="center">
+  <img src="app_icon.png" width="192" height="192" style="border-radius: 40px;">
+</p>
 
-**RepRush** is a high-performance Android application designed for fitness enthusiasts who want to track their gym progress with precision and a touch of gamification. Built with a modern Android stack, it bridges the gap between raw data and rewarding achievement.
+<h1 align="center">RepRush</h1>
+
+<p align="center">
+  <strong>RepRush</strong> is a high-performance Android application designed for fitness enthusiasts who want to track their gym progress with precision and a touch of gamification. Built with a modern Android stack, it bridges the gap between raw data and rewarding achievement.
+</p>
 
 ---
 
@@ -48,19 +54,12 @@ com.reprush.app
 
 ---
 
-## 🗺 Roadmap & Documentation
-The full project documentation, including PRDs, Database Schema, and API Contracts, can be found in the [`.plan`](./.plan) folder:
+## 🗺 Documentation
+The core project documentation can be found in the [`.plan`](./.plan) folder:
 - [**Product Requirements (PRD)**](./.plan/01_PRD.docx)
 - [**Database Schema**](./.plan/02_Database_Schema.docx)
 - [**API Contract**](./.plan/03_API_Contract.docx)
 - [**Feature Scope**](./.plan/04_Scope_Feature_List.docx)
-- [**AI Pair-Programming Guide (AGENTS.md)**](./.plan/05_AGENTS.md)
-- [**Development Roadmap**](./.plan/06_Task_Roadmap.docx)
-
----
-
-## 🤝 Contribution Guidelines
-This project follows strict development standards. If you are using AI assistance, please refer to our [**AGENTS.md**](./.plan/05_AGENTS.md) for interaction rules and coding patterns.
 
 ---
 
