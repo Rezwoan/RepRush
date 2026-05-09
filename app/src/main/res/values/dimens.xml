@@ -1,0 +1,24 @@
+<resources>
+    <!-- Spacing -->
+    <dimen name="spacing_xs">4dp</dimen>
+    <dimen name="spacing_sm">8dp</dimen>
+    <dimen name="spacing_md">16dp</dimen>
+    <dimen name="spacing_lg">24dp</dimen>
+    <dimen name="spacing_xl">32dp</dimen>
+    <dimen name="spacing_xxl">48dp</dimen>
+
+    <!-- Shape -->
+    <dimen name="shape_xs">4dp</dimen>
+    <dimen name="shape_sm">8dp</dimen>
+    <dimen name="shape_md">12dp</dimen>
+    <dimen name="shape_lg">16dp</dimen>
+    <dimen name="shape_xl">24dp</dimen>
+
+    <!-- Component Sizes -->
+    <dimen name="avatar_sm">48dp</dimen>
+    <dimen name="avatar_md">80dp</dimen>
+    <dimen name="min_tap_target">48dp</dimen>
+    <dimen name="heatmap_cell_size">14dp</dimen>
+    <dimen name="exercise_image_height">120dp</dimen>
+    <dimen name="exercise_image_height_full">200dp</dimen>
+</resources>
