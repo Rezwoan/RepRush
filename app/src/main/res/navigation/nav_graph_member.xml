@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph_member"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/pendingFragment"
+        android:name="com.reprush.app.ui.auth.PendingFragment"
+        android:label="Pending" />
+
+    <fragment
+        android:id="@+id/statusBlockedFragment"
+        android:name="com.reprush.app.ui.auth.StatusBlockedFragment"
+        android:label="Blocked" />
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.reprush.app.ui.member.HomeFragment"
+        android:label="Home" />
+
+    <fragment
+        android:id="@+id/workoutFragment"
+        android:name="com.reprush.app.ui.member.WorkoutFragment"
+        android:label="Workout" />
+
+    <fragment
+        android:id="@+id/progressFragment"
+        android:name="com.reprush.app.ui.member.ProgressFragment"
+        android:label="Progress" />
+
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.reprush.app.ui.member.ProfileFragment"
+        android:label="Profile" />
+
+    <fragment
+        android:id="@+id/planGoalFragment"
+        android:name="com.reprush.app.ui.auth.onboarding.PlanGoalFragment"
+        android:label="Goal" />
+
+    <fragment
+        android:id="@+id/planDaysFragment"
+        android:name="com.reprush.app.ui.auth.onboarding.PlanDaysFragment"
+        android:label="Days" />
+
+    <fragment
+        android:id="@+id/planSplitFragment"
+        android:name="com.reprush.app.ui.auth.onboarding.PlanSplitFragment"
+        android:label="Split" />
+
+    <fragment
+        android:id="@+id/planDurationFragment"
+        android:name="com.reprush.app.ui.auth.onboarding.PlanDurationFragment"
+        android:label="Duration" />
+
+    <fragment
+        android:id="@+id/planEquipmentFragment"
+        android:name="com.reprush.app.ui.auth.onboarding.PlanEquipmentFragment"
+        android:label="Equipment" />
+
+    <fragment
+        android:id="@+id/planLevelFragment"
+        android:name="com.reprush.app.ui.auth.onboarding.PlanLevelFragment"
+        android:label="Level" />
+
+    <fragment
+        android:id="@+id/planWeeksFragment"
+        android:name="com.reprush.app.ui.auth.onboarding.PlanWeeksFragment"
+        android:label="Weeks" />
+
+    <fragment
+        android:id="@+id/planInjuriesFragment"
+        android:name="com.reprush.app.ui.auth.onboarding.PlanInjuriesFragment"
+        android:label="Injuries" />
+
+</navigation>
