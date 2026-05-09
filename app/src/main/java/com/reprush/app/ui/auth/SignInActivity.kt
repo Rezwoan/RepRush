@@ -28,10 +28,19 @@ class SignInActivity : AppCompatActivity() {
     ) { result ->
         val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
         try {
-            val account = task.getResult(Exception::class.java)
-            account.idToken?.let { viewModel.handleGoogleSignIn(it) }
-        } catch (e: Exception) {
-            showError("Sign-in cancelled")
+            val account = task.getResult(com.google.android.gms.common.api.ApiException::class.java)
+            val idToken = account.idToken
+            if (idToken != null) {
+                viewModel.handleGoogleSignIn(idToken)
+            } else {
+                showError("Failed to get ID token. Check SHA-1 in Firebase.")
+            }
+        } catch (e: com.google.android.gms.common.api.ApiException) {
+            when (e.statusCode) {
+                com.google.android.gms.auth.api.signin.GoogleSignInStatusCodes.SIGN_IN_CANCELLED -> showError("Sign-in cancelled")
+                com.google.android.gms.auth.api.signin.GoogleSignInStatusCodes.NETWORK_ERROR -> showError("No internet connection. Please try again.")
+                else -> showError("Sign-in failed. Code: ${e.statusCode}")
+            }
         }
     }
 
