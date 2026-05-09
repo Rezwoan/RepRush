@@ -58,7 +58,6 @@ com.reprush.app
 The core project documentation can be found in the [`.plan`](./.plan) folder:
 - [**Product Requirements (PRD)**](./.plan/01_PRD.docx)
 - [**Database Schema**](./.plan/02_Database_Schema.docx)
-- [**API Contract**](./.plan/03_API_Contract.docx)
 - [**Feature Scope**](./.plan/04_Scope_Feature_List.docx)
 
 ---
