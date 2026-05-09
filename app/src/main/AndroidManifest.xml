@@ -14,13 +14,21 @@
         android:theme="@style/Theme.RepRush">
 
         <activity
-            android:name=".ui.auth.AuthActivity"
+            android:name=".ui.auth.SignInActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".ui.admin.AdminActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.member.MemberActivity"
+            android:exported="false" />
 
         <activity
             android:name=".MainActivity"
