@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/adminDashboardFragment"
+        android:icon="@android:drawable/ic_menu_compass"
+        android:title="Dashboard" />
+
+    <item
+        android:id="@+id/memberDirectoryFragment"
+        android:icon="@android:drawable/ic_menu_myplaces"
+        android:title="Members" />
+
+    <item
+        android:id="@+id/paymentLogFragment"
+        android:icon="@android:drawable/ic_menu_agenda"
+        android:title="Payments" />
+
+    <item
+        android:id="@+id/adminSettingsFragment"
+        android:icon="@android:drawable/ic_menu_preferences"
+        android:title="Settings" />
+
+</menu>

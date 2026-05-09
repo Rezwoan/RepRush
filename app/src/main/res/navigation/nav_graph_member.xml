@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/nav_graph"
-    app:startDestination="@id/pendingFragment">
+    android:id="@+id/nav_graph_member"
+    app:startDestination="@id/homeFragment">
 
-    <!-- Auth -->
     <fragment
         android:id="@+id/pendingFragment"
         android:name="com.reprush.app.ui.auth.PendingFragment"
@@ -13,30 +12,8 @@
     <fragment
         android:id="@+id/statusBlockedFragment"
         android:name="com.reprush.app.ui.auth.StatusBlockedFragment"
-        android:label="Account Blocked" />
+        android:label="Blocked" />
 
-    <!-- Admin -->
-    <fragment
-        android:id="@+id/adminDashboardFragment"
-        android:name="com.reprush.app.ui.admin.AdminDashboardFragment"
-        android:label="Dashboard" />
-
-    <fragment
-        android:id="@+id/memberDirectoryFragment"
-        android:name="com.reprush.app.ui.admin.MemberDirectoryFragment"
-        android:label="Members" />
-
-    <fragment
-        android:id="@+id/paymentLogFragment"
-        android:name="com.reprush.app.ui.admin.PaymentLogFragment"
-        android:label="Payments" />
-
-    <fragment
-        android:id="@+id/adminSettingsFragment"
-        android:name="com.reprush.app.ui.admin.AdminSettingsFragment"
-        android:label="Settings" />
-
-    <!-- Member -->
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.reprush.app.ui.member.HomeFragment"

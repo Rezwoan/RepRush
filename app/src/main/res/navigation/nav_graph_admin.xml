@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph_admin"
+    app:startDestination="@id/adminDashboardFragment">
+
+    <fragment
+        android:id="@+id/adminDashboardFragment"
+        android:name="com.reprush.app.ui.admin.AdminDashboardFragment"
+        android:label="Dashboard" />
+
+    <fragment
+        android:id="@+id/memberDirectoryFragment"
+        android:name="com.reprush.app.ui.admin.MemberDirectoryFragment"
+        android:label="Members" />
+
+    <fragment
+        android:id="@+id/paymentLogFragment"
+        android:name="com.reprush.app.ui.admin.PaymentLogFragment"
+        android:label="Payments" />
+
+    <fragment
+        android:id="@+id/adminSettingsFragment"
+        android:name="com.reprush.app.ui.admin.AdminSettingsFragment"
+        android:label="Settings" />
+
+</navigation>
