@@ -7,7 +7,13 @@
     <fragment
         android:id="@+id/adminDashboardFragment"
         android:name="com.reprush.app.ui.admin.AdminDashboardFragment"
-        android:label="Dashboard" />
+        android:label="Dashboard">
+
+        <action
+            android:id="@+id/action_adminDashboardFragment_to_packageListFragment"
+            app:destination="@id/packageListFragment" />
+
+    </fragment>
 
     <fragment
         android:id="@+id/memberDirectoryFragment"
@@ -23,5 +29,21 @@
         android:id="@+id/adminSettingsFragment"
         android:name="com.reprush.app.ui.admin.AdminSettingsFragment"
         android:label="Settings" />
+
+    <fragment
+        android:id="@+id/packageListFragment"
+        android:name="com.reprush.app.ui.admin.packages.PackageListFragment"
+        android:label="Packages">
+
+        <action
+            android:id="@+id/action_packageListFragment_to_createPackageFragment"
+            app:destination="@id/createPackageFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/createPackageFragment"
+        android:name="com.reprush.app.ui.admin.packages.CreatePackageFragment"
+        android:label="Create Package" />
 
 </navigation>
