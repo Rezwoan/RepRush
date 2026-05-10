@@ -30,3 +30,4 @@ google-services.json
 /generated
 # Do NOT ignore Room schema exports
 !app/schemas/
+.claude/
