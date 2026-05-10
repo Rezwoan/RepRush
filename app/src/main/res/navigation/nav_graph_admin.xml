@@ -18,6 +18,10 @@
             android:id="@+id/action_adminDashboardFragment_to_pendingMembersFragment"
             app:destination="@id/pendingMembersFragment" />
 
+        <action
+            android:id="@+id/action_adminDashboardFragment_to_manualRegisterFragment"
+            app:destination="@id/manualRegisterFragment" />
+
     </fragment>
 
     <fragment
@@ -56,5 +60,11 @@
         android:name="com.reprush.app.ui.admin.members.PendingMembersFragment"
         android:label="Pending Registrations"
         tools:layout="@layout/fragment_pending_members" />
+
+    <fragment
+        android:id="@+id/manualRegisterFragment"
+        android:name="com.reprush.app.ui.admin.members.ManualRegisterFragment"
+        android:label="Register Member"
+        tools:layout="@layout/fragment_manual_register" />
 
 </navigation>

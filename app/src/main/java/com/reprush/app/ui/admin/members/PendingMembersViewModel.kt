@@ -73,4 +73,13 @@ class PendingMembersViewModel @Inject constructor(
             }
         }
     }
+
+    fun registerMemberManually(displayName: String, email: String, phone: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _isLoading.postValue(true)
+            val result = memberRepository.registerMemberManually(displayName, email, phone)
+            _operationResult.postValue(result)
+            _isLoading.postValue(false)
+        }
+    }
 }

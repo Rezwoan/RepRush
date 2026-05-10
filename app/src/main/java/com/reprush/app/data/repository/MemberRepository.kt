@@ -98,4 +98,31 @@ class MemberRepository @Inject constructor(
             Result.Error(e.message ?: "Failed to reject member")
         }
     }
+
+    suspend fun registerMemberManually(
+        displayName: String,
+        email: String,
+        phone: String
+    ): Result<Unit> = withContext(Dispatchers.IO) {
+        try {
+            val docRef = firestore.collection("users").document()
+            val newMember = hashMapOf(
+                "displayName" to displayName,
+                "email" to email,
+                "phone" to phone,
+                "photoUrl" to null,
+                "role" to "member",
+                "membershipStatus" to "pending",
+                "packageId" to null,
+                "membershipStartDate" to null,
+                "membershipEndDate" to null,
+                "onboardingComplete" to false,
+                "createdAt" to System.currentTimeMillis()
+            )
+            docRef.set(newMember).await()
+            Result.Success(Unit)
+        } catch (e: Exception) {
+            Result.Error(e.message ?: "Failed to register member")
+        }
+    }
 }
