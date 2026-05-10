@@ -22,12 +22,17 @@
             android:id="@+id/action_adminDashboardFragment_to_manualRegisterFragment"
             app:destination="@id/manualRegisterFragment" />
 
+        <action
+            android:id="@+id/action_adminDashboardFragment_to_memberDirectoryFragment"
+            app:destination="@id/memberDirectoryFragment" />
+
     </fragment>
 
     <fragment
         android:id="@+id/memberDirectoryFragment"
-        android:name="com.reprush.app.ui.admin.MemberDirectoryFragment"
-        android:label="Members" />
+        android:name="com.reprush.app.ui.admin.members.MemberDirectoryFragment"
+        android:label="Members"
+        tools:layout="@layout/fragment_member_directory" />
 
     <fragment
         android:id="@+id/paymentLogFragment"
@@ -66,5 +71,6 @@
         android:name="com.reprush.app.ui.admin.members.ManualRegisterFragment"
         android:label="Register Member"
         tools:layout="@layout/fragment_manual_register" />
+
 
 </navigation>
