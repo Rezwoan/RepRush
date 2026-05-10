@@ -3,69 +3,74 @@ package com.reprush.app.ui.auth
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import androidx.credentials.CredentialManager
+import androidx.credentials.CustomCredential
+import androidx.credentials.GetCredentialRequest
+import androidx.credentials.exceptions.GetCredentialCancellationException
+import androidx.credentials.exceptions.GetCredentialException
+import androidx.lifecycle.lifecycleScope
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.material.snackbar.Snackbar
 import com.reprush.app.R
 import com.reprush.app.databinding.ActivitySignInBinding
 import com.reprush.app.ui.admin.AdminActivity
 import com.reprush.app.ui.member.MemberActivity
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class SignInActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySignInBinding
-    private lateinit var googleSignInClient: GoogleSignInClient
+    private lateinit var credentialManager: CredentialManager
     private val viewModel: AuthViewModel by viewModels()
-
-    private val signInLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-        try {
-            val account = task.getResult(com.google.android.gms.common.api.ApiException::class.java)
-            val idToken = account.idToken
-            if (idToken != null) {
-                viewModel.handleGoogleSignIn(idToken)
-            } else {
-                showError("Failed to get ID token. Check SHA-1 in Firebase.")
-            }
-        } catch (e: com.google.android.gms.common.api.ApiException) {
-            when (e.statusCode) {
-                com.google.android.gms.auth.api.signin.GoogleSignInStatusCodes.SIGN_IN_CANCELLED -> showError("Sign-in cancelled")
-                com.google.android.gms.auth.api.signin.GoogleSignInStatusCodes.NETWORK_ERROR -> showError("No internet connection. Please try again.")
-                else -> showError("Sign-in failed. Code: ${e.statusCode}")
-            }
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySignInBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setupGoogleSignIn()
-        observeAuthState()
+        credentialManager = CredentialManager.create(this)
 
-        // Check if already signed in
+        observeAuthState()
         viewModel.checkCurrentUser()
 
         binding.buttonGoogleSignIn.setOnClickListener {
-            signInLauncher.launch(googleSignInClient.signInIntent)
+            launchGoogleSignIn()
         }
     }
 
-    private fun setupGoogleSignIn() {
-        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(getString(R.string.default_web_client_id))
-            .requestEmail()
+    private fun launchGoogleSignIn() {
+        val googleIdOption = GetGoogleIdOption.Builder()
+            .setServerClientId(getString(R.string.default_web_client_id))
+            .setFilterByAuthorizedAccounts(false)
             .build()
-        googleSignInClient = GoogleSignIn.getClient(this, gso)
+
+        val request = GetCredentialRequest.Builder()
+            .addCredentialOption(googleIdOption)
+            .build()
+
+        lifecycleScope.launch {
+            try {
+                val result = credentialManager.getCredential(this@SignInActivity, request)
+                val credential = result.credential
+                if (credential is CustomCredential &&
+                    credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
+                ) {
+                    val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
+                    viewModel.handleGoogleSignIn(googleIdTokenCredential.idToken)
+                } else {
+                    showError("Unexpected credential type")
+                }
+            } catch (_: GetCredentialCancellationException) {
+                showError("Sign-in cancelled")
+            } catch (e: GetCredentialException) {
+                showError("Sign-in failed: ${e.message}")
+            }
+        }
     }
 
     private fun observeAuthState() {
