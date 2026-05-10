@@ -4,6 +4,10 @@ Thumbs.db
 # Android Studio IDE files
 *.iml
 .idea/*
+.claude/*
+.claude
+/claude
+*claude
 !.idea/modules.xml
 !.idea/runConfigurations/
 # Android build outputs and intermediates
