@@ -10,6 +10,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
+import com.reprush.app.data.repository.Result
 import com.reprush.app.databinding.FragmentPendingMembersBinding
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -77,6 +78,23 @@ class PendingMembersFragment : Fragment() {
             }
         }
 
+        // Null-safe observer — only reacts when result is non-null
+        viewModel.operationResult.observe(viewLifecycleOwner) { result ->
+            result ?: return@observe
+            when (result) {
+                is Result.Success -> {
+                    Snackbar.make(binding.root, "Action completed", Snackbar.LENGTH_SHORT).show()
+                }
+                is Result.Error -> {
+                    Snackbar.make(binding.root, result.message, Snackbar.LENGTH_LONG).show()
+                }
+            }
+            viewModel.clearOperationResult()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
         viewModel.loadPendingMembers()
     }
 

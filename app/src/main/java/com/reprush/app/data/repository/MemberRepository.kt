@@ -73,12 +73,12 @@ class MemberRepository @Inject constructor(
     suspend fun approveMember(
         uid: String,
         packageId: String,
+        startDate: String,
         packageDurationDays: Int
     ): Result<Unit> = withContext(Dispatchers.IO) {
         try {
-            val today = java.time.LocalDate.now()
-            val startDate = today.toString()                                // yyyy-MM-dd
-            val endDate = today.plusDays(packageDurationDays.toLong()).toString()
+            val start = java.time.LocalDate.parse(startDate)
+            val endDate = start.plusDays(packageDurationDays.toLong()).toString()
 
             firestore.collection("users").document(uid).update(
                 mapOf(

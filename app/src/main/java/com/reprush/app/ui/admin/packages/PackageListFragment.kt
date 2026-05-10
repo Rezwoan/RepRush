@@ -67,6 +67,7 @@ class PackageListFragment : Fragment() {
         }
 
         viewModel.operationResult.observe(viewLifecycleOwner) { result ->
+            result ?: return@observe
             if (result is Result.Error) {
                 binding.progressBarPackages.visibility = View.GONE
                 Snackbar.make(binding.root, result.message, Snackbar.LENGTH_LONG).show()

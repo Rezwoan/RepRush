@@ -19,6 +19,7 @@ class CreatePackageFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: PackageViewModel by activityViewModels()
+    private var isSubmitting = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -72,13 +73,17 @@ class CreatePackageFragment : Fragment() {
 
         binding.progressBarSavePackage.visibility = View.VISIBLE
         binding.buttonSavePackage.isEnabled = false
+        isSubmitting = true
         viewModel.createPackage(name, price!!, duration!!, description)
     }
 
     private fun observeViewModel() {
         viewModel.operationResult.observe(viewLifecycleOwner) { result ->
+            result ?: return@observe
+            if (!isSubmitting) return@observe
             when (result) {
                 is Result.Success<*> -> {
+                    viewModel.clearOperationResult()
                     Snackbar.make(
                         requireActivity().findViewById(android.R.id.content),
                         "Package created successfully",
@@ -89,6 +94,8 @@ class CreatePackageFragment : Fragment() {
                 is Result.Error -> {
                     binding.progressBarSavePackage.visibility = View.GONE
                     binding.buttonSavePackage.isEnabled = true
+                    isSubmitting = false
+                    viewModel.clearOperationResult()
                     Snackbar.make(binding.root, result.message, Snackbar.LENGTH_LONG).show()
                 }
             }

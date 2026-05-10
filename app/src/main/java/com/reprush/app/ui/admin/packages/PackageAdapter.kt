@@ -39,7 +39,7 @@ class PackageAdapter(
                 binding.textViewPackageDescription.text = pkg.description
             }
 
-            if (pkg.isActive) {
+            if (pkg.active) {
                 binding.chipPackageStatus.text = "Active"
                 binding.chipPackageStatus.chipBackgroundColor =
                     ColorStateList.valueOf(Color.parseColor("#4CAF50"))

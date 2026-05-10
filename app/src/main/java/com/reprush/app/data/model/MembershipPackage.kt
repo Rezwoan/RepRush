@@ -6,6 +6,6 @@ data class MembershipPackage(
     val price: Double = 0.0,
     val durationDays: Int = 0,
     val description: String? = null,
-    val isActive: Boolean = true,
+    val active: Boolean = true,
     val createdAt: Long = 0L
 )

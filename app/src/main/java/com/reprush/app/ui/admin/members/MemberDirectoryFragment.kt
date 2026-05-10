@@ -11,6 +11,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
+import com.reprush.app.R
 import com.reprush.app.databinding.FragmentMemberDirectoryBinding
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -37,9 +38,12 @@ class MemberDirectoryFragment : Fragment() {
             findNavController().navigateUp()
         }
 
-        // Adapter
         adapter = MemberAdapter { member ->
-            // TODO: Step 11 — navigate to MemberDetailFragment with member uid
+            val bundle = Bundle().apply { putString("memberUid", member.uid) }
+            findNavController().navigate(
+                R.id.action_memberDirectoryFragment_to_memberDetailFragment,
+                bundle
+            )
         }
         binding.recyclerViewMembers.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerViewMembers.adapter = adapter
@@ -53,7 +57,7 @@ class MemberDirectoryFragment : Fragment() {
             override fun afterTextChanged(s: Editable?) {}
         })
 
-        // Filter chips — single select behaviour
+        // Filter chips
         val chipMap = mapOf(
             binding.chipFilterAll       to "all",
             binding.chipFilterActive    to "active",
@@ -69,7 +73,7 @@ class MemberDirectoryFragment : Fragment() {
             }
         }
 
-        // Clear filters button in empty state
+        // Clear filters
         binding.buttonClearFilters.setOnClickListener {
             binding.editTextSearchMembers.setText("")
             chipMap.keys.forEach { it.isChecked = false }
@@ -79,8 +83,9 @@ class MemberDirectoryFragment : Fragment() {
 
         // FAB
         binding.fabRegisterMember.setOnClickListener {
-            // TODO: Step 11 nav graph — navigate to ManualRegisterFragment
-            // findNavController().navigate(R.id.action_memberDirectoryFragment_to_manualRegisterFragment)
+            findNavController().navigate(
+                R.id.action_memberDirectoryFragment_to_manualRegisterFragment
+            )
         }
 
         // Observers

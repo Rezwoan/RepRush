@@ -26,14 +26,20 @@ class PendingMembersViewModel @Inject constructor(
     private val _error = MutableLiveData<String?>()
     val error: LiveData<String?> = _error
 
+    // Null means "no pending result" — consumers set it back to null after handling
+    private val _operationResult = MutableLiveData<Result<Unit>?>(null)
+    val operationResult: LiveData<Result<Unit>?> = _operationResult
+
+    fun clearOperationResult() {
+        _operationResult.postValue(null)
+    }
+
     fun loadPendingMembers() {
         viewModelScope.launch(Dispatchers.IO) {
             _isLoading.postValue(true)
             _error.postValue(null)
             when (val result = memberRepository.getPendingMembers()) {
-                is Result.Success -> {
-                    _pendingMembers.postValue(result.data)
-                }
+                is Result.Success -> _pendingMembers.postValue(result.data)
                 is Result.Error -> {
                     _error.postValue(result.message)
                     _pendingMembers.postValue(emptyList())
@@ -43,16 +49,12 @@ class PendingMembersViewModel @Inject constructor(
         }
     }
 
-    private val _operationResult = MutableLiveData<Result<Unit>>()
-    val operationResult: LiveData<Result<Unit>> = _operationResult
-
-    fun approveMember(uid: String, packageId: String, packageDurationDays: Int) {
+    fun approveMember(uid: String, packageId: String, startDate: String, packageDurationDays: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             _isLoading.postValue(true)
-            val result = memberRepository.approveMember(uid, packageId, packageDurationDays)
+            val result = memberRepository.approveMember(uid, packageId, startDate, packageDurationDays)
             _operationResult.postValue(result)
             if (result is Result.Success) {
-                // Refresh the list so approved member disappears
                 loadPendingMembers()
             } else {
                 _isLoading.postValue(false)
@@ -66,7 +68,6 @@ class PendingMembersViewModel @Inject constructor(
             val result = memberRepository.rejectMember(uid)
             _operationResult.postValue(result)
             if (result is Result.Success) {
-                // Refresh the list so rejected member disappears
                 loadPendingMembers()
             } else {
                 _isLoading.postValue(false)
