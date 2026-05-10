@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph_admin"
     app:startDestination="@id/adminDashboardFragment">
 
@@ -12,6 +13,10 @@
         <action
             android:id="@+id/action_adminDashboardFragment_to_packageListFragment"
             app:destination="@id/packageListFragment" />
+
+        <action
+            android:id="@+id/action_adminDashboardFragment_to_pendingMembersFragment"
+            app:destination="@id/pendingMembersFragment" />
 
     </fragment>
 
@@ -45,5 +50,11 @@
         android:id="@+id/createPackageFragment"
         android:name="com.reprush.app.ui.admin.packages.CreatePackageFragment"
         android:label="Create Package" />
+
+    <fragment
+        android:id="@+id/pendingMembersFragment"
+        android:name="com.reprush.app.ui.admin.members.PendingMembersFragment"
+        android:label="Pending Registrations"
+        tools:layout="@layout/fragment_pending_members" />
 
 </navigation>
