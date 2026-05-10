@@ -16,6 +16,17 @@ data class PendingMember(
     val createdAt: Long = 0L
 )
 
+data class Member(
+    val uid: String = "",
+    val displayName: String = "",
+    val email: String = "",
+    val photoUrl: String? = null,
+    val membershipStatus: String = "pending",
+    val packageId: String? = null,
+    val membershipEndDate: String? = null,
+    val createdAt: Long = 0L
+)
+
 @Singleton
 class MemberRepository @Inject constructor(
     private val firestore: FirebaseFirestore
@@ -123,6 +134,38 @@ class MemberRepository @Inject constructor(
             Result.Success(Unit)
         } catch (e: Exception) {
             Result.Error(e.message ?: "Failed to register member")
+        }
+    }
+
+    suspend fun getMembers(statusFilter: String? = null): Result<List<Member>> = withContext(Dispatchers.IO) {
+        try {
+            val query = if (statusFilter == null || statusFilter == "all") {
+                firestore.collection("users")
+                    .whereEqualTo("role", "member")
+                    .orderBy("displayName", Query.Direction.ASCENDING)
+            } else {
+                firestore.collection("users")
+                    .whereEqualTo("role", "member")
+                    .whereEqualTo("membershipStatus", statusFilter)
+                    .orderBy("displayName", Query.Direction.ASCENDING)
+            }
+
+            val snapshot = query.get().await()
+            val members = snapshot.documents.map { doc ->
+                Member(
+                    uid = doc.id,
+                    displayName = doc.getString("displayName") ?: "",
+                    email = doc.getString("email") ?: "",
+                    photoUrl = doc.getString("photoUrl"),
+                    membershipStatus = doc.getString("membershipStatus") ?: "pending",
+                    packageId = doc.getString("packageId"),
+                    membershipEndDate = doc.getString("membershipEndDate"),
+                    createdAt = doc.getLong("createdAt") ?: 0L
+                )
+            }
+            Result.Success(members)
+        } catch (e: Exception) {
+            Result.Error(e.message ?: "Failed to fetch members")
         }
     }
 }
