@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.reprush.app.data.repository.MemberDetail
 import com.reprush.app.data.repository.MemberRepository
+import com.reprush.app.data.repository.PackageRepository
 import com.reprush.app.data.repository.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -14,7 +15,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MemberDetailViewModel @Inject constructor(
-    private val memberRepository: MemberRepository
+    private val memberRepository: MemberRepository,
+    private val packageRepository: PackageRepository
 ) : ViewModel() {
 
     private val _member = MutableLiveData<MemberDetail>()
@@ -33,7 +35,16 @@ class MemberDetailViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             _isLoading.postValue(true)
             when (val result = memberRepository.getMemberById(uid)) {
-                is Result.Success -> _member.postValue(result.data)
+                is Result.Success -> {
+                    val memberData = result.data
+                    val pkgName = memberData.packageId?.let { pkgId ->
+                        when (val pkgResult = packageRepository.getPackageById(pkgId)) {
+                            is Result.Success -> pkgResult.data.name
+                            is Result.Error -> null
+                        }
+                    }
+                    _member.postValue(memberData.copy(packageName = pkgName))
+                }
                 is Result.Error -> _error.postValue(result.message)
             }
             _isLoading.postValue(false)

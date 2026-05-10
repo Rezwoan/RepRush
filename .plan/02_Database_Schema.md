@@ -30,7 +30,7 @@ Locally cached user profile. Populated from Firestore on login. Contains records
 | primaryGoal | TEXT | NULLABLE | Strength / Hypertrophy / Fat Loss / Endurance / General |
 | availableEquipment | TEXT | NULLABLE | Full Gym / Barbell+DB / DB Only / Bodyweight |
 | injuries | TEXT | NULLABLE | Free text injury and restriction notes |
-| membershipStatus | TEXT | NOT NULL DEFAULT 'pending' | pending / active / expired / suspended |
+| membershipStatus | TEXT | NOT NULL DEFAULT 'pending' | pending / active / expired / suspended / rejected |
 | packageId | TEXT | NULLABLE FK | Currently assigned membership package ID |
 | membershipStartDate | TEXT | NULLABLE | yyyy-MM-dd of current period start |
 | membershipEndDate | TEXT | NULLABLE | yyyy-MM-dd of current period expiry |

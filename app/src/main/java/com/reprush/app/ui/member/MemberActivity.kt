@@ -2,6 +2,9 @@ package com.reprush.app.ui.member
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.reprush.app.R
@@ -17,6 +20,15 @@ class MemberActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMemberBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, windowInsets ->
+            val bars = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout()
+            )
+            binding.navHostMember.updatePadding(top = bars.top)
+            binding.bottomNavMember.updatePadding(bottom = bars.bottom)
+            WindowInsetsCompat.CONSUMED
+        }
 
         val pending = intent.getBooleanExtra("pending", false)
         val blocked = intent.getBooleanExtra("blocked", false)
