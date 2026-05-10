@@ -42,4 +42,35 @@ class PendingMembersViewModel @Inject constructor(
             _isLoading.postValue(false)
         }
     }
+
+    private val _operationResult = MutableLiveData<Result<Unit>>()
+    val operationResult: LiveData<Result<Unit>> = _operationResult
+
+    fun approveMember(uid: String, packageId: String, packageDurationDays: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _isLoading.postValue(true)
+            val result = memberRepository.approveMember(uid, packageId, packageDurationDays)
+            _operationResult.postValue(result)
+            if (result is Result.Success) {
+                // Refresh the list so approved member disappears
+                loadPendingMembers()
+            } else {
+                _isLoading.postValue(false)
+            }
+        }
+    }
+
+    fun rejectMember(uid: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _isLoading.postValue(true)
+            val result = memberRepository.rejectMember(uid)
+            _operationResult.postValue(result)
+            if (result is Result.Success) {
+                // Refresh the list so rejected member disappears
+                loadPendingMembers()
+            } else {
+                _isLoading.postValue(false)
+            }
+        }
+    }
 }
