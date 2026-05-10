@@ -59,11 +59,11 @@ class MemberDirectoryFragment : Fragment() {
 
         // Filter chips
         val chipMap = mapOf(
-            binding.chipFilterAll       to "all",
             binding.chipFilterActive    to "active",
             binding.chipFilterPending   to "pending",
             binding.chipFilterExpired   to "expired",
-            binding.chipFilterSuspended to "suspended"
+            binding.chipFilterSuspended to "suspended",
+            binding.chipFilterRejected  to "rejected"
         )
         chipMap.forEach { (chip, status) ->
             chip.setOnClickListener {
@@ -77,8 +77,8 @@ class MemberDirectoryFragment : Fragment() {
         binding.buttonClearFilters.setOnClickListener {
             binding.editTextSearchMembers.setText("")
             chipMap.keys.forEach { it.isChecked = false }
-            binding.chipFilterAll.isChecked = true
-            viewModel.onStatusFilterChanged("all")
+            binding.chipFilterActive.isChecked = true
+            viewModel.onStatusFilterChanged("active")
         }
 
         // FAB

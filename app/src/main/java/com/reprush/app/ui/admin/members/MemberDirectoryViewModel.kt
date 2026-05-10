@@ -28,10 +28,10 @@ class MemberDirectoryViewModel @Inject constructor(
     private val _error = MutableLiveData<String?>()
     val error: LiveData<String?> = _error
 
-    private var currentStatusFilter: String = "all"
+    private var currentStatusFilter: String = "active"
     private var currentSearchQuery: String = ""
 
-    fun loadMembers(statusFilter: String = "all") {
+    fun loadMembers(statusFilter: String = "active") {
         currentStatusFilter = statusFilter
         viewModelScope.launch(Dispatchers.IO) {
             _isLoading.postValue(true)

@@ -49,20 +49,12 @@
                 android:gravity="center_vertical">
 
                 <com.google.android.material.chip.Chip
-                    android:id="@+id/chip_filterAll"
-                    style="@style/Widget.Material3.Chip.Filter"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:checked="true"
-                    android:text="All" />
-
-                <com.google.android.material.chip.Chip
                     android:id="@+id/chip_filterActive"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
+                    android:checked="true"
                     android:text="Active" />
 
                 <com.google.android.material.chip.Chip
@@ -86,7 +78,15 @@
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
                     android:text="Suspended" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_filterRejected"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Rejected" />
 
             </LinearLayout>
 
