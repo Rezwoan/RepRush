@@ -19,6 +19,7 @@ class ManualRegisterFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: PendingMembersViewModel by activityViewModels()
+    private var isSubmitting = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -62,14 +63,21 @@ class ManualRegisterFragment : Fragment() {
 
             binding.progressBarRegister.visibility = View.VISIBLE
             binding.buttonRegisterMember.isEnabled = false
-
+            isSubmitting = true
             viewModel.registerMemberManually(name, email, phone)
         }
 
         viewModel.operationResult.observe(viewLifecycleOwner) { result ->
+            result ?: return@observe
+            if (!isSubmitting) return@observe
             when (result) {
                 is Result.Success -> {
-                    Snackbar.make(binding.root, "Member registered successfully", Snackbar.LENGTH_SHORT).show()
+                    viewModel.clearOperationResult()
+                    Snackbar.make(
+                        binding.root,
+                        "Member registered successfully",
+                        Snackbar.LENGTH_SHORT
+                    ).show()
                     findNavController().navigateUp()
                 }
                 is Result.Error -> {
@@ -81,11 +89,13 @@ class ManualRegisterFragment : Fragment() {
         }
 
         viewModel.isLoading.observe(viewLifecycleOwner) { loading ->
+            if (!isSubmitting) return@observe
             binding.progressBarRegister.visibility = if (loading) View.VISIBLE else View.GONE
         }
     }
 
     override fun onDestroyView() {
+        viewModel.clearOperationResult()
         super.onDestroyView()
         _binding = null
     }

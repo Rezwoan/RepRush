@@ -23,8 +23,12 @@ class PackageViewModel @Inject constructor(
     private val _activePackages = MutableLiveData<List<MembershipPackage>>()
     val activePackages: LiveData<List<MembershipPackage>> = _activePackages
 
-    private val _operationResult = MutableLiveData<Result<*>>()
-    val operationResult: LiveData<Result<*>> = _operationResult
+    private val _operationResult = MutableLiveData<Result<*>?>(null)
+    val operationResult: LiveData<Result<*>?> = _operationResult
+
+    fun clearOperationResult() {
+        _operationResult.postValue(null)
+    }
 
     fun loadPackages() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -32,7 +36,6 @@ class PackageViewModel @Inject constructor(
             if (result is Result.Success) {
                 _packages.postValue(result.data)
             }
-            _operationResult.postValue(result)
         }
     }
 
@@ -42,7 +45,6 @@ class PackageViewModel @Inject constructor(
             if (result is Result.Success) {
                 _activePackages.postValue(result.data)
             }
-            _operationResult.postValue(result)
         }
     }
 

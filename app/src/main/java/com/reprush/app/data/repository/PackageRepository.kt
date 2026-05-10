@@ -21,9 +21,13 @@ class PackageRepository @Inject constructor(
 
     suspend fun getActivePackages(): Result<List<MembershipPackage>> = withContext(Dispatchers.IO) {
         try {
-            val snapshot = collection.whereEqualTo("isActive", true).get().await()
-            val packages = snapshot.documents.map { doc ->
-                doc.toObject(MembershipPackage::class.java)!!.copy(id = doc.id)
+            val snapshot = collection.whereEqualTo("active", true).get().await()
+            val packages = snapshot.documents.mapNotNull { doc ->
+                try {
+                    doc.toObject(MembershipPackage::class.java)?.copy(id = doc.id)
+                } catch (e: Exception) {
+                    null
+                }
             }
             Result.Success(packages)
         } catch (e: Exception) {
@@ -34,8 +38,12 @@ class PackageRepository @Inject constructor(
     suspend fun getAllPackages(): Result<List<MembershipPackage>> = withContext(Dispatchers.IO) {
         try {
             val snapshot = collection.get().await()
-            val packages = snapshot.documents.map { doc ->
-                doc.toObject(MembershipPackage::class.java)!!.copy(id = doc.id)
+            val packages = snapshot.documents.mapNotNull { doc ->
+                try {
+                    doc.toObject(MembershipPackage::class.java)?.copy(id = doc.id)
+                } catch (e: Exception) {
+                    null
+                }
             }
             Result.Success(packages)
         } catch (e: Exception) {
@@ -71,7 +79,7 @@ class PackageRepository @Inject constructor(
 
     suspend fun deactivatePackage(packageId: String): Result<Unit> = withContext(Dispatchers.IO) {
         try {
-            collection.document(packageId).update("isActive", false).await()
+            collection.document(packageId).update("active", false).await()
             Result.Success(Unit)
         } catch (e: Exception) {
             Result.Error(e.message ?: "Failed to deactivate package")

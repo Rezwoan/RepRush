@@ -31,6 +31,7 @@ class ApprovalBottomSheet : BottomSheetDialogFragment() {
     private var selectedPackage: MembershipPackage? = null
     private var selectedStartDate: LocalDate = LocalDate.now()
     private val displayFormat = SimpleDateFormat("MMM d, yyyy", Locale.getDefault())
+    private var hasSubmitted = false
 
     companion object {
         private const val ARG_UID = "uid"
@@ -60,14 +61,20 @@ class ApprovalBottomSheet : BottomSheetDialogFragment() {
         val memberName = arguments?.getString(ARG_NAME) ?: ""
 
         binding.textViewApprovalMemberName.text = "Approving: $memberName"
-
-        // Set default start date to today
         binding.editTextStartDate.setText(displayFormat.format(Date()))
+        binding.buttonConfirmApproval.isEnabled = false
 
-        // Load active packages into dropdown
-        packageViewModel.loadActivePackages()
+        // Observer must be registered before the load call so it catches the emission
         packageViewModel.activePackages.observe(viewLifecycleOwner) { packages ->
-            val packageNames = packages.map { it.name }
+            android.util.Log.d("ApprovalSheet", "Packages loaded: ${packages?.size ?: 0}")
+            if (packages.isNullOrEmpty()) {
+                binding.layoutPackageSelector.error = "No packages available. Create a package first."
+                binding.buttonConfirmApproval.isEnabled = false
+                return@observe
+            }
+            binding.layoutPackageSelector.error = null
+
+            val packageNames = packages.map { "${it.name} — ${it.durationDays} days" }
             val adapter = ArrayAdapter(
                 requireContext(),
                 android.R.layout.simple_dropdown_item_1line,
@@ -76,16 +83,20 @@ class ApprovalBottomSheet : BottomSheetDialogFragment() {
             binding.editTextSelectPackage.setAdapter(adapter)
             binding.editTextSelectPackage.setOnItemClickListener { _, _, position, _ ->
                 selectedPackage = packages[position]
+                binding.layoutPackageSelector.error = null
                 updateCoveragePreview()
                 binding.buttonConfirmApproval.isEnabled = true
             }
         }
 
+        // Load packages fresh every time the sheet opens (after observer is set up)
+        packageViewModel.loadActivePackages()
+
         // Date picker
         binding.editTextStartDate.setOnClickListener { showDatePicker() }
         binding.layoutStartDate.setEndIconOnClickListener { showDatePicker() }
 
-        // Confirm
+        // Confirm button
         binding.buttonConfirmApproval.setOnClickListener {
             val pkg = selectedPackage
             if (pkg == null) {
@@ -95,19 +106,25 @@ class ApprovalBottomSheet : BottomSheetDialogFragment() {
             binding.layoutPackageSelector.error = null
             binding.progressBarApproval.visibility = View.VISIBLE
             binding.buttonConfirmApproval.isEnabled = false
-            pendingViewModel.approveMember(uid, pkg.id, pkg.durationDays)
+            hasSubmitted = true
+            pendingViewModel.clearOperationResult()
+            pendingViewModel.approveMember(uid, pkg.id, selectedStartDate.toString(), pkg.durationDays)
         }
 
-        // Observe result
+        // Only react to results after user has submitted
         pendingViewModel.operationResult.observe(viewLifecycleOwner) { result ->
+            result ?: return@observe
+            if (!hasSubmitted) return@observe
             when (result) {
                 is Result.Success -> {
+                    pendingViewModel.clearOperationResult()
                     dismiss()
                 }
                 is Result.Error -> {
                     binding.progressBarApproval.visibility = View.GONE
                     binding.buttonConfirmApproval.isEnabled = true
                     Snackbar.make(binding.root, result.message, Snackbar.LENGTH_LONG).show()
+                    pendingViewModel.clearOperationResult()
                 }
             }
         }
