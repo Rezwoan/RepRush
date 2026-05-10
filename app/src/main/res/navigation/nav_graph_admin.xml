@@ -1,18 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph_admin"
     app:startDestination="@id/adminDashboardFragment">
 
     <fragment
         android:id="@+id/adminDashboardFragment"
         android:name="com.reprush.app.ui.admin.AdminDashboardFragment"
-        android:label="Dashboard" />
+        android:label="Dashboard">
+
+        <action
+            android:id="@+id/action_adminDashboardFragment_to_packageListFragment"
+            app:destination="@id/packageListFragment" />
+
+        <action
+            android:id="@+id/action_adminDashboardFragment_to_pendingMembersFragment"
+            app:destination="@id/pendingMembersFragment" />
+
+        <action
+            android:id="@+id/action_adminDashboardFragment_to_manualRegisterFragment"
+            app:destination="@id/manualRegisterFragment" />
+
+        <action
+            android:id="@+id/action_adminDashboardFragment_to_memberDirectoryFragment"
+            app:destination="@id/memberDirectoryFragment" />
+
+    </fragment>
 
     <fragment
         android:id="@+id/memberDirectoryFragment"
-        android:name="com.reprush.app.ui.admin.MemberDirectoryFragment"
-        android:label="Members" />
+        android:name="com.reprush.app.ui.admin.members.MemberDirectoryFragment"
+        android:label="Members"
+        tools:layout="@layout/fragment_member_directory">
+
+        <action
+            android:id="@+id/action_memberDirectoryFragment_to_memberDetailFragment"
+            app:destination="@id/memberDetailFragment" />
+
+        <action
+            android:id="@+id/action_memberDirectoryFragment_to_manualRegisterFragment"
+            app:destination="@id/manualRegisterFragment" />
+
+    </fragment>
+
 
     <fragment
         android:id="@+id/paymentLogFragment"
@@ -23,5 +54,40 @@
         android:id="@+id/adminSettingsFragment"
         android:name="com.reprush.app.ui.admin.AdminSettingsFragment"
         android:label="Settings" />
+
+    <fragment
+        android:id="@+id/packageListFragment"
+        android:name="com.reprush.app.ui.admin.packages.PackageListFragment"
+        android:label="Packages">
+
+        <action
+            android:id="@+id/action_packageListFragment_to_createPackageFragment"
+            app:destination="@id/createPackageFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/createPackageFragment"
+        android:name="com.reprush.app.ui.admin.packages.CreatePackageFragment"
+        android:label="Create Package" />
+
+    <fragment
+        android:id="@+id/pendingMembersFragment"
+        android:name="com.reprush.app.ui.admin.members.PendingMembersFragment"
+        android:label="Pending Registrations"
+        tools:layout="@layout/fragment_pending_members" />
+
+    <fragment
+        android:id="@+id/manualRegisterFragment"
+        android:name="com.reprush.app.ui.admin.members.ManualRegisterFragment"
+        android:label="Register Member"
+        tools:layout="@layout/fragment_manual_register" />
+
+    <fragment
+        android:id="@+id/memberDetailFragment"
+        android:name="com.reprush.app.ui.admin.members.MemberDetailFragment"
+        android:label="Member Profile"
+        tools:layout="@layout/fragment_member_detail" />
+
 
 </navigation>

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/card_member"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="8dp"
+    android:layout_marginVertical="4dp"
+    android:clickable="true"
+    android:focusable="true"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="12dp">
+
+        <!-- Avatar -->
+        <ImageView
+            android:id="@+id/imageView_memberAvatar"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:contentDescription="Member avatar"
+            android:src="@android:drawable/ic_menu_myplaces"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Name -->
+        <TextView
+            android:id="@+id/textView_memberName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textAppearance="?attr/textAppearanceTitleMedium"
+            app:layout_constraintEnd_toStartOf="@id/chip_memberStatus"
+            app:layout_constraintStart_toEndOf="@id/imageView_memberAvatar"
+            app:layout_constraintTop_toTopOf="@id/imageView_memberAvatar"
+            tools:text="Aryan Khan" />
+
+        <!-- Package name -->
+        <TextView
+            android:id="@+id/textView_memberPackage"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textAppearance="?attr/textAppearanceBodyMedium"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            app:layout_constraintEnd_toStartOf="@id/chip_memberStatus"
+            app:layout_constraintStart_toEndOf="@id/imageView_memberAvatar"
+            app:layout_constraintTop_toBottomOf="@id/textView_memberName"
+            tools:text="Monthly Basic" />
+
+        <!-- Status chip -->
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_memberStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="false"
+            android:focusable="false"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/imageView_memberChevron"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Active" />
+
+        <!-- Chevron -->
+        <ImageView
+            android:id="@+id/imageView_memberChevron"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:contentDescription="View member details"
+            app:srcCompat="@drawable/ic_chevron_right"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="?attr/colorOnSurfaceVariant" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>
