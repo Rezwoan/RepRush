@@ -108,7 +108,7 @@ class MemberDetailFragment : Fragment() {
         binding.chipDetailStatus.setTextColor(Color.WHITE)
 
         // Membership info
-        binding.textViewPackageName.text = member.packageId ?: "No package assigned"
+        binding.textViewPackageName.text = member.packageName ?: "No package assigned"
         binding.textViewMembershipStart.text =
             if (member.membershipStartDate != null) "Start: ${member.membershipStartDate}" else "Start: —"
         binding.textViewMembershipEnd.text =

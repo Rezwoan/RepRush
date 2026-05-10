@@ -30,7 +30,7 @@ class MemberAdapter(
 
         fun bind(member: Member) {
             binding.textViewMemberName.text = member.displayName
-            binding.textViewMemberPackage.text = member.packageId ?: "No package assigned"
+            binding.textViewMemberPackage.text = member.packageName ?: "No package assigned"
 
             // Status chip text and color
             val (statusLabel, chipColor, textColor) = when (member.membershipStatus) {

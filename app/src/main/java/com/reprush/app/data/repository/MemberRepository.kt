@@ -23,6 +23,7 @@ data class Member(
     val photoUrl: String? = null,
     val membershipStatus: String = "pending",
     val packageId: String? = null,
+    val packageName: String? = null,
     val membershipEndDate: String? = null,
     val createdAt: Long = 0L
 )
@@ -34,6 +35,7 @@ data class MemberDetail(
     val photoUrl: String? = null,
     val membershipStatus: String = "pending",
     val packageId: String? = null,
+    val packageName: String? = null,
     val membershipStartDate: String? = null,
     val membershipEndDate: String? = null,
     val createdAt: Long = 0L,
