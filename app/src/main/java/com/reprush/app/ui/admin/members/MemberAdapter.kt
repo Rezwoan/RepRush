@@ -30,7 +30,7 @@ class MemberAdapter(
 
         fun bind(member: Member) {
             binding.textViewMemberName.text = member.displayName
-            binding.textViewMemberPackage.text = member.packageId ?: "No package assigned"
+            binding.textViewMemberPackage.text = member.packageName ?: "No package assigned"
 
             // Status chip text and color
             val (statusLabel, chipColor, textColor) = when (member.membershipStatus) {
@@ -38,6 +38,7 @@ class MemberAdapter(
                 "expired"   -> Triple("Expired",   "#F44336", "#FFFFFF")
                 "suspended" -> Triple("Suspended", "#FF9800", "#FFFFFF")
                 "pending"   -> Triple("Pending",   "#2196F3", "#FFFFFF")
+                "rejected"  -> Triple("Rejected",  "#757575", "#FFFFFF")
                 else        -> Triple("Unknown",   "#9E9E9E", "#FFFFFF")
             }
             binding.chipMemberStatus.text = statusLabel

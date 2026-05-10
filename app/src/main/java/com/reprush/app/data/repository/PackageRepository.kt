@@ -51,6 +51,18 @@ class PackageRepository @Inject constructor(
         }
     }
 
+    suspend fun getPackageById(id: String): Result<MembershipPackage> = withContext(Dispatchers.IO) {
+        try {
+            val doc = collection.document(id).get().await()
+            if (!doc.exists()) return@withContext Result.Error("Package not found")
+            val pkg = doc.toObject(MembershipPackage::class.java)?.copy(id = doc.id)
+                ?: return@withContext Result.Error("Failed to parse package")
+            Result.Success(pkg)
+        } catch (e: Exception) {
+            Result.Error(e.message ?: "Failed to load package")
+        }
+    }
+
     suspend fun createPackage(pkg: MembershipPackage): Result<String> = withContext(Dispatchers.IO) {
         try {
             val docRef = collection.document()
