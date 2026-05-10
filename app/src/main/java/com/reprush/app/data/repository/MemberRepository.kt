@@ -27,6 +27,21 @@ data class Member(
     val createdAt: Long = 0L
 )
 
+data class MemberDetail(
+    val uid: String = "",
+    val displayName: String = "",
+    val email: String = "",
+    val photoUrl: String? = null,
+    val membershipStatus: String = "pending",
+    val packageId: String? = null,
+    val membershipStartDate: String? = null,
+    val membershipEndDate: String? = null,
+    val createdAt: Long = 0L,
+    val totalPoints: Long = 0L,
+    val totalWorkouts: Long = 0L,
+    val totalPRs: Long = 0L
+)
+
 @Singleton
 class MemberRepository @Inject constructor(
     private val firestore: FirebaseFirestore
@@ -166,6 +181,80 @@ class MemberRepository @Inject constructor(
             Result.Success(members)
         } catch (e: Exception) {
             Result.Error(e.message ?: "Failed to fetch members")
+        }
+    }
+
+    suspend fun getMemberById(uid: String): Result<MemberDetail> = withContext(Dispatchers.IO) {
+        try {
+            val doc = firestore.collection("users").document(uid).get().await()
+            if (!doc.exists()) return@withContext Result.Error("Member not found")
+
+            val member = MemberDetail(
+                uid = doc.id,
+                displayName = doc.getString("displayName") ?: "",
+                email = doc.getString("email") ?: "",
+                photoUrl = doc.getString("photoUrl"),
+                membershipStatus = doc.getString("membershipStatus") ?: "pending",
+                packageId = doc.getString("packageId"),
+                membershipStartDate = doc.getString("membershipStartDate"),
+                membershipEndDate = doc.getString("membershipEndDate"),
+                createdAt = doc.getLong("createdAt") ?: 0L,
+                totalPoints = doc.getLong("totalPoints") ?: 0L,
+                totalWorkouts = doc.getLong("totalWorkouts") ?: 0L,
+                totalPRs = doc.getLong("totalPRs") ?: 0L
+            )
+            Result.Success(member)
+        } catch (e: Exception) {
+            Result.Error(e.message ?: "Failed to fetch member")
+        }
+    }
+
+    suspend fun suspendMember(uid: String): Result<Unit> = withContext(Dispatchers.IO) {
+        try {
+            firestore.collection("users").document(uid)
+                .update("membershipStatus", "suspended")
+                .await()
+
+            // Notify member
+            val notificationId = java.util.UUID.randomUUID().toString()
+            val notification = hashMapOf(
+                "type" to "suspension",
+                "title" to "Account Suspended",
+                "body" to "Your gym membership has been suspended. Please contact the gym for more information.",
+                "isRead" to false,
+                "metadata" to "",
+                "createdAt" to System.currentTimeMillis()
+            )
+            firestore.collection("notifications")
+                .document(uid)
+                .collection("items")
+                .document(notificationId)
+                .set(notification)
+                .await()
+
+            Result.Success(Unit)
+        } catch (e: Exception) {
+            Result.Error(e.message ?: "Failed to suspend member")
+        }
+    }
+
+    suspend fun reactivateMember(uid: String): Result<Unit> = withContext(Dispatchers.IO) {
+        try {
+            firestore.collection("users").document(uid)
+                .update("membershipStatus", "active")
+                .await()
+            Result.Success(Unit)
+        } catch (e: Exception) {
+            Result.Error(e.message ?: "Failed to reactivate member")
+        }
+    }
+
+    suspend fun removeMember(uid: String): Result<Unit> = withContext(Dispatchers.IO) {
+        try {
+            firestore.collection("users").document(uid).delete().await()
+            Result.Success(Unit)
+        } catch (e: Exception) {
+            Result.Error(e.message ?: "Failed to remove member")
         }
     }
 }
