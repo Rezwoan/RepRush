@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.reprush.app.databinding.FragmentPendingMembersBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -37,10 +38,18 @@ class PendingMembersFragment : Fragment() {
 
         adapter = PendingMembersAdapter(
             onApproveClick = { member ->
-                // TODO: Step 6 — open approval bottom sheet with package selection
+                ApprovalBottomSheet.newInstance(member.uid, member.displayName)
+                    .show(parentFragmentManager, "approval_sheet")
             },
             onRejectClick = { member ->
-                // TODO: Step 5 — call rejection logic
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle("Reject Registration")
+                    .setMessage("Reject ${member.displayName}'s registration? They will be notified.")
+                    .setNegativeButton("Cancel", null)
+                    .setPositiveButton("Reject") { _, _ ->
+                        viewModel.rejectMember(member.uid)
+                    }
+                    .show()
             }
         )
 
