@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Read(//mnt/e/**)",
-      "Bash(./gradlew assembleDebug)",
-      "Bash(./gradlew assembleDebug --stacktrace)"
-    ]
-  }
-}
