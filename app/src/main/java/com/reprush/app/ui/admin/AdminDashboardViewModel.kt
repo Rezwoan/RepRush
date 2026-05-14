@@ -5,9 +5,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.reprush.app.data.repository.AttendanceRepository
+import com.reprush.app.data.repository.GymSettingsRepository
 import com.reprush.app.data.repository.MemberRepository
 import com.reprush.app.data.repository.PaymentRepository
 import com.reprush.app.data.repository.Result
+import com.reprush.app.service.ExpiryNotificationService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -18,7 +20,9 @@ import javax.inject.Inject
 class AdminDashboardViewModel @Inject constructor(
     private val memberRepository: MemberRepository,
     private val attendanceRepository: AttendanceRepository,
-    private val paymentRepository: PaymentRepository
+    private val paymentRepository: PaymentRepository,
+    private val gymSettingsRepository: GymSettingsRepository,
+    private val expiryNotificationService: ExpiryNotificationService
 ) : ViewModel() {
 
     private val _totalMembers = MutableLiveData(0)
@@ -40,6 +44,7 @@ class AdminDashboardViewModel @Inject constructor(
     val yearlyRevenue: LiveData<Double> = _yearlyRevenue
 
     fun loadStats() {
+        runBackgroundJobs()
         viewModelScope.launch(Dispatchers.IO) {
             when (val result = memberRepository.getMembers()) {
                 is Result.Success -> {
@@ -72,6 +77,25 @@ class AdminDashboardViewModel @Inject constructor(
                 is Result.Success -> _yearlyRevenue.postValue(result.data)
                 is Result.Error -> {}
             }
+        }
+    }
+
+    private fun runBackgroundJobs() {
+        viewModelScope.launch(Dispatchers.IO) {
+            try { expiryNotificationService.checkAndNotify() } catch (_: Exception) {}
+        }
+
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                when (val settingsResult = gymSettingsRepository.getSettings()) {
+                    is Result.Success -> {
+                        if (settingsResult.data.autoSuspensionEnabled) {
+                            gymSettingsRepository.runAutoSuspension(settingsResult.data.gracePeriodDays)
+                        }
+                    }
+                    is Result.Error -> {}
+                }
+            } catch (_: Exception) {}
         }
     }
 }
