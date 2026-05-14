@@ -4,9 +4,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.reprush.app.data.repository.AttendanceRecord
+import com.reprush.app.data.repository.AttendanceRepository
 import com.reprush.app.data.repository.MemberDetail
 import com.reprush.app.data.repository.MemberRepository
 import com.reprush.app.data.repository.PackageRepository
+import com.reprush.app.data.repository.PaymentRecord
+import com.reprush.app.data.repository.PaymentRepository
 import com.reprush.app.data.repository.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -16,7 +20,9 @@ import javax.inject.Inject
 @HiltViewModel
 class MemberDetailViewModel @Inject constructor(
     private val memberRepository: MemberRepository,
-    private val packageRepository: PackageRepository
+    private val packageRepository: PackageRepository,
+    private val paymentRepository: PaymentRepository,
+    private val attendanceRepository: AttendanceRepository
 ) : ViewModel() {
 
     private val _member = MutableLiveData<MemberDetail>()
@@ -30,6 +36,12 @@ class MemberDetailViewModel @Inject constructor(
 
     private val _error = MutableLiveData<String?>()
     val error: LiveData<String?> = _error
+
+    private val _payments = MutableLiveData<List<PaymentRecord>>()
+    val payments: LiveData<List<PaymentRecord>> = _payments
+
+    private val _attendance = MutableLiveData<List<AttendanceRecord>>()
+    val attendance: LiveData<List<AttendanceRecord>> = _attendance
 
     fun loadMember(uid: String) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -48,6 +60,24 @@ class MemberDetailViewModel @Inject constructor(
                 is Result.Error -> _error.postValue(result.message)
             }
             _isLoading.postValue(false)
+        }
+    }
+
+    fun loadPayments(memberId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            when (val result = paymentRepository.getPaymentsForMember(memberId)) {
+                is Result.Success -> _payments.postValue(result.data)
+                is Result.Error -> _payments.postValue(emptyList())
+            }
+        }
+    }
+
+    fun loadAttendance(memberId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            when (val result = attendanceRepository.getMemberAttendance(memberId)) {
+                is Result.Success -> _attendance.postValue(result.data)
+                is Result.Error -> _attendance.postValue(emptyList())
+            }
         }
     }
 
