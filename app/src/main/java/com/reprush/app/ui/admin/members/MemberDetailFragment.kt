@@ -10,6 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
+import com.reprush.app.R
 import com.reprush.app.data.repository.MemberDetail
 import com.reprush.app.data.repository.Result
 import com.reprush.app.databinding.FragmentMemberDetailBinding
@@ -197,7 +198,14 @@ class MemberDetailFragment : Fragment() {
         }
 
         binding.buttonRecordPayment.setOnClickListener {
-            // TODO: Milestone 3
+            val bundle = Bundle().apply {
+                putString("memberUid", member.uid)
+                putString("memberName", member.displayName)
+            }
+            findNavController().navigate(
+                R.id.action_memberDetailFragment_to_recordPaymentFragment,
+                bundle
+            )
         }
     }
 
