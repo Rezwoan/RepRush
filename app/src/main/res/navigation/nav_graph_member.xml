@@ -35,6 +35,11 @@
         android:label="Profile" />
 
     <fragment
+        android:id="@+id/notificationsFragment"
+        android:name="com.reprush.app.ui.member.notifications.NotificationsFragment"
+        android:label="Notifications" />
+
+    <fragment
         android:id="@+id/planGoalFragment"
         android:name="com.reprush.app.ui.auth.onboarding.PlanGoalFragment"
         android:label="Goal" />
