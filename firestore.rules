@@ -33,5 +33,10 @@ service cloud.firestore {
       allow write: if isAdmin() || request.auth.uid == uid;
     }
 
+    match /announcements/{annId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
   }
 }

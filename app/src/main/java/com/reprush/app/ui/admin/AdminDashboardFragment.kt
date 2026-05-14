@@ -38,6 +38,10 @@ class AdminDashboardFragment : Fragment() {
             findNavController().navigate(R.id.action_adminDashboardFragment_to_packageListFragment)
         }
 
+        binding.cardAnnouncements.setOnClickListener {
+            findNavController().navigate(R.id.action_adminDashboardFragment_to_announcementListFragment)
+        }
+
         binding.cardRegisterMember.setOnClickListener {
             findNavController().navigate(R.id.action_adminDashboardFragment_to_manualRegisterFragment)
         }

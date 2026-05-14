@@ -34,6 +34,10 @@
             android:id="@+id/action_adminDashboardFragment_to_recordPaymentFragment"
             app:destination="@id/recordPaymentFragment" />
 
+        <action
+            android:id="@+id/action_adminDashboardFragment_to_announcementListFragment"
+            app:destination="@id/announcementListFragment" />
+
     </fragment>
 
     <fragment
@@ -136,5 +140,23 @@
         android:name="com.reprush.app.ui.admin.payments.ReceiptViewFragment"
         android:label="Receipt"
         tools:layout="@layout/fragment_receipt" />
+
+    <fragment
+        android:id="@+id/announcementListFragment"
+        android:name="com.reprush.app.ui.admin.announcements.AnnouncementListFragment"
+        android:label="Announcements"
+        tools:layout="@layout/fragment_announcement_list">
+
+        <action
+            android:id="@+id/action_announcementListFragment_to_postAnnouncementFragment"
+            app:destination="@id/postAnnouncementFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/postAnnouncementFragment"
+        android:name="com.reprush.app.ui.admin.announcements.PostAnnouncementFragment"
+        android:label="New Announcement"
+        tools:layout="@layout/fragment_post_announcement" />
 
 </navigation>
