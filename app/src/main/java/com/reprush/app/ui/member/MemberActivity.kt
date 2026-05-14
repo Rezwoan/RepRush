@@ -1,6 +1,7 @@
 package com.reprush.app.ui.member
 
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -32,14 +33,24 @@ class MemberActivity : AppCompatActivity() {
 
         val pending = intent.getBooleanExtra("pending", false)
         val blocked = intent.getBooleanExtra("blocked", false)
+        val rejected = intent.getBooleanExtra("rejected", false)
 
         val navHost = supportFragmentManager
             .findFragmentById(R.id.nav_host_member) as NavHostFragment
         val navController = navHost.navController
 
         when {
-            pending -> navController.navigate(R.id.pendingFragment)
-            blocked -> navController.navigate(R.id.statusBlockedFragment)
+            pending -> {
+                binding.bottomNavMember.visibility = View.GONE
+                navController.navigate(R.id.pendingFragment)
+            }
+            blocked || rejected -> {
+                binding.bottomNavMember.visibility = View.GONE
+                val bundle = Bundle().apply {
+                    putBoolean("rejected", rejected)
+                }
+                navController.navigate(R.id.statusBlockedFragment, bundle)
+            }
             else -> binding.bottomNavMember.setupWithNavController(navController)
         }
     }

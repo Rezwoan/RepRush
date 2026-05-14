@@ -4,13 +4,17 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
+import com.reprush.app.data.model.MembershipPackage
 import com.reprush.app.data.repository.Result
 import com.reprush.app.databinding.FragmentManualRegisterBinding
+import com.reprush.app.ui.admin.packages.PackageViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import java.time.LocalDate
 
 @AndroidEntryPoint
 class ManualRegisterFragment : Fragment() {
@@ -19,7 +23,9 @@ class ManualRegisterFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: PendingMembersViewModel by activityViewModels()
+    private val packageViewModel: PackageViewModel by activityViewModels()
     private var isSubmitting = false
+    private var selectedPackage: MembershipPackage? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -35,10 +41,39 @@ class ManualRegisterFragment : Fragment() {
             findNavController().navigateUp()
         }
 
+        binding.switchRegisterActive.setOnCheckedChangeListener { _, isChecked ->
+            binding.layoutRegisterPackage.visibility = if (isChecked) View.VISIBLE else View.GONE
+            if (isChecked) {
+                packageViewModel.loadActivePackages()
+            } else {
+                selectedPackage = null
+            }
+        }
+
+        packageViewModel.activePackages.observe(viewLifecycleOwner) { packages ->
+            if (packages.isNullOrEmpty()) {
+                binding.layoutRegisterPackage.error = "No packages available. Create a package first."
+                return@observe
+            }
+            binding.layoutRegisterPackage.error = null
+            val packageNames = packages.map { "${it.name} — ${it.durationDays} days" }
+            val adapter = ArrayAdapter(
+                requireContext(),
+                android.R.layout.simple_dropdown_item_1line,
+                packageNames
+            )
+            binding.editTextSelectPackage.setAdapter(adapter)
+            binding.editTextSelectPackage.setOnItemClickListener { _, _, position, _ ->
+                selectedPackage = packages[position]
+                binding.layoutRegisterPackage.error = null
+            }
+        }
+
         binding.buttonRegisterMember.setOnClickListener {
             val name = binding.editTextRegisterName.text?.toString()?.trim() ?: ""
             val email = binding.editTextRegisterEmail.text?.toString()?.trim() ?: ""
             val phone = binding.editTextRegisterPhone.text?.toString()?.trim() ?: ""
+            val registerAsActive = binding.switchRegisterActive.isChecked
 
             var isValid = true
 
@@ -59,12 +94,25 @@ class ManualRegisterFragment : Fragment() {
                 binding.layoutRegisterEmail.error = null
             }
 
+            if (registerAsActive && selectedPackage == null) {
+                binding.layoutRegisterPackage.error = "Please select a package"
+                isValid = false
+            }
+
             if (!isValid) return@setOnClickListener
 
             binding.progressBarRegister.visibility = View.VISIBLE
             binding.buttonRegisterMember.isEnabled = false
             isSubmitting = true
-            viewModel.registerMemberManually(name, email, phone)
+
+            if (registerAsActive) {
+                val pkg = selectedPackage!!
+                val startDate = LocalDate.now().toString()
+                val endDate = LocalDate.now().plusDays(pkg.durationDays.toLong()).toString()
+                viewModel.registerMemberAsActive(name, email, phone, pkg.id, startDate, endDate)
+            } else {
+                viewModel.registerMemberManually(name, email, phone)
+            }
         }
 
         viewModel.operationResult.observe(viewLifecycleOwner) { result ->
