@@ -38,7 +38,7 @@ data class GeminiPlan(
 @Singleton
 class GeminiRepository @Inject constructor() {
 
-    private val endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
+    private val endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"
 
     suspend fun generatePlan(
         goal: String,
@@ -69,8 +69,10 @@ class GeminiRepository @Inject constructor() {
                     })
                 })
                 put("generationConfig", JSONObject().apply {
-                    put("temperature", 0.7)
+                    put("temperature", 0.2)
                     put("maxOutputTokens", 8192)
+                    put("responseMimeType", "application/json")
+                    put("responseSchema", buildResponseSchema())
                 })
             }
 
@@ -78,8 +80,8 @@ class GeminiRepository @Inject constructor() {
             val conn = url.openConnection() as HttpURLConnection
             conn.requestMethod = "POST"
             conn.setRequestProperty("Content-Type", "application/json")
-            conn.connectTimeout = 30_000
-            conn.readTimeout = 30_000
+            conn.connectTimeout = 60_000
+            conn.readTimeout = 120_000
             conn.doOutput = true
 
             OutputStreamWriter(conn.outputStream).use { writer ->
@@ -105,15 +107,14 @@ class GeminiRepository @Inject constructor() {
                 return@withContext Result.Error("AI trainer returned an unexpected response.")
             }
 
-            val content = candidates.getJSONObject(0)
+            val planJson = candidates.getJSONObject(0)
                 .optJSONObject("content")
                 ?.optJSONArray("parts")
                 ?.optJSONObject(0)
                 ?.optString("text")
                 ?: return@withContext Result.Error("AI trainer returned an unexpected response.")
 
-            val cleanedJson = extractJson(content)
-            Result.Success(cleanedJson)
+            Result.Success(planJson.trim())
         } catch (e: java.net.SocketTimeoutException) {
             Result.Error("Your AI trainer is taking too long to respond. Check your connection and try again.")
         } catch (e: Exception) {
@@ -122,12 +123,56 @@ class GeminiRepository @Inject constructor() {
         }
     }
 
+    private fun buildResponseSchema(): JSONObject = JSONObject().apply {
+        put("type", "OBJECT")
+        put("required", JSONArray().apply {
+            put("schema_version"); put("plan_name"); put("goal")
+            put("weeks"); put("days_per_week"); put("schedule")
+        })
+        put("properties", JSONObject().apply {
+            put("schema_version", JSONObject().put("type", "INTEGER"))
+            put("plan_name", JSONObject().put("type", "STRING"))
+            put("goal", JSONObject().put("type", "STRING"))
+            put("weeks", JSONObject().put("type", "INTEGER"))
+            put("days_per_week", JSONObject().put("type", "INTEGER"))
+            put("schedule", JSONObject().apply {
+                put("type", "ARRAY")
+                put("items", JSONObject().apply {
+                    put("type", "OBJECT")
+                    put("required", JSONArray().apply {
+                        put("day_number"); put("day_label"); put("exercises")
+                    })
+                    put("properties", JSONObject().apply {
+                        put("day_number", JSONObject().put("type", "INTEGER"))
+                        put("day_label", JSONObject().put("type", "STRING"))
+                        put("exercises", JSONObject().apply {
+                            put("type", "ARRAY")
+                            put("items", JSONObject().apply {
+                                put("type", "OBJECT")
+                                put("required", JSONArray().apply {
+                                    put("exercise_name"); put("sets"); put("reps"); put("rest_seconds")
+                                })
+                                put("properties", JSONObject().apply {
+                                    put("exercise_name", JSONObject().put("type", "STRING"))
+                                    put("sets", JSONObject().put("type", "INTEGER"))
+                                    put("reps", JSONObject().put("type", "STRING"))
+                                    put("rest_seconds", JSONObject().put("type", "INTEGER"))
+                                    put("notes", JSONObject().put("type", "STRING"))
+                                })
+                            })
+                        })
+                    })
+                })
+            })
+        })
+    }
+
     private fun buildPrompt(
         goal: String, daysPerWeek: Int, splitType: String, sessionDuration: Int,
         equipment: String, fitnessLevel: String, weeks: Int, injuries: String,
         exerciseList: String
     ): String = """
-You are a professional fitness trainer. Generate a workout plan using ONLY the exercises from the list below. Return ONLY valid JSON with no explanation, markdown, or text outside the JSON object.
+You are a professional fitness trainer. Generate a workout plan using ONLY the exercises from the list below.
 
 Member profile:
 - Goal: $goal
@@ -142,34 +187,6 @@ Member profile:
 Available exercises (use ONLY these names exactly as written):
 $exerciseList
 
-Return this exact JSON structure:
-{
-  "schema_version": 1,
-  "plan_name": "string",
-  "goal": "string",
-  "weeks": number,
-  "days_per_week": number,
-  "schedule": [
-    {
-      "day_number": number,
-      "day_label": "string",
-      "exercises": [
-        {
-          "exercise_name": "string",
-          "sets": number,
-          "reps": "string",
-          "rest_seconds": number,
-          "notes": "string or null"
-        }
-      ]
-    }
-  ]
-}
+Set schema_version to 1. The schedule must have exactly $daysPerWeek day entries. Use only exercise names from the list above.
 """.trimIndent()
-
-    private fun extractJson(text: String): String {
-        val start = text.indexOf('{')
-        val end = text.lastIndexOf('}')
-        return if (start != -1 && end != -1 && end > start) text.substring(start, end + 1) else text
-    }
 }
