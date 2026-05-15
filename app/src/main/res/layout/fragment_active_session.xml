@@ -17,27 +17,45 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize">
 
-            <TextView
-                android:id="@+id/textView_elapsedTimer"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="start"
-                android:text="00:00"
-                android:textColor="@color/on_surface"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:fontFamily="monospace" />
+            <!-- LinearLayout owns all toolbar content so the close button and
+                 timer don't overlap when the nav-icon API would have done so -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingStart="@dimen/spacing_xs"
+                android:paddingEnd="@dimen/spacing_sm">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/button_finish"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:layout_marginEnd="@dimen/spacing_sm"
-                android:text="Finish"
-                android:textColor="@color/on_primary"
-                app:backgroundTint="@color/primary" />
+                <ImageButton
+                    android:id="@+id/button_closeSession"
+                    android:layout_width="@dimen/min_tap_target"
+                    android:layout_height="@dimen/min_tap_target"
+                    android:src="@android:drawable/ic_menu_close_clear_cancel"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Close session" />
 
+                <TextView
+                    android:id="@+id/textView_elapsedTimer"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="@dimen/spacing_xs"
+                    android:text="00:00"
+                    android:textColor="@color/on_surface"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:fontFamily="monospace" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button_finish"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Finish"
+                    android:textColor="@color/on_primary"
+                    app:backgroundTint="@color/primary" />
+
+            </LinearLayout>
         </com.google.android.material.appbar.MaterialToolbar>
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -55,14 +73,17 @@
             android:orientation="vertical"
             android:paddingBottom="88dp">
 
-            <!-- Session notes input -->
+            <!-- Session notes with Done end-icon to dismiss keyboard -->
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/textInputLayout_sessionNotes"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/spacing_md"
                 android:layout_marginTop="@dimen/spacing_md"
                 android:layout_marginEnd="@dimen/spacing_md"
                 android:hint="Session notes (optional)"
+                app:endIconMode="custom"
+                app:endIconDrawable="@android:drawable/checkbox_on_background"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -70,6 +91,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textMultiLine"
+                    android:imeOptions="actionDone"
                     android:maxLines="3"
                     android:textColor="@color/on_surface" />
             </com.google.android.material.textfield.TextInputLayout>

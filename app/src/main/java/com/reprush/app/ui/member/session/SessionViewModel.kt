@@ -50,7 +50,7 @@ class SessionViewModel @Inject constructor(
     val restTimerEvent: LiveData<RestTimerData?> = _restTimerEvent
 
     // In-memory backing updated silently on every TextWatcher keystroke.
-    // LiveData only posts on cascade (focus loss) and structural changes (add/remove set/exercise).
+    // LiveData only posts on cascade (focus loss) and structural changes.
     private var sessionData: ActiveSessionState? = null
 
     private var elapsedJob: Job? = null
@@ -154,7 +154,8 @@ class SessionViewModel @Inject constructor(
         val newSet = SessionSet(
             setNumber = ex.sets.size + 1,
             weight = lastSet?.weight ?: 0.0,
-            reps = lastSet?.reps ?: 0
+            reps = lastSet?.reps ?: 0,
+            isBodyweight = lastSet?.isBodyweight ?: false
         )
         val updatedEx = ex.copy(sets = (ex.sets + newSet).toMutableList())
         exercises[exerciseIndex] = updatedEx
@@ -183,7 +184,7 @@ class SessionViewModel @Inject constructor(
         updateSetSilent(exerciseIndex, setIndex) { it.copy(reps = reps, repsUserEdited = true) }
     }
 
-    // Called on focus loss — cascades weight to unedited non-completed sibling sets, then publishes
+    // Called on weight field focus loss — cascades to unedited, non-completed, non-BW sibling sets
     fun cascadeSetWeight(exerciseIndex: Int, setIndex: Int) {
         val current = sessionData ?: return
         if (exerciseIndex < 0 || exerciseIndex >= current.exercises.size) return
@@ -194,7 +195,7 @@ class SessionViewModel @Inject constructor(
         val exercises = current.exercises.toMutableList()
         val updatedSets = ex.sets.toMutableList()
         updatedSets.forEachIndexed { i, set ->
-            if (i != setIndex && !set.isCompleted && !set.weightUserEdited) {
+            if (i != setIndex && !set.isCompleted && !set.weightUserEdited && !set.isBodyweight) {
                 updatedSets[i] = set.copy(weight = sourceWeight)
             }
         }
@@ -202,7 +203,7 @@ class SessionViewModel @Inject constructor(
         publishSession(current.copy(exercises = exercises))
     }
 
-    // Called on focus loss — cascades reps to unedited non-completed sibling sets, then publishes
+    // Called on reps field focus loss — cascades to unedited, non-completed sibling sets
     fun cascadeSetReps(exerciseIndex: Int, setIndex: Int) {
         val current = sessionData ?: return
         if (exerciseIndex < 0 || exerciseIndex >= current.exercises.size) return
@@ -225,6 +226,20 @@ class SessionViewModel @Inject constructor(
         updateSet(exerciseIndex, setIndex) { it.copy(isWarmup = !it.isWarmup) }
     }
 
+    fun toggleBodyweight(exerciseIndex: Int, setIndex: Int) {
+        val current = sessionData ?: return
+        if (exerciseIndex < 0 || exerciseIndex >= current.exercises.size) return
+        val exercises = current.exercises.toMutableList()
+        val ex = exercises[exerciseIndex]
+        if (setIndex < 0 || setIndex >= ex.sets.size) return
+        val set = ex.sets[setIndex]
+        val nowBw = !set.isBodyweight
+        val updatedSets = ex.sets.toMutableList()
+        updatedSets[setIndex] = set.copy(isBodyweight = nowBw, weight = if (nowBw) 0.0 else set.weight)
+        exercises[exerciseIndex] = ex.copy(sets = updatedSets)
+        publishSession(current.copy(exercises = exercises))
+    }
+
     fun completeSet(exerciseIndex: Int, setIndex: Int) {
         val current = sessionData ?: return
         if (exerciseIndex < 0 || exerciseIndex >= current.exercises.size) return
@@ -240,9 +255,10 @@ class SessionViewModel @Inject constructor(
         exercises[exerciseIndex] = ex.copy(sets = updatedSets)
         publishSession(current.copy(exercises = exercises))
 
+        val restSeconds = if (ex.plannedRestSeconds > 0) ex.plannedRestSeconds else 60
         _restTimerEvent.value = RestTimerData(
             exerciseName = ex.exerciseName,
-            durationSeconds = ex.plannedRestSeconds
+            durationSeconds = restSeconds
         )
     }
 
@@ -271,6 +287,15 @@ class SessionViewModel @Inject constructor(
                     _sessionState.value = SessionState.Error(result.message)
                 }
             }
+        }
+    }
+
+    fun discardCurrentSession(onComplete: () -> Unit) {
+        val current = sessionData ?: run { clearSession(); onComplete(); return }
+        viewModelScope.launch {
+            sessionRepository.discardIncompleteSession(current.sessionId)
+            clearSession()
+            onComplete()
         }
     }
 
