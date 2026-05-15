@@ -4,10 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import androidx.viewpager2.widget.ViewPager2
 import com.reprush.app.R
 import com.reprush.app.databinding.FragmentPlanQuestionnaireBinding
 import com.reprush.app.ui.member.plan.questionnaire.*
@@ -48,14 +50,30 @@ class PlanQuestionnaireFragment : Fragment() {
         binding.viewPagerQuestionnaire.adapter = adapter
         binding.viewPagerQuestionnaire.isUserInputEnabled = false
 
+        // Register selection-changed callbacks on every step so the host knows when to enable Next.
+        steps.forEachIndexed { index, step ->
+            step.onSelectionChanged = {
+                if (binding.viewPagerQuestionnaire.currentItem == index) {
+                    refreshNextButton(index)
+                }
+            }
+        }
+
         updateStepIndicator(0)
+        refreshNextButton(0)
+
+        binding.viewPagerQuestionnaire.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                updateStepIndicator(position)
+                updateButtons(position)
+                refreshNextButton(position)
+            }
+        })
 
         binding.buttonPrevious.setOnClickListener {
             val current = binding.viewPagerQuestionnaire.currentItem
             if (current > 0) {
                 binding.viewPagerQuestionnaire.currentItem = current - 1
-                updateStepIndicator(current - 1)
-                updateButtons(current - 1)
             } else {
                 findNavController().popBackStack()
             }
@@ -64,25 +82,26 @@ class PlanQuestionnaireFragment : Fragment() {
         binding.buttonNext.setOnClickListener {
             val current = binding.viewPagerQuestionnaire.currentItem
             val step = steps[current]
-            if (!step.isSelectionMade()) return@setOnClickListener
+
+            if (!step.isSelectionMade()) {
+                Toast.makeText(requireContext(), "Please make a selection to continue", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
 
             step.saveSelection(viewModel)
 
             if (current < steps.size - 1) {
                 binding.viewPagerQuestionnaire.currentItem = current + 1
-                updateStepIndicator(current + 1)
-                updateButtons(current + 1)
             } else {
                 findNavController().navigate(R.id.action_planQuestionnaireFragment_to_geminiLoadingFragment)
             }
         }
+    }
 
-        binding.viewPagerQuestionnaire.registerOnPageChangeCallback(object : androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                updateStepIndicator(position)
-                updateButtons(position)
-            }
-        })
+    private fun refreshNextButton(position: Int) {
+        val isMade = steps[position].isSelectionMade()
+        binding.buttonNext.isEnabled = isMade
+        binding.buttonNext.alpha = if (isMade) 1.0f else 0.5f
     }
 
     private fun updateStepIndicator(position: Int) {
@@ -96,6 +115,8 @@ class PlanQuestionnaireFragment : Fragment() {
     }
 
     override fun onDestroyView() {
+        // Clear callbacks to avoid leaking references to this Fragment's binding.
+        steps.forEach { it.onSelectionChanged = null }
         super.onDestroyView()
         _binding = null
     }

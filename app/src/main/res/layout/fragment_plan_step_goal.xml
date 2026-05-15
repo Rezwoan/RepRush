@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.core.widget.NestedScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background"
@@ -24,42 +25,49 @@
             android:id="@+id/chipGroup_goal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_lg">
+            android:layout_marginTop="@dimen/spacing_lg"
+            app:singleSelection="true"
+            app:selectionRequired="false">
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip_strength"
                 style="@style/Widget.Material3.Chip.Filter"
                 android:layout_width="wrap_content"
                 android:layout_height="48dp"
-                android:text="Strength" />
+                android:text="Strength"
+                android:checkable="true" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip_hypertrophy"
                 style="@style/Widget.Material3.Chip.Filter"
                 android:layout_width="wrap_content"
                 android:layout_height="48dp"
-                android:text="Hypertrophy" />
+                android:text="Hypertrophy"
+                android:checkable="true" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip_fatLoss"
                 style="@style/Widget.Material3.Chip.Filter"
                 android:layout_width="wrap_content"
                 android:layout_height="48dp"
-                android:text="Fat Loss" />
+                android:text="Fat Loss"
+                android:checkable="true" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip_endurance"
                 style="@style/Widget.Material3.Chip.Filter"
                 android:layout_width="wrap_content"
                 android:layout_height="48dp"
-                android:text="Endurance" />
+                android:text="Endurance"
+                android:checkable="true" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip_generalFitness"
                 style="@style/Widget.Material3.Chip.Filter"
                 android:layout_width="wrap_content"
                 android:layout_height="48dp"
-                android:text="General Fitness" />
+                android:text="General Fitness"
+                android:checkable="true" />
 
         </com.google.android.material.chip.ChipGroup>
 
