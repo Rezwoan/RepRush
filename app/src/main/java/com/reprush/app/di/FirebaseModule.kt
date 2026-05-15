@@ -31,6 +31,6 @@ object FirebaseModule {
             context,
             AppDatabase::class.java,
             "reprush_database"
-        ).build()
+        ).fallbackToDestructiveMigration().build()
     }
 }

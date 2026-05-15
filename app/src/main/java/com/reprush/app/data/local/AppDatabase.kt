@@ -24,7 +24,7 @@ import com.reprush.app.data.local.entity.*
         AchievementEntity::class,
         ChatMessageEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
