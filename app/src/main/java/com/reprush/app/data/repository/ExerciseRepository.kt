@@ -33,6 +33,20 @@ class ExerciseRepository @Inject constructor(
         return dir
     }
 
+    // Maps user-visible filter chip labels to the exact primaryMuscle values stored in Room.
+    // All DB values are title-cased during sync (e.g. "lats" → "Lats").
+    val MUSCLE_FILTER_MAP: Map<String, List<String>> = mapOf(
+        "Chest"     to listOf("Chest"),
+        "Back"      to listOf("Lats", "Middle Back", "Lower Back", "Traps"),
+        "Shoulders" to listOf("Shoulders"),
+        "Biceps"    to listOf("Biceps"),
+        "Triceps"   to listOf("Triceps"),
+        "Legs"      to listOf("Quadriceps", "Hamstrings", "Glutes", "Calves", "Adductors", "Abductors"),
+        "Core"      to listOf("Abdominals"),
+        "Forearms"  to listOf("Forearms"),
+        "Neck"      to listOf("Neck")
+    )
+
     suspend fun isLibrarySynced(): Boolean = appPreferences.isLibrarySynced.first()
 
     suspend fun syncExercises(
@@ -43,7 +57,7 @@ class ExerciseRepository @Inject constructor(
             val jsonArray = JSONArray(jsonText)
 
             val exercises = mutableListOf<ExerciseEntity>()
-            val imagePaths = mutableListOf<Pair<String, List<String>>>() // exerciseId to imagePaths
+            val imagePaths = mutableListOf<Pair<String, List<String>>>()
 
             for (i in 0 until jsonArray.length()) {
                 val obj = jsonArray.getJSONObject(i)
@@ -100,13 +114,12 @@ class ExerciseRepository @Inject constructor(
             exerciseDao.insertAll(exercises)
 
             val resumeFrom = appPreferences.syncProgressCount.first()
-            val imageItems = imagePaths
-            val totalImages = imageItems.size
+            val totalImages = imagePaths.size
 
             onProgress(SyncProgress(resumeFrom, totalImages))
 
-            for (idx in resumeFrom until imageItems.size) {
-                val (exerciseId, paths) = imageItems[idx]
+            for (idx in resumeFrom until imagePaths.size) {
+                val (exerciseId, paths) = imagePaths[idx]
                 if (paths.isEmpty()) continue
 
                 val imagePath = paths[0]
@@ -141,16 +154,41 @@ class ExerciseRepository @Inject constructor(
         }
     }
 
+    /**
+     * Returns exercises filtered by name query, muscle chip label, and equipment label.
+     * Muscle filtering expands chip labels (e.g. "Back") to all matching DB values
+     * (e.g. Lats, Middle Back, Lower Back, Traps) and checks both primaryMuscle and
+     * secondaryMuscles (comma-separated) so compound exercises surface under both groups.
+     */
     suspend fun getExercisesFiltered(
         query: String = "",
         muscle: String = "",
         equipment: String = ""
     ): List<ExerciseEntity> = withContext(Dispatchers.IO) {
-        exerciseDao.getExercisesFiltered(
-            query = if (query.isBlank()) "" else query.trim(),
-            muscle = if (muscle.isBlank() || muscle == "All") "" else muscle,
-            equipment = if (equipment.isBlank() || equipment == "All") "" else equipment
-        )
+        val all = exerciseDao.getAllExercises()
+
+        val muscleTargets: List<String> = when {
+            muscle.isBlank() || muscle == "All" -> emptyList()
+            else -> MUSCLE_FILTER_MAP[muscle] ?: listOf(muscle)
+        }
+
+        val equipmentLower = equipment.trim().lowercase()
+
+        all.filter { ex ->
+            // Name search
+            (query.isBlank() || ex.name.contains(query.trim(), ignoreCase = true)) &&
+            // Muscle filter: match primaryMuscle OR any mapped name in the comma-separated secondaryMuscles
+            (muscleTargets.isEmpty() ||
+                muscleTargets.any { target ->
+                    ex.primaryMuscle.equals(target, ignoreCase = true) ||
+                    ex.secondaryMuscles?.split(",")?.any { sec ->
+                        sec.trim().equals(target, ignoreCase = true)
+                    } == true
+                }) &&
+            // Equipment filter
+            (equipmentLower.isBlank() || equipmentLower == "all" ||
+                ex.equipment.equals(equipmentLower, ignoreCase = true))
+        }
     }
 
     suspend fun getExerciseById(id: String): ExerciseEntity? =
@@ -219,7 +257,7 @@ class ExerciseRepository @Inject constructor(
                     "Barbell+Dumbbells" to listOf("Barbell", "Dumbbell"),
                     "Dumbbells Only" to listOf("Dumbbell"),
                     "Bodyweight" to listOf("Bodyweight"),
-                    "Full Gym" to emptyList()
+                    "Full Gym" to emptyList<String>()
                 )
                 val equipmentList = equipmentMap[equipment] ?: emptyList()
                 if (equipmentList.isEmpty()) {

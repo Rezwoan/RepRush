@@ -27,6 +27,11 @@ class ExerciseLibraryFragment : Fragment() {
     private var selectedMuscle = ""
     private var selectedEquipment = ""
 
+    // Chip labels that map to DB muscle values via ExerciseRepository.MUSCLE_FILTER_MAP.
+    // "All" means no filter. The rest correspond exactly to map keys.
+    private val muscleChipLabels = listOf("All", "Chest", "Back", "Shoulders", "Biceps", "Triceps", "Legs", "Core", "Forearms")
+    private val equipmentChipLabels = listOf("All", "Barbell", "Dumbbell", "Cable", "Machine", "Bodyweight")
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentExerciseLibraryBinding.inflate(inflater, container, false)
         return binding.root
@@ -83,10 +88,9 @@ class ExerciseLibraryFragment : Fragment() {
     }
 
     private fun setupMuscleChips() {
-        val muscles = listOf("All", "Chest", "Back", "Shoulders", "Biceps", "Triceps", "Abdominals", "Quadriceps", "Hamstrings", "Glutes", "Calves", "Forearms")
-        muscles.forEach { muscle ->
+        muscleChipLabels.forEach { label ->
             val chip = Chip(requireContext()).apply {
-                text = muscle
+                text = label
                 isCheckable = true
                 id = View.generateViewId()
             }
@@ -94,16 +98,18 @@ class ExerciseLibraryFragment : Fragment() {
         }
         binding.chipGroupMuscle.setOnCheckedStateChangeListener { group, checkedIds ->
             val chip = if (checkedIds.isEmpty()) null else group.findViewById<Chip>(checkedIds[0])
-            selectedMuscle = if (chip == null || chip.text == "All") "" else chip.text.toString()
+            selectedMuscle = when {
+                chip == null || chip.text == "All" -> ""
+                else -> chip.text.toString()
+            }
             viewModel.loadExercises(muscle = selectedMuscle)
         }
     }
 
     private fun setupEquipmentChips() {
-        val equipments = listOf("All", "Barbell", "Dumbbell", "Cable", "Machine", "Bodyweight")
-        equipments.forEach { eq ->
+        equipmentChipLabels.forEach { label ->
             val chip = Chip(requireContext()).apply {
-                text = eq
+                text = label
                 isCheckable = true
                 id = View.generateViewId()
             }
@@ -111,7 +117,10 @@ class ExerciseLibraryFragment : Fragment() {
         }
         binding.chipGroupEquipment.setOnCheckedStateChangeListener { group, checkedIds ->
             val chip = if (checkedIds.isEmpty()) null else group.findViewById<Chip>(checkedIds[0])
-            selectedEquipment = if (chip == null || chip.text == "All") "" else chip.text.toString()
+            selectedEquipment = when {
+                chip == null || chip.text == "All" -> ""
+                else -> chip.text.toString()
+            }
             viewModel.loadExercises(equipment = selectedEquipment)
         }
     }
