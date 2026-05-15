@@ -1,15 +1,25 @@
 package com.reprush.app.ui.member.postsession
 
+import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.dynamicanimation.animation.DynamicAnimation
+import androidx.dynamicanimation.animation.SpringAnimation
+import androidx.dynamicanimation.animation.SpringForce
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.reprush.app.R
+import com.reprush.app.data.gamification.NewPR
+import com.reprush.app.data.gamification.PostWorkoutResult
+import com.reprush.app.data.repository.Result
 import com.reprush.app.databinding.FragmentPostWorkoutBinding
+import com.reprush.app.databinding.ItemAchievementCardBinding
+import com.reprush.app.databinding.ItemPrCardBinding
 import com.reprush.app.ui.member.session.SessionViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -34,12 +44,8 @@ class PostWorkoutFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val sessionId = arguments?.getString("sessionId") ?: run {
-            navigateHome()
-            return
-        }
-
-        viewModel.runPipeline(sessionId)
+        val sessionId = arguments?.getString("sessionId").orEmpty()
+        if (sessionId.isEmpty()) { navigateHome(); return }
 
         viewModel.isLoading.observe(viewLifecycleOwner) { loading ->
             binding.progressBarPostWorkout.visibility = if (loading) View.VISIBLE else View.GONE
@@ -49,19 +55,18 @@ class PostWorkoutFragment : Fragment() {
         viewModel.result.observe(viewLifecycleOwner) { result ->
             result ?: return@observe
             when (result) {
-                is com.reprush.app.data.repository.Result.Success -> bindResult(result.data)
-                is com.reprush.app.data.repository.Result.Error -> navigateHome()
+                is Result.Success -> bindResult(result.data)
+                is Result.Error -> navigateHome()
             }
             viewModel.clearResult()
         }
 
         binding.buttonBackToHome.setOnClickListener { navigateHome() }
+
+        viewModel.runPipeline(sessionId)
     }
 
-    private fun bindResult(data: com.reprush.app.data.gamification.PostWorkoutResult) {
-        binding.textViewTotalPoints.text = data.pointsBreakdown.totalPoints.toString()
-
-        // Points breakdown
+    private fun bindResult(data: PostWorkoutResult) {
         binding.textViewAttendancePoints.text = "+${data.pointsBreakdown.attendancePoints}"
         binding.textViewExercisePoints.text = "+${data.pointsBreakdown.exercisePoints}"
         binding.textViewSetPoints.text = "+${data.pointsBreakdown.setPoints}"
@@ -74,13 +79,9 @@ class PostWorkoutFragment : Fragment() {
             binding.rowStreakBonus.visibility = View.GONE
         }
 
-        if (data.pointsBreakdown.capApplied) {
-            binding.textViewCapNotice.visibility = View.VISIBLE
-        } else {
-            binding.textViewCapNotice.visibility = View.GONE
-        }
+        binding.textViewCapNotice.visibility =
+            if (data.pointsBreakdown.capApplied) View.VISIBLE else View.GONE
 
-        // Streak
         if (data.streakUpdate.currentStreak > 0) {
             binding.rowStreak.visibility = View.VISIBLE
             binding.textViewStreakCount.text = "${data.streakUpdate.currentStreak} day streak"
@@ -88,7 +89,6 @@ class PostWorkoutFragment : Fragment() {
             binding.rowStreak.visibility = View.GONE
         }
 
-        // PR section
         if (data.newPRs.isEmpty()) {
             binding.sectionPRs.visibility = View.GONE
         } else {
@@ -96,7 +96,6 @@ class PostWorkoutFragment : Fragment() {
             addPRCards(data.newPRs)
         }
 
-        // Achievement section
         if (data.newAchievements.isEmpty()) {
             binding.sectionAchievements.visibility = View.GONE
         } else {
@@ -107,36 +106,73 @@ class PostWorkoutFragment : Fragment() {
         animateTotalPoints(data.pointsBreakdown.totalPoints)
     }
 
-    private fun addPRCards(prs: List<com.reprush.app.data.gamification.NewPR>) {
+    private fun addPRCards(prs: List<NewPR>) {
         binding.containerPRCards.removeAllViews()
-        for (pr in prs) {
-            val chip = com.google.android.material.chip.Chip(requireContext()).apply {
-                text = "${pr.exerciseName}  ${pr.reps}×${pr.weight}kg  🏆"
-                isClickable = false
-            }
-            binding.containerPRCards.addView(chip)
+        prs.forEachIndexed { index, pr ->
+            val cardBinding = ItemPrCardBinding.inflate(
+                LayoutInflater.from(requireContext()), binding.containerPRCards, false
+            )
+            cardBinding.textViewPrExerciseName.text = pr.exerciseName
+            cardBinding.textViewPrValue.text = "${pr.reps}×${pr.weight}kg"
+
+            cardBinding.root.alpha = 0f
+            cardBinding.root.scaleX = 0.8f
+            cardBinding.root.scaleY = 0.8f
+            binding.containerPRCards.addView(cardBinding.root)
+
+            cardBinding.root.postDelayed({
+                ObjectAnimator.ofFloat(cardBinding.root, "alpha", 0f, 1f).apply {
+                    duration = 400
+                    start()
+                }
+                ObjectAnimator.ofFloat(cardBinding.root, "scaleX", 0.8f, 1f).apply {
+                    duration = 400
+                    start()
+                }
+                ObjectAnimator.ofFloat(cardBinding.root, "scaleY", 0.8f, 1f).apply {
+                    duration = 400
+                    start()
+                }
+            }, index * 100L)
         }
     }
 
     private fun addAchievementCards(badges: List<String>) {
         binding.containerAchievements.removeAllViews()
-        for (badgeId in badges) {
-            val chip = com.google.android.material.chip.Chip(requireContext()).apply {
-                text = badgeDisplayName(badgeId)
-                isClickable = false
-            }
-            binding.containerAchievements.addView(chip)
+        badges.forEachIndexed { index, badgeId ->
+            val cardBinding = ItemAchievementCardBinding.inflate(
+                LayoutInflater.from(requireContext()), binding.containerAchievements, false
+            )
+            cardBinding.textViewAchievementName.text = badgeDisplayName(badgeId)
+            cardBinding.textViewAchievementIcon.text = badgeIcon(badgeId)
+
+            cardBinding.root.scaleX = 0f
+            cardBinding.root.scaleY = 0f
+            binding.containerAchievements.addView(cardBinding.root)
+
+            cardBinding.root.postDelayed({
+                SpringAnimation(cardBinding.root, DynamicAnimation.SCALE_X, 1f).apply {
+                    spring.stiffness = SpringForce.STIFFNESS_MEDIUM
+                    spring.dampingRatio = SpringForce.DAMPING_RATIO_MEDIUM_BOUNCY
+                    start()
+                }
+                SpringAnimation(cardBinding.root, DynamicAnimation.SCALE_Y, 1f).apply {
+                    spring.stiffness = SpringForce.STIFFNESS_MEDIUM
+                    spring.dampingRatio = SpringForce.DAMPING_RATIO_MEDIUM_BOUNCY
+                    start()
+                }
+            }, index * 150L)
         }
     }
 
     private fun animateTotalPoints(total: Int) {
-        val animator = android.animation.ValueAnimator.ofInt(0, total).apply {
+        ValueAnimator.ofInt(0, total).apply {
             duration = 600
             addUpdateListener { anim ->
                 binding.textViewTotalPoints.text = anim.animatedValue.toString()
             }
+            start()
         }
-        animator.start()
     }
 
     private fun badgeDisplayName(badgeId: String) = when (badgeId) {
@@ -152,6 +188,21 @@ class PostWorkoutFragment : Fragment() {
         "comeback" -> "Comeback"
         "full_house" -> "Full House"
         else -> badgeId
+    }
+
+    private fun badgeIcon(badgeId: String) = when (badgeId) {
+        "first_rep" -> "💪"
+        "on_a_roll" -> "🔥"
+        "unstoppable" -> "⚡"
+        "century" -> "💯"
+        "pr_machine" -> "🏆"
+        "plan_master" -> "📋"
+        "heavy_bench" -> "🏋️"
+        "heavy_squat" -> "🦵"
+        "heavy_deadlift" -> "⬆️"
+        "comeback" -> "🔄"
+        "full_house" -> "✅"
+        else -> "🏅"
     }
 
     private fun navigateHome() {

@@ -85,6 +85,7 @@ dependencies {
     implementation(libs.androidx.localbroadcastmanager)
     implementation(libs.kizitonwose.calendar)
     implementation(libs.mpandroidchart)
+    implementation("androidx.dynamicanimation:dynamicanimation:1.0.0")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
