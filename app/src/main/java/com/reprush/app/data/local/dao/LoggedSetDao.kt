@@ -30,6 +30,12 @@ interface LoggedSetDao {
     @Update
     suspend fun updateSet(set: LoggedSetEntity)
 
+    @Query("SELECT * FROM logged_sets WHERE sessionId = :sessionId AND isWarmup = 0 AND isCompleted = 1")
+    suspend fun getWorkingSetsForSession(sessionId: String): List<LoggedSetEntity>
+
+    @Query("UPDATE logged_sets SET isPersonalRecord = :flag WHERE id = :setId")
+    suspend fun updatePersonalRecordFlag(setId: String, flag: Int)
+
     @Query("DELETE FROM logged_sets WHERE sessionId = :sessionId")
     suspend fun deleteSetsForSession(sessionId: String)
 }

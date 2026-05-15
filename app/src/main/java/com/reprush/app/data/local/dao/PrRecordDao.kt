@@ -16,4 +16,7 @@ interface PrRecordDao {
 
     @Query("SELECT COUNT(*) FROM pr_records WHERE userId = :userId")
     suspend fun getTotalPrCount(userId: String): Int
+
+    @Query("SELECT * FROM pr_records WHERE userId = :userId ORDER BY achievedAt DESC LIMIT :limit")
+    suspend fun getRecentPRs(userId: String, limit: Int): List<PrRecordEntity>
 }
