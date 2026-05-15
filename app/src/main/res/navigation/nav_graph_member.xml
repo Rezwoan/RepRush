@@ -169,4 +169,34 @@
         android:name="com.reprush.app.ui.auth.onboarding.PlanInjuriesFragment"
         android:label="Injuries" />
 
+    <!-- Workout Session Flow -->
+    <fragment
+        android:id="@+id/activeSessionFragment"
+        android:name="com.reprush.app.ui.member.session.ActiveSessionFragment"
+        android:label="Active Session">
+        <argument
+            android:name="planDayId"
+            app:argType="string"
+            android:defaultValue="" />
+        <action
+            android:id="@+id/action_activeSessionFragment_to_finishWorkoutFragment"
+            app:destination="@id/finishWorkoutFragment" />
+        <action
+            android:id="@+id/action_activeSessionFragment_to_homeFragment"
+            app:destination="@id/homeFragment"
+            app:popUpTo="@id/homeFragment"
+            app:popUpToInclusive="false" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/finishWorkoutFragment"
+        android:name="com.reprush.app.ui.member.session.FinishWorkoutFragment"
+        android:label="Finish Workout">
+        <action
+            android:id="@+id/action_finishWorkoutFragment_to_homeFragment"
+            app:destination="@id/homeFragment"
+            app:popUpTo="@id/homeFragment"
+            app:popUpToInclusive="false" />
+    </fragment>
+
 </navigation>
