@@ -48,7 +48,7 @@ class ActiveSessionFragment : Fragment() {
         val sessionAlreadyActive = viewModel.sessionState.value is SessionState.Active
 
         if (!sessionAlreadyActive) {
-            if (planDayId != null) {
+            if (!planDayId.isNullOrBlank()) {
                 viewModel.startFromPlan(planDayId)
             } else {
                 viewModel.startBlankSession()

@@ -11,6 +11,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.firebase.auth.FirebaseAuth
 import com.reprush.app.R
+import com.reprush.app.data.local.dao.PlanDayDao
+import com.reprush.app.data.local.dao.WorkoutPlanDao
 import com.reprush.app.data.local.datastore.AppPreferences
 import com.reprush.app.data.repository.SessionRepository
 import com.reprush.app.databinding.FragmentHomeBinding
@@ -35,6 +37,10 @@ class HomeFragment : Fragment() {
     @Inject lateinit var appPreferences: AppPreferences
     @Inject lateinit var sessionRepository: SessionRepository
     @Inject lateinit var auth: FirebaseAuth
+    @Inject lateinit var workoutPlanDao: WorkoutPlanDao
+    @Inject lateinit var planDayDao: PlanDayDao
+
+    private var todayPlanDayId: String? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
@@ -51,10 +57,12 @@ class HomeFragment : Fragment() {
                 return@launch
             }
             checkForIncompleteSession()
+            loadTodayPlanDay()
         }
 
         binding.buttonStartWorkout.setOnClickListener {
-            findNavController().navigate(R.id.action_homeFragment_to_activeSessionFragment)
+            val bundle = Bundle().apply { putString("planDayId", todayPlanDayId ?: "") }
+            findNavController().navigate(R.id.action_homeFragment_to_activeSessionFragment, bundle)
         }
     }
 
@@ -92,6 +100,18 @@ class HomeFragment : Fragment() {
                     .show()
             }
         }
+    }
+
+    private suspend fun loadTodayPlanDay() {
+        val userId = auth.currentUser?.uid ?: return
+        val plan = workoutPlanDao.getActivePlan(userId) ?: return
+        val planDays = planDayDao.getDaysForPlan(plan.id)
+        if (planDays.isEmpty()) return
+        val daysSinceStart = ((System.currentTimeMillis() - plan.createdAt) / 86400000L).toInt()
+        val todayIndex = daysSinceStart % plan.daysPerWeek
+        val todayDay = planDays.getOrNull(todayIndex) ?: planDays.first()
+        todayPlanDayId = todayDay.id
+        if (isAdded) binding.textViewTodayDayLabel.text = todayDay.dayLabel
     }
 
     override fun onDestroyView() {
