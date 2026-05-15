@@ -196,7 +196,20 @@
         android:name="com.reprush.app.ui.member.session.FinishWorkoutFragment"
         android:label="Finish Workout">
         <action
-            android:id="@+id/action_finishWorkoutFragment_to_homeFragment"
+            android:id="@+id/action_finishWorkoutFragment_to_postWorkoutFragment"
+            app:destination="@id/postWorkoutFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/postWorkoutFragment"
+        android:name="com.reprush.app.ui.member.postsession.PostWorkoutFragment"
+        android:label="Post Workout">
+        <argument
+            android:name="sessionId"
+            app:argType="string"
+            android:defaultValue="" />
+        <action
+            android:id="@+id/action_postWorkoutFragment_to_homeFragment"
             app:destination="@id/homeFragment"
             app:popUpTo="@id/homeFragment"
             app:popUpToInclusive="false" />

@@ -50,23 +50,11 @@ class FinishWorkoutFragment : Fragment() {
                     binding.buttonConfirmFinish.text = "Saving..."
                 }
                 is SessionState.Saved -> {
-                    val sessionDurationMs = viewModel.getDurationMs()
-                    viewModel.clearSession()
-                    val underTenMinutes = sessionDurationMs < 10 * 60 * 1000
+                    val bundle = Bundle().apply { putString("sessionId", state.sessionId) }
                     findNavController().navigate(
-                        R.id.action_finishWorkoutFragment_to_homeFragment,
-                        null,
-                        androidx.navigation.NavOptions.Builder()
-                            .setPopUpTo(R.id.homeFragment, false)
-                            .build()
+                        R.id.action_finishWorkoutFragment_to_postWorkoutFragment,
+                        bundle
                     )
-                    if (underTenMinutes) {
-                        Snackbar.make(
-                            requireActivity().window.decorView,
-                            "Sessions under 10 minutes do not earn attendance points.",
-                            Snackbar.LENGTH_LONG
-                        ).show()
-                    }
                 }
                 is SessionState.Error -> {
                     binding.buttonConfirmFinish.isEnabled = true
