@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
@@ -20,44 +19,42 @@
         android:textSize="14sp"
         android:gravity="center" />
 
-    <!-- Weight input (hidden when BW chip is active) -->
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/textInputLayout_weight"
+    <!-- Weight input: plain EditText, no floating label, actionNext -->
+    <EditText
+        android:id="@+id/editText_weight"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:layout_weight="1"
         android:layout_marginEnd="@dimen/spacing_xs"
-        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense">
+        android:background="@drawable/bg_input_set"
+        android:hint="kg"
+        android:inputType="numberDecimal"
+        android:imeOptions="actionNext"
+        android:nextFocusForward="@+id/editText_reps"
+        android:textColor="@color/on_surface"
+        android:textColorHint="@color/on_surface_variant"
+        android:textSize="14sp"
+        android:gravity="center"
+        android:paddingStart="@dimen/spacing_xs"
+        android:paddingEnd="@dimen/spacing_xs" />
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/editText_weight"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="numberDecimal"
-            android:hint="0"
-            android:textColor="@color/on_surface"
-            android:textSize="14sp"
-            android:gravity="center" />
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <!-- Reps input -->
-    <com.google.android.material.textfield.TextInputLayout
+    <!-- Reps input: plain EditText, actionDone -->
+    <EditText
+        android:id="@+id/editText_reps"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:layout_weight="1"
         android:layout_marginEnd="@dimen/spacing_xs"
-        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/editText_reps"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="number"
-            android:hint="0"
-            android:textColor="@color/on_surface"
-            android:textSize="14sp"
-            android:gravity="center" />
-    </com.google.android.material.textfield.TextInputLayout>
+        android:background="@drawable/bg_input_set"
+        android:hint="reps"
+        android:inputType="number"
+        android:imeOptions="actionDone"
+        android:textColor="@color/on_surface"
+        android:textColorHint="@color/on_surface_variant"
+        android:textSize="14sp"
+        android:gravity="center"
+        android:paddingStart="@dimen/spacing_xs"
+        android:paddingEnd="@dimen/spacing_xs" />
 
     <!-- Warmup chip -->
     <com.google.android.material.chip.Chip
@@ -69,7 +66,7 @@
         android:checkable="true"
         android:layout_marginEnd="@dimen/spacing_xs" />
 
-    <!-- Bodyweight chip — hides weight field when checked -->
+    <!-- Bodyweight chip — disables weight field when checked -->
     <com.google.android.material.chip.Chip
         android:id="@+id/chip_bodyweight"
         style="@style/Widget.Material3.Chip.Filter"

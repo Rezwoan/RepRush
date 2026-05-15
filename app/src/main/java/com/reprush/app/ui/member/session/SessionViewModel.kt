@@ -1,5 +1,6 @@
 package com.reprush.app.ui.member.session
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -12,7 +13,11 @@ import com.reprush.app.data.repository.SessionRepository
 import com.reprush.app.data.repository.SessionSet
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.util.UUID
@@ -46,8 +51,11 @@ class SessionViewModel @Inject constructor(
     private val _elapsedTime = MutableLiveData("00:00")
     val elapsedTime: LiveData<String> = _elapsedTime
 
-    private val _restTimerEvent = MutableLiveData<RestTimerData?>()
-    val restTimerEvent: LiveData<RestTimerData?> = _restTimerEvent
+    private val _restTimerEvent = MutableSharedFlow<RestTimerData>(
+        extraBufferCapacity = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
+    val restTimerEvent: SharedFlow<RestTimerData> = _restTimerEvent.asSharedFlow()
 
     // In-memory backing updated silently on every TextWatcher keystroke.
     // LiveData only posts on cascade (focus loss) and structural changes.
@@ -153,8 +161,8 @@ class SessionViewModel @Inject constructor(
         val lastSet = ex.sets.lastOrNull()
         val newSet = SessionSet(
             setNumber = ex.sets.size + 1,
-            weight = lastSet?.weight ?: 0.0,
-            reps = lastSet?.reps ?: 0,
+            weight = lastSet?.weight,
+            reps = lastSet?.reps,
             isBodyweight = lastSet?.isBodyweight ?: false
         )
         val updatedEx = ex.copy(sets = (ex.sets + newSet).toMutableList())
@@ -191,7 +199,7 @@ class SessionViewModel @Inject constructor(
         val ex = current.exercises[exerciseIndex]
         if (setIndex < 0 || setIndex >= ex.sets.size) return
         val sourceWeight = ex.sets[setIndex].weight
-        if (sourceWeight <= 0.0) return
+        if (sourceWeight == null || sourceWeight <= 0.0) return
         val exercises = current.exercises.toMutableList()
         val updatedSets = ex.sets.toMutableList()
         updatedSets.forEachIndexed { i, set ->
@@ -210,7 +218,7 @@ class SessionViewModel @Inject constructor(
         val ex = current.exercises[exerciseIndex]
         if (setIndex < 0 || setIndex >= ex.sets.size) return
         val sourceReps = ex.sets[setIndex].reps
-        if (sourceReps <= 0) return
+        if (sourceReps == null || sourceReps <= 0) return
         val exercises = current.exercises.toMutableList()
         val updatedSets = ex.sets.toMutableList()
         updatedSets.forEachIndexed { i, set ->
@@ -235,7 +243,7 @@ class SessionViewModel @Inject constructor(
         val set = ex.sets[setIndex]
         val nowBw = !set.isBodyweight
         val updatedSets = ex.sets.toMutableList()
-        updatedSets[setIndex] = set.copy(isBodyweight = nowBw, weight = if (nowBw) 0.0 else set.weight)
+        updatedSets[setIndex] = set.copy(isBodyweight = nowBw, weight = if (nowBw) null else set.weight)
         exercises[exerciseIndex] = ex.copy(sets = updatedSets)
         publishSession(current.copy(exercises = exercises))
     }
@@ -256,14 +264,12 @@ class SessionViewModel @Inject constructor(
         publishSession(current.copy(exercises = exercises))
 
         val restSeconds = if (ex.plannedRestSeconds > 0) ex.plannedRestSeconds else 60
-        _restTimerEvent.value = RestTimerData(
+        Log.d("RestTimer", "ViewModel: emitting rest for ${ex.exerciseName}, ${restSeconds}s")
+        val emitted = _restTimerEvent.tryEmit(RestTimerData(
             exerciseName = ex.exerciseName,
             durationSeconds = restSeconds
-        )
-    }
-
-    fun clearRestTimerEvent() {
-        _restTimerEvent.value = null
+        ))
+        Log.d("RestTimer", "ViewModel: tryEmit returned $emitted")
     }
 
     fun updateNotes(notes: String) {
@@ -317,7 +323,7 @@ class SessionViewModel @Inject constructor(
     fun getTotalVolumeKg(): Double {
         return sessionData?.exercises?.sumOf { ex ->
             ex.sets.filter { it.isCompleted && !it.isWarmup }
-                .sumOf { it.weight * it.reps }
+                .sumOf { (it.weight ?: 0.0) * (it.reps ?: 0) }
         } ?: 0.0
     }
 
