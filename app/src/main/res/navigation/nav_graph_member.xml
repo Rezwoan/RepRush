@@ -17,12 +17,39 @@
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.reprush.app.ui.member.HomeFragment"
-        android:label="Home" />
+        android:label="Home">
+        <action
+            android:id="@+id/action_homeFragment_to_librarySyncFragment"
+            app:destination="@id/librarySyncFragment"
+            app:popUpTo="@id/homeFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/librarySyncFragment"
+        android:name="com.reprush.app.ui.member.exercise.LibrarySyncFragment"
+        android:label="Setting Up Library">
+        <action
+            android:id="@+id/action_librarySyncFragment_to_homeFragment"
+            app:destination="@id/homeFragment"
+            app:popUpTo="@id/librarySyncFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
 
     <fragment
         android:id="@+id/workoutFragment"
         android:name="com.reprush.app.ui.member.WorkoutFragment"
-        android:label="Workout" />
+        android:label="Workout">
+        <action
+            android:id="@+id/action_workoutFragment_to_exerciseLibraryFragment"
+            app:destination="@id/exerciseLibraryFragment" />
+        <action
+            android:id="@+id/action_workoutFragment_to_planListFragment"
+            app:destination="@id/planListFragment" />
+        <action
+            android:id="@+id/action_workoutFragment_to_planQuestionnaireFragment"
+            app:destination="@id/planQuestionnaireFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/progressFragment"
@@ -39,41 +66,104 @@
         android:name="com.reprush.app.ui.member.notifications.NotificationsFragment"
         android:label="Notifications" />
 
+    <!-- Exercise Library -->
+    <fragment
+        android:id="@+id/exerciseLibraryFragment"
+        android:name="com.reprush.app.ui.member.exercise.ExerciseLibraryFragment"
+        android:label="Exercise Library">
+        <action
+            android:id="@+id/action_exerciseLibraryFragment_to_exerciseDetailFragment"
+            app:destination="@id/exerciseDetailFragment" />
+        <action
+            android:id="@+id/action_exerciseLibraryFragment_to_addCustomExerciseFragment"
+            app:destination="@id/addCustomExerciseFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/exerciseDetailFragment"
+        android:name="com.reprush.app.ui.member.exercise.ExerciseDetailFragment"
+        android:label="Exercise Detail">
+        <argument
+            android:name="exerciseId"
+            app:argType="string"
+            android:defaultValue="" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/addCustomExerciseFragment"
+        android:name="com.reprush.app.ui.member.exercise.AddCustomExerciseFragment"
+        android:label="Add Exercise" />
+
+    <!-- Plan Flow -->
+    <fragment
+        android:id="@+id/planListFragment"
+        android:name="com.reprush.app.ui.member.plan.PlanListFragment"
+        android:label="My Plans">
+        <action
+            android:id="@+id/action_planListFragment_to_planQuestionnaireFragment"
+            app:destination="@id/planQuestionnaireFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/planQuestionnaireFragment"
+        android:name="com.reprush.app.ui.member.plan.PlanQuestionnaireFragment"
+        android:label="Generate Plan">
+        <action
+            android:id="@+id/action_planQuestionnaireFragment_to_geminiLoadingFragment"
+            app:destination="@id/geminiLoadingFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/geminiLoadingFragment"
+        android:name="com.reprush.app.ui.member.plan.GeminiLoadingFragment"
+        android:label="Generating Plan">
+        <action
+            android:id="@+id/action_geminiLoadingFragment_to_planSummaryFragment"
+            app:destination="@id/planSummaryFragment"
+            app:popUpTo="@id/planQuestionnaireFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/planSummaryFragment"
+        android:name="com.reprush.app.ui.member.plan.PlanSummaryFragment"
+        android:label="Plan Summary">
+        <action
+            android:id="@+id/action_planSummaryFragment_to_workoutFragment"
+            app:destination="@id/workoutFragment"
+            app:popUpTo="@id/workoutFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <!-- Onboarding fragments still referenced but no longer used for plan gen -->
     <fragment
         android:id="@+id/planGoalFragment"
         android:name="com.reprush.app.ui.auth.onboarding.PlanGoalFragment"
         android:label="Goal" />
-
     <fragment
         android:id="@+id/planDaysFragment"
         android:name="com.reprush.app.ui.auth.onboarding.PlanDaysFragment"
         android:label="Days" />
-
     <fragment
         android:id="@+id/planSplitFragment"
         android:name="com.reprush.app.ui.auth.onboarding.PlanSplitFragment"
         android:label="Split" />
-
     <fragment
         android:id="@+id/planDurationFragment"
         android:name="com.reprush.app.ui.auth.onboarding.PlanDurationFragment"
         android:label="Duration" />
-
     <fragment
         android:id="@+id/planEquipmentFragment"
         android:name="com.reprush.app.ui.auth.onboarding.PlanEquipmentFragment"
         android:label="Equipment" />
-
     <fragment
         android:id="@+id/planLevelFragment"
         android:name="com.reprush.app.ui.auth.onboarding.PlanLevelFragment"
         android:label="Level" />
-
     <fragment
         android:id="@+id/planWeeksFragment"
         android:name="com.reprush.app.ui.auth.onboarding.PlanWeeksFragment"
         android:label="Weeks" />
-
     <fragment
         android:id="@+id/planInjuriesFragment"
         android:name="com.reprush.app.ui.auth.onboarding.PlanInjuriesFragment"
