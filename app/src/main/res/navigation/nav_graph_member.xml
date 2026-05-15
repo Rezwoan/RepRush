@@ -26,6 +26,9 @@
         <action
             android:id="@+id/action_homeFragment_to_activeSessionFragment"
             app:destination="@id/activeSessionFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_leaderboardFragment"
+            app:destination="@id/leaderboardFragment" />
     </fragment>
 
     <fragment
@@ -199,6 +202,11 @@
             android:id="@+id/action_finishWorkoutFragment_to_postWorkoutFragment"
             app:destination="@id/postWorkoutFragment" />
     </fragment>
+
+    <fragment
+        android:id="@+id/leaderboardFragment"
+        android:name="com.reprush.app.ui.member.leaderboard.LeaderboardFragment"
+        android:label="Leaderboard" />
 
     <fragment
         android:id="@+id/postWorkoutFragment"

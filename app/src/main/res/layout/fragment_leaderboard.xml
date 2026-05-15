@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/background">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Monthly Leaderboard"
+        android:textColor="@color/on_surface"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:padding="@dimen/spacing_md" />
+
+    <ProgressBar
+        android:id="@+id/progressBar_leaderboard"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/textView_emptyState"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="No leaderboard data yet for this month."
+        android:textColor="@color/on_surface_variant"
+        android:textSize="14sp"
+        android:gravity="center"
+        android:padding="@dimen/spacing_xl"
+        android:visibility="gone" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView_leaderboard"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:paddingHorizontal="@dimen/spacing_md" />
+
+    <View
+        android:id="@+id/divider_pinnedUser"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/outline"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:id="@+id/layout_pinnedUser"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="@dimen/spacing_md"
+        android:background="@color/primary_container"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/textView_pinnedRank"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="#—"
+            android:textColor="@color/on_primary_container"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:minWidth="40dp"
+            android:layout_marginEnd="@dimen/spacing_sm" />
+
+        <TextView
+            android:id="@+id/textView_pinnedName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="You"
+            android:textColor="@color/on_primary_container"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/textView_pinnedPoints"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0 pts"
+            android:textColor="@color/points_yellow"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+</LinearLayout>
