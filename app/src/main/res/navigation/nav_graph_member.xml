@@ -23,6 +23,9 @@
             app:destination="@id/librarySyncFragment"
             app:popUpTo="@id/homeFragment"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_homeFragment_to_activeSessionFragment"
+            app:destination="@id/activeSessionFragment" />
     </fragment>
 
     <fragment
