@@ -43,4 +43,5 @@ object FirebaseModule {
     @Provides fun provideWorkoutSessionDao(db: AppDatabase): WorkoutSessionDao = db.workoutSessionDao()
     @Provides fun provideLoggedSetDao(db: AppDatabase): LoggedSetDao = db.loggedSetDao()
     @Provides fun providePrRecordDao(db: AppDatabase): PrRecordDao = db.prRecordDao()
+    @Provides fun provideStreakDao(db: AppDatabase): StreakDao = db.streakDao()
 }
