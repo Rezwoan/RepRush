@@ -96,6 +96,7 @@ class SignInActivity : AppCompatActivity() {
                 is AuthState.MemberActive -> navigateTo(MemberActivity::class.java)
                 is AuthState.MemberPending -> navigateTo(MemberActivity::class.java, pending = true)
                 is AuthState.MemberBlocked -> navigateTo(MemberActivity::class.java, blocked = true)
+                is AuthState.MemberRejected -> navigateTo(MemberActivity::class.java, rejected = true)
                 is AuthState.Error -> {
                     showLoading(false)
                     showError(state.message)
@@ -104,10 +105,11 @@ class SignInActivity : AppCompatActivity() {
         }
     }
 
-    private fun navigateTo(activityClass: Class<*>, pending: Boolean = false, blocked: Boolean = false) {
+    private fun navigateTo(activityClass: Class<*>, pending: Boolean = false, blocked: Boolean = false, rejected: Boolean = false) {
         val intent = Intent(this, activityClass).apply {
             putExtra("pending", pending)
             putExtra("blocked", blocked)
+            putExtra("rejected", rejected)
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
         startActivity(intent)

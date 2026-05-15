@@ -17,14 +17,23 @@ interface ExerciseDao {
     @Query("SELECT * FROM exercises WHERE id = :exerciseId")
     suspend fun getExerciseById(exerciseId: String): ExerciseEntity?
 
-    @Query("SELECT * FROM exercises WHERE name LIKE '%' || :query || '%'")
-    suspend fun searchExercises(query: String): List<ExerciseEntity>
+    @Query("SELECT * FROM exercises WHERE LOWER(name) = LOWER(:name) LIMIT 1")
+    suspend fun getExerciseByName(name: String): ExerciseEntity?
 
-    @Query("SELECT * FROM exercises WHERE primaryMuscle = :muscle")
-    suspend fun getExercisesByMuscle(muscle: String): List<ExerciseEntity>
+    @Query("""
+        SELECT * FROM exercises
+        WHERE (:query = '' OR LOWER(name) LIKE '%' || LOWER(:query) || '%')
+        AND (:muscle = '' OR LOWER(primaryMuscle) = LOWER(:muscle))
+        AND (:equipment = '' OR LOWER(equipment) = LOWER(:equipment))
+        ORDER BY name ASC
+    """)
+    suspend fun getExercisesFiltered(query: String, muscle: String, equipment: String): List<ExerciseEntity>
 
-    @Query("SELECT * FROM exercises WHERE equipment = :equipment")
-    suspend fun getExercisesByEquipment(equipment: String): List<ExerciseEntity>
+    @Query("SELECT * FROM exercises WHERE equipment IN (:equipmentList) ORDER BY name ASC")
+    suspend fun getExercisesForEquipmentList(equipmentList: List<String>): List<ExerciseEntity>
+
+    @Query("UPDATE exercises SET imageUrl = :imageUrl WHERE id = :exerciseId")
+    suspend fun updateImageUrl(exerciseId: String, imageUrl: String)
 
     @Query("SELECT COUNT(*) FROM exercises")
     suspend fun getExerciseCount(): Int

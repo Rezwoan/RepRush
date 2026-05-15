@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:padding="@dimen/spacing_md">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_xl"
+            android:text="Preferred split type?"
+            android:textColor="@color/on_surface"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipGroup_split"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_lg"
+            app:singleSelection="true"
+            app:selectionRequired="false">
+            <com.google.android.material.chip.Chip android:id="@+id/chip_ppl" style="@style/Widget.Material3.Chip.Filter" android:layout_width="wrap_content" android:layout_height="48dp" android:text="Push-Pull-Legs" android:checkable="true" />
+            <com.google.android.material.chip.Chip android:id="@+id/chip_upper_lower" style="@style/Widget.Material3.Chip.Filter" android:layout_width="wrap_content" android:layout_height="48dp" android:text="Upper-Lower" android:checkable="true" />
+            <com.google.android.material.chip.Chip android:id="@+id/chip_full_body" style="@style/Widget.Material3.Chip.Filter" android:layout_width="wrap_content" android:layout_height="48dp" android:text="Full Body" android:checkable="true" />
+            <com.google.android.material.chip.Chip android:id="@+id/chip_bro_split" style="@style/Widget.Material3.Chip.Filter" android:layout_width="wrap_content" android:layout_height="48dp" android:text="Bro Split" android:checkable="true" />
+            <com.google.android.material.chip.Chip android:id="@+id/chip_custom" style="@style/Widget.Material3.Chip.Filter" android:layout_width="wrap_content" android:layout_height="48dp" android:text="Custom" android:checkable="true" />
+        </com.google.android.material.chip.ChipGroup>
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

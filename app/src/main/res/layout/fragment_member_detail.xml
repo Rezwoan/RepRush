@@ -270,8 +270,6 @@
                 android:layout_marginBottom="16dp"
                 android:text="Remove Member" />
 
-            <!-- Placeholder tabs for Payment History and Attendance -->
-            <!-- These will be fully built in Milestone 3 -->
             <com.google.android.material.tabs.TabLayout
                 android:id="@+id/tabLayout_memberDetail"
                 android:layout_width="match_parent"
@@ -290,16 +288,38 @@
 
             </com.google.android.material.tabs.TabLayout>
 
-            <TextView
-                android:id="@+id/textView_tabPlaceholder"
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:padding="32dp"
-                android:text="Payment history and attendance will be available in the next update."
-                android:textAlignment="center"
-                android:textAppearance="?attr/textAppearanceBodyMedium"
-                android:textColor="?attr/colorOnSurfaceVariant" />
+                android:minHeight="200dp">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerView_memberPayments"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    android:visibility="gone" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerView_memberAttendance"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/textView_tabEmpty"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:padding="32dp"
+                    android:text="No records found"
+                    android:textAlignment="center"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:visibility="gone" />
+
+            </FrameLayout>
 
         </LinearLayout>
 

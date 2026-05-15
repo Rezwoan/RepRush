@@ -34,3 +34,9 @@ google-services.json
 /generated
 # Do NOT ignore Room schema exports
 !app/schemas/
+
+# Local planning and scratch docs (never pushed)
+MILESTONE_3_*.md
+*_SCRATCH.md
+MILESTONE_3_PLAN.md
+MILESTONE_3_COMPLETION_REPORT.md

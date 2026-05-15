@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:padding="@dimen/spacing_md">
+
+    <TextView
+        android:id="@+id/textView_appTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="RepRush"
+        android:textColor="@color/primary"
+        android:textSize="32sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@id/textView_syncStatus"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <TextView
+        android:id="@+id/textView_syncStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_lg"
+        android:text="Setting up your exercise library..."
+        android:textColor="@color/on_surface"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@id/progressBar_sync"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textView_appTitle" />
+
+    <ProgressBar
+        android:id="@+id/progressBar_sync"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:layout_width="0dp"
+        android:layout_height="8dp"
+        android:layout_marginTop="@dimen/spacing_lg"
+        android:indeterminate="false"
+        android:max="100"
+        android:progress="0"
+        android:progressTint="@color/primary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textView_syncStatus"
+        app:layout_constraintBottom_toTopOf="@id/textView_syncCount" />
+
+    <TextView
+        android:id="@+id/textView_syncCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_sm"
+        android:text="Preparing exercise library..."
+        android:textColor="@color/on_surface_variant"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/progressBar_sync"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <TextView
+        android:id="@+id/textView_syncError"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_md"
+        android:text=""
+        android:textColor="@color/error"
+        android:textSize="14sp"
+        android:gravity="center"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textView_syncCount" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_retrySync"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:layout_marginTop="@dimen/spacing_md"
+        android:text="Retry"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textView_syncError" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

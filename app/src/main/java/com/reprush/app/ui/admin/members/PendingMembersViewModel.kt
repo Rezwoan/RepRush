@@ -83,4 +83,22 @@ class PendingMembersViewModel @Inject constructor(
             _isLoading.postValue(false)
         }
     }
+
+    fun registerMemberAsActive(
+        displayName: String,
+        email: String,
+        phone: String,
+        packageId: String,
+        startDate: String,
+        endDate: String
+    ) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _isLoading.postValue(true)
+            val result = memberRepository.registerMemberAsActive(
+                displayName, email, phone, packageId, startDate, endDate
+            )
+            _operationResult.postValue(result)
+            _isLoading.postValue(false)
+        }
+    }
 }

@@ -8,8 +8,11 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.tabs.TabLayout
+import com.reprush.app.R
 import com.reprush.app.data.repository.MemberDetail
 import com.reprush.app.data.repository.Result
 import com.reprush.app.databinding.FragmentMemberDetailBinding
@@ -27,6 +30,8 @@ class MemberDetailFragment : Fragment() {
     private var memberUid: String = ""
     private var hasPerformedAction = false
     private var pendingRemove = false
+    private lateinit var paymentAdapter: MemberPaymentAdapter
+    private lateinit var attendanceAdapter: MemberAttendanceAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -49,6 +54,38 @@ class MemberDetailFragment : Fragment() {
         }
 
         viewModel.loadMember(memberUid)
+
+        paymentAdapter = MemberPaymentAdapter()
+        binding.recyclerViewMemberPayments.layoutManager = LinearLayoutManager(requireContext())
+        binding.recyclerViewMemberPayments.adapter = paymentAdapter
+
+        attendanceAdapter = MemberAttendanceAdapter()
+        binding.recyclerViewMemberAttendance.layoutManager = LinearLayoutManager(requireContext())
+        binding.recyclerViewMemberAttendance.adapter = attendanceAdapter
+
+        binding.tabLayoutMemberDetail.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab) { switchTab(tab.position) }
+            override fun onTabUnselected(tab: TabLayout.Tab) {}
+            override fun onTabReselected(tab: TabLayout.Tab) {}
+        })
+
+        viewModel.payments.observe(viewLifecycleOwner) { payments ->
+            paymentAdapter.submitList(payments)
+            if (binding.tabLayoutMemberDetail.selectedTabPosition == 0) {
+                updateTabContent(0)
+            }
+        }
+
+        viewModel.attendance.observe(viewLifecycleOwner) { records ->
+            attendanceAdapter.submitList(records)
+            if (binding.tabLayoutMemberDetail.selectedTabPosition == 1) {
+                updateTabContent(1)
+            }
+        }
+
+        viewModel.loadPayments(memberUid)
+        viewModel.loadAttendance(memberUid)
+        switchTab(0)
 
         viewModel.isLoading.observe(viewLifecycleOwner) { loading ->
             binding.progressBarMemberDetail.visibility = if (loading) View.VISIBLE else View.GONE
@@ -197,7 +234,50 @@ class MemberDetailFragment : Fragment() {
         }
 
         binding.buttonRecordPayment.setOnClickListener {
-            // TODO: Milestone 3
+            val bundle = Bundle().apply {
+                putString("memberUid", member.uid)
+                putString("memberName", member.displayName)
+            }
+            findNavController().navigate(
+                R.id.action_memberDetailFragment_to_recordPaymentFragment,
+                bundle
+            )
+        }
+    }
+
+    private fun switchTab(position: Int) {
+        binding.recyclerViewMemberPayments.visibility = View.GONE
+        binding.recyclerViewMemberAttendance.visibility = View.GONE
+        binding.textViewTabEmpty.visibility = View.GONE
+        updateTabContent(position)
+    }
+
+    private fun updateTabContent(position: Int) {
+        when (position) {
+            0 -> {
+                val payments = viewModel.payments.value
+                if (payments.isNullOrEmpty()) {
+                    binding.textViewTabEmpty.text = "No payment records"
+                    binding.textViewTabEmpty.visibility = View.VISIBLE
+                    binding.recyclerViewMemberPayments.visibility = View.GONE
+                } else {
+                    binding.textViewTabEmpty.visibility = View.GONE
+                    binding.recyclerViewMemberPayments.visibility = View.VISIBLE
+                }
+                binding.recyclerViewMemberAttendance.visibility = View.GONE
+            }
+            1 -> {
+                val attendance = viewModel.attendance.value
+                if (attendance.isNullOrEmpty()) {
+                    binding.textViewTabEmpty.text = "No attendance records"
+                    binding.textViewTabEmpty.visibility = View.VISIBLE
+                    binding.recyclerViewMemberAttendance.visibility = View.GONE
+                } else {
+                    binding.textViewTabEmpty.visibility = View.GONE
+                    binding.recyclerViewMemberAttendance.visibility = View.VISIBLE
+                }
+                binding.recyclerViewMemberPayments.visibility = View.GONE
+            }
         }
     }
 

@@ -19,9 +19,28 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    match /attendance/{attId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /payments/{payId} {
+      allow read: if request.auth.uid == resource.data.memberId || isAdmin();
+      allow write: if isAdmin();
+    }
+
     match /notifications/{uid}/items/{notifId} {
       allow read: if request.auth.uid == uid;
       allow write: if isAdmin() || request.auth.uid == uid;
+    }
+
+    match /announcements/{annId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    match /settings/{settingId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
     }
 
   }
