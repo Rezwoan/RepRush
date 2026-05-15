@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:padding="@dimen/spacing_md">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_xl"
+            android:text="What is your primary goal?"
+            android:textColor="@color/on_surface"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipGroup_goal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_lg">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_strength"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:text="Strength" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_hypertrophy"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:text="Hypertrophy" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_fatLoss"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:text="Fat Loss" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_endurance"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:text="Endurance" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_generalFitness"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:text="General Fitness" />
+
+        </com.google.android.material.chip.ChipGroup>
+
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>
