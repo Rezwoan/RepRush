@@ -49,8 +49,41 @@ class SessionViewModel @Inject constructor(
     private val _restTimerEvent = MutableLiveData<RestTimerData?>()
     val restTimerEvent: LiveData<RestTimerData?> = _restTimerEvent
 
+    // In-memory backing updated silently on every TextWatcher keystroke.
+    // LiveData only posts on cascade (focus loss) and structural changes (add/remove set/exercise).
+    private var sessionData: ActiveSessionState? = null
+
     private var elapsedJob: Job? = null
     private var autoSaveJob: Job? = null
+
+    private fun publishSession(state: ActiveSessionState) {
+        sessionData = state
+        _activeSession.value = state
+    }
+
+    private fun updateSet(exerciseIndex: Int, setIndex: Int, transform: (SessionSet) -> SessionSet) {
+        val current = sessionData ?: return
+        if (exerciseIndex < 0 || exerciseIndex >= current.exercises.size) return
+        val exercises = current.exercises.toMutableList()
+        val ex = exercises[exerciseIndex]
+        if (setIndex < 0 || setIndex >= ex.sets.size) return
+        val updatedSets = ex.sets.toMutableList()
+        updatedSets[setIndex] = transform(updatedSets[setIndex])
+        exercises[exerciseIndex] = ex.copy(sets = updatedSets)
+        publishSession(current.copy(exercises = exercises))
+    }
+
+    private fun updateSetSilent(exerciseIndex: Int, setIndex: Int, transform: (SessionSet) -> SessionSet) {
+        val current = sessionData ?: return
+        if (exerciseIndex < 0 || exerciseIndex >= current.exercises.size) return
+        val exercises = current.exercises.toMutableList()
+        val ex = exercises[exerciseIndex]
+        if (setIndex < 0 || setIndex >= ex.sets.size) return
+        val updatedSets = ex.sets.toMutableList()
+        updatedSets[setIndex] = transform(updatedSets[setIndex])
+        exercises[exerciseIndex] = ex.copy(sets = updatedSets)
+        sessionData = current.copy(exercises = exercises)
+    }
 
     fun startFromPlan(planDayId: String) {
         val userId = auth.currentUser?.uid ?: return
@@ -66,7 +99,7 @@ class SessionViewModel @Inject constructor(
                 exercises = exercises.toMutableList()
             )
             sessionRepository.startSession(state)
-            _activeSession.value = state
+            publishSession(state)
             _sessionState.value = SessionState.Active
             startElapsedTimer(startTime)
             startAutoSave()
@@ -86,7 +119,7 @@ class SessionViewModel @Inject constructor(
                 exercises = mutableListOf()
             )
             sessionRepository.startSession(state)
-            _activeSession.value = state
+            publishSession(state)
             _sessionState.value = SessionState.Active
             startElapsedTimer(startTime)
             startAutoSave()
@@ -94,27 +127,26 @@ class SessionViewModel @Inject constructor(
     }
 
     fun resumeSession(state: ActiveSessionState) {
-        _activeSession.value = state
+        publishSession(state)
         _sessionState.value = SessionState.Active
         startElapsedTimer(state.startTime)
         startAutoSave()
     }
 
     fun addExercise(exercise: SessionExercise) {
-        val current = _activeSession.value ?: return
-        val updated = current.copy(exercises = (current.exercises + exercise).toMutableList())
-        _activeSession.value = updated
+        val current = sessionData ?: return
+        publishSession(current.copy(exercises = (current.exercises + exercise).toMutableList()))
     }
 
     fun removeExercise(index: Int) {
-        val current = _activeSession.value ?: return
+        val current = sessionData ?: return
         if (index < 0 || index >= current.exercises.size) return
         val updated = current.exercises.toMutableList().also { it.removeAt(index) }
-        _activeSession.value = current.copy(exercises = updated)
+        publishSession(current.copy(exercises = updated))
     }
 
     fun addSet(exerciseIndex: Int) {
-        val current = _activeSession.value ?: return
+        val current = sessionData ?: return
         if (exerciseIndex < 0 || exerciseIndex >= current.exercises.size) return
         val exercises = current.exercises.toMutableList()
         val ex = exercises[exerciseIndex]
@@ -126,11 +158,11 @@ class SessionViewModel @Inject constructor(
         )
         val updatedEx = ex.copy(sets = (ex.sets + newSet).toMutableList())
         exercises[exerciseIndex] = updatedEx
-        _activeSession.value = current.copy(exercises = exercises)
+        publishSession(current.copy(exercises = exercises))
     }
 
     fun removeSet(exerciseIndex: Int, setIndex: Int) {
-        val current = _activeSession.value ?: return
+        val current = sessionData ?: return
         if (exerciseIndex < 0 || exerciseIndex >= current.exercises.size) return
         val exercises = current.exercises.toMutableList()
         val ex = exercises[exerciseIndex]
@@ -138,15 +170,55 @@ class SessionViewModel @Inject constructor(
         val updatedSets = ex.sets.toMutableList().also { it.removeAt(setIndex) }
             .mapIndexed { i, s -> s.copy(setNumber = i + 1) }.toMutableList()
         exercises[exerciseIndex] = ex.copy(sets = updatedSets)
-        _activeSession.value = current.copy(exercises = exercises)
+        publishSession(current.copy(exercises = exercises))
     }
 
+    // Called from TextWatcher — silent, no LiveData post, marks field as user-edited
     fun updateSetWeight(exerciseIndex: Int, setIndex: Int, weight: Double) {
-        updateSet(exerciseIndex, setIndex) { it.copy(weight = weight) }
+        updateSetSilent(exerciseIndex, setIndex) { it.copy(weight = weight, weightUserEdited = true) }
     }
 
+    // Called from TextWatcher — silent, no LiveData post, marks field as user-edited
     fun updateSetReps(exerciseIndex: Int, setIndex: Int, reps: Int) {
-        updateSet(exerciseIndex, setIndex) { it.copy(reps = reps) }
+        updateSetSilent(exerciseIndex, setIndex) { it.copy(reps = reps, repsUserEdited = true) }
+    }
+
+    // Called on focus loss — cascades weight to unedited non-completed sibling sets, then publishes
+    fun cascadeSetWeight(exerciseIndex: Int, setIndex: Int) {
+        val current = sessionData ?: return
+        if (exerciseIndex < 0 || exerciseIndex >= current.exercises.size) return
+        val ex = current.exercises[exerciseIndex]
+        if (setIndex < 0 || setIndex >= ex.sets.size) return
+        val sourceWeight = ex.sets[setIndex].weight
+        if (sourceWeight <= 0.0) return
+        val exercises = current.exercises.toMutableList()
+        val updatedSets = ex.sets.toMutableList()
+        updatedSets.forEachIndexed { i, set ->
+            if (i != setIndex && !set.isCompleted && !set.weightUserEdited) {
+                updatedSets[i] = set.copy(weight = sourceWeight)
+            }
+        }
+        exercises[exerciseIndex] = ex.copy(sets = updatedSets)
+        publishSession(current.copy(exercises = exercises))
+    }
+
+    // Called on focus loss — cascades reps to unedited non-completed sibling sets, then publishes
+    fun cascadeSetReps(exerciseIndex: Int, setIndex: Int) {
+        val current = sessionData ?: return
+        if (exerciseIndex < 0 || exerciseIndex >= current.exercises.size) return
+        val ex = current.exercises[exerciseIndex]
+        if (setIndex < 0 || setIndex >= ex.sets.size) return
+        val sourceReps = ex.sets[setIndex].reps
+        if (sourceReps <= 0) return
+        val exercises = current.exercises.toMutableList()
+        val updatedSets = ex.sets.toMutableList()
+        updatedSets.forEachIndexed { i, set ->
+            if (i != setIndex && !set.isCompleted && !set.repsUserEdited) {
+                updatedSets[i] = set.copy(reps = sourceReps)
+            }
+        }
+        exercises[exerciseIndex] = ex.copy(sets = updatedSets)
+        publishSession(current.copy(exercises = exercises))
     }
 
     fun toggleWarmup(exerciseIndex: Int, setIndex: Int) {
@@ -154,7 +226,7 @@ class SessionViewModel @Inject constructor(
     }
 
     fun completeSet(exerciseIndex: Int, setIndex: Int) {
-        val current = _activeSession.value ?: return
+        val current = sessionData ?: return
         if (exerciseIndex < 0 || exerciseIndex >= current.exercises.size) return
         val exercises = current.exercises.toMutableList()
         val ex = exercises[exerciseIndex]
@@ -166,7 +238,7 @@ class SessionViewModel @Inject constructor(
             loggedAt = System.currentTimeMillis()
         )
         exercises[exerciseIndex] = ex.copy(sets = updatedSets)
-        _activeSession.value = current.copy(exercises = exercises)
+        publishSession(current.copy(exercises = exercises))
 
         _restTimerEvent.value = RestTimerData(
             exerciseName = ex.exerciseName,
@@ -179,13 +251,12 @@ class SessionViewModel @Inject constructor(
     }
 
     fun updateNotes(notes: String) {
-        val current = _activeSession.value ?: return
-        _activeSession.value = current.copy(notes = notes)
+        val current = sessionData ?: return
+        sessionData = current.copy(notes = notes)
     }
 
     fun finishWorkout() {
-        val current = _activeSession.value ?: return
-        val userId = auth.currentUser?.uid ?: return
+        val current = sessionData ?: return
         _sessionState.value = SessionState.Saving
         viewModelScope.launch {
             val endTime = System.currentTimeMillis()
@@ -206,26 +277,27 @@ class SessionViewModel @Inject constructor(
     fun clearSession() {
         stopElapsedTimer()
         stopAutoSave()
+        sessionData = null
         _activeSession.value = null
         _sessionState.value = SessionState.Idle
         _elapsedTime.value = "00:00"
     }
 
     fun getWorkingSetCount(): Int {
-        return _activeSession.value?.exercises?.sumOf { ex ->
+        return sessionData?.exercises?.sumOf { ex ->
             ex.sets.count { it.isCompleted && !it.isWarmup }
         } ?: 0
     }
 
     fun getTotalVolumeKg(): Double {
-        return _activeSession.value?.exercises?.sumOf { ex ->
+        return sessionData?.exercises?.sumOf { ex ->
             ex.sets.filter { it.isCompleted && !it.isWarmup }
                 .sumOf { it.weight * it.reps }
         } ?: 0.0
     }
 
     fun getDurationMs(): Long {
-        val state = _activeSession.value ?: return 0L
+        val state = sessionData ?: return 0L
         return System.currentTimeMillis() - state.startTime
     }
 
@@ -253,7 +325,7 @@ class SessionViewModel @Inject constructor(
         autoSaveJob = viewModelScope.launch {
             while (isActive) {
                 delay(30_000)
-                val state = _activeSession.value ?: continue
+                val state = sessionData ?: continue
                 sessionRepository.autoSave(state)
             }
         }
@@ -262,18 +334,6 @@ class SessionViewModel @Inject constructor(
     private fun stopAutoSave() {
         autoSaveJob?.cancel()
         autoSaveJob = null
-    }
-
-    private fun updateSet(exerciseIndex: Int, setIndex: Int, transform: (SessionSet) -> SessionSet) {
-        val current = _activeSession.value ?: return
-        if (exerciseIndex < 0 || exerciseIndex >= current.exercises.size) return
-        val exercises = current.exercises.toMutableList()
-        val ex = exercises[exerciseIndex]
-        if (setIndex < 0 || setIndex >= ex.sets.size) return
-        val updatedSets = ex.sets.toMutableList()
-        updatedSets[setIndex] = transform(updatedSets[setIndex])
-        exercises[exerciseIndex] = ex.copy(sets = updatedSets)
-        _activeSession.value = current.copy(exercises = exercises)
     }
 
     override fun onCleared() {

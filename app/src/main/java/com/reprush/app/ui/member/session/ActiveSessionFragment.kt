@@ -198,6 +198,9 @@ class ActiveSessionFragment : Fragment() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
+        weightEdit.setOnFocusChangeListener { _, hasFocus ->
+            if (!hasFocus) viewModel.cascadeSetWeight(exIndex, setIndex)
+        }
 
         repsEdit.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
@@ -207,6 +210,9 @@ class ActiveSessionFragment : Fragment() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
+        repsEdit.setOnFocusChangeListener { _, hasFocus ->
+            if (!hasFocus) viewModel.cascadeSetReps(exIndex, setIndex)
+        }
 
         completeBtn.setOnClickListener {
             if (set.isCompleted) return@setOnClickListener

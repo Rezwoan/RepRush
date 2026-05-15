@@ -22,7 +22,9 @@ data class SessionSet(
     val reps: Int = 0,
     val isWarmup: Boolean = false,
     val isCompleted: Boolean = false,
-    val loggedAt: Long? = null
+    val loggedAt: Long? = null,
+    val weightUserEdited: Boolean = false,
+    val repsUserEdited: Boolean = false
 )
 
 data class SessionExercise(
