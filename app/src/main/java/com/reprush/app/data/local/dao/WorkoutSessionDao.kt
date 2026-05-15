@@ -19,4 +19,7 @@ interface WorkoutSessionDao {
 
     @Update
     suspend fun updateSession(session: WorkoutSessionEntity)
+
+    @Query("DELETE FROM workout_sessions WHERE id = :sessionId")
+    suspend fun deleteSession(sessionId: String)
 }

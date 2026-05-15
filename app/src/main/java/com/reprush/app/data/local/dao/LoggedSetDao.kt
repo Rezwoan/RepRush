@@ -29,6 +29,9 @@ interface LoggedSetDao {
 
     @Update
     suspend fun updateSet(set: LoggedSetEntity)
+
+    @Query("DELETE FROM logged_sets WHERE sessionId = :sessionId")
+    suspend fun deleteSetsForSession(sessionId: String)
 }
 
 data class DailyVolume(
