@@ -36,7 +36,7 @@ google-services.json
 !app/schemas/
 
 # Local planning and scratch docs (never pushed)
-MILESTONE_3_*.md
+MILESTONE_*_PLAN.md
+MILESTONE_*_COMPLETION_REPORT.md
 *_SCRATCH.md
-MILESTONE_3_PLAN.md
-MILESTONE_3_COMPLETION_REPORT.md
+*_NOTES.md
