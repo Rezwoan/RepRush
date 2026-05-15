@@ -13,12 +13,22 @@ class PlanStep1GoalFragment : Fragment(), QuestionnaireStep {
     private var _binding: FragmentPlanStepGoalBinding? = null
     private val binding get() = _binding!!
 
+    override var onSelectionChanged: (() -> Unit)? = null
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentPlanStepGoalBinding.inflate(inflater, container, false)
         return binding.root
     }
 
-    override fun isSelectionMade(): Boolean = binding.chipGroupGoal.checkedChipId != View.NO_ID
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding.chipGroupGoal.setOnCheckedStateChangeListener { _, _ ->
+            onSelectionChanged?.invoke()
+        }
+    }
+
+    override fun isSelectionMade(): Boolean =
+        _binding != null && binding.chipGroupGoal.checkedChipId != View.NO_ID
 
     override fun saveSelection(viewModel: PlanGenerationViewModel) {
         val chip = binding.chipGroupGoal.findViewById<Chip>(binding.chipGroupGoal.checkedChipId)

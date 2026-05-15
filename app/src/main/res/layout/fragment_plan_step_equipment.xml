@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.core.widget.NestedScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background"
@@ -21,11 +22,13 @@
             android:id="@+id/chipGroup_equipment"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_lg">
-            <com.google.android.material.chip.Chip android:id="@+id/chip_fullGym" style="@style/Widget.Material3.Chip.Filter" android:layout_width="wrap_content" android:layout_height="48dp" android:text="Full Gym" />
-            <com.google.android.material.chip.Chip android:id="@+id/chip_barbellDb" style="@style/Widget.Material3.Chip.Filter" android:layout_width="wrap_content" android:layout_height="48dp" android:text="Barbell+Dumbbells" />
-            <com.google.android.material.chip.Chip android:id="@+id/chip_dbOnly" style="@style/Widget.Material3.Chip.Filter" android:layout_width="wrap_content" android:layout_height="48dp" android:text="Dumbbells Only" />
-            <com.google.android.material.chip.Chip android:id="@+id/chip_bodyweight" style="@style/Widget.Material3.Chip.Filter" android:layout_width="wrap_content" android:layout_height="48dp" android:text="Bodyweight" />
+            android:layout_marginTop="@dimen/spacing_lg"
+            app:singleSelection="true"
+            app:selectionRequired="false">
+            <com.google.android.material.chip.Chip android:id="@+id/chip_fullGym" style="@style/Widget.Material3.Chip.Filter" android:layout_width="wrap_content" android:layout_height="48dp" android:text="Full Gym" android:checkable="true" />
+            <com.google.android.material.chip.Chip android:id="@+id/chip_barbellDb" style="@style/Widget.Material3.Chip.Filter" android:layout_width="wrap_content" android:layout_height="48dp" android:text="Barbell+Dumbbells" android:checkable="true" />
+            <com.google.android.material.chip.Chip android:id="@+id/chip_dbOnly" style="@style/Widget.Material3.Chip.Filter" android:layout_width="wrap_content" android:layout_height="48dp" android:text="Dumbbells Only" android:checkable="true" />
+            <com.google.android.material.chip.Chip android:id="@+id/chip_bodyweight" style="@style/Widget.Material3.Chip.Filter" android:layout_width="wrap_content" android:layout_height="48dp" android:text="Bodyweight" android:checkable="true" />
         </com.google.android.material.chip.ChipGroup>
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

@@ -5,4 +5,5 @@ import com.reprush.app.ui.member.plan.PlanGenerationViewModel
 interface QuestionnaireStep {
     fun isSelectionMade(): Boolean
     fun saveSelection(viewModel: PlanGenerationViewModel)
+    var onSelectionChanged: (() -> Unit)?
 }

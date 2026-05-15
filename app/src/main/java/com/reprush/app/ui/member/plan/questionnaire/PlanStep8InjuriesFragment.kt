@@ -12,12 +12,20 @@ class PlanStep8InjuriesFragment : Fragment(), QuestionnaireStep {
     private var _binding: FragmentPlanStepInjuriesBinding? = null
     private val binding get() = _binding!!
 
+    override var onSelectionChanged: (() -> Unit)? = null
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentPlanStepInjuriesBinding.inflate(inflater, container, false)
         return binding.root
     }
 
-    override fun isSelectionMade(): Boolean = true // injuries is optional free text
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        // Step 8 is optional free-text — always valid. Notify parent immediately so button is enabled on arrival.
+        onSelectionChanged?.invoke()
+    }
+
+    override fun isSelectionMade(): Boolean = true
 
     override fun saveSelection(viewModel: PlanGenerationViewModel) {
         viewModel.injuries = binding.editTextInjuries.text?.toString()?.trim() ?: ""

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.core.widget.NestedScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background"
@@ -21,10 +22,12 @@
             android:id="@+id/chipGroup_duration"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_lg">
-            <com.google.android.material.chip.Chip android:id="@+id/chip_45min" style="@style/Widget.Material3.Chip.Filter" android:layout_width="wrap_content" android:layout_height="48dp" android:text="45 minutes" />
-            <com.google.android.material.chip.Chip android:id="@+id/chip_60min" style="@style/Widget.Material3.Chip.Filter" android:layout_width="wrap_content" android:layout_height="48dp" android:text="60 minutes" />
-            <com.google.android.material.chip.Chip android:id="@+id/chip_90min" style="@style/Widget.Material3.Chip.Filter" android:layout_width="wrap_content" android:layout_height="48dp" android:text="90 minutes" />
+            android:layout_marginTop="@dimen/spacing_lg"
+            app:singleSelection="true"
+            app:selectionRequired="false">
+            <com.google.android.material.chip.Chip android:id="@+id/chip_45min" style="@style/Widget.Material3.Chip.Filter" android:layout_width="wrap_content" android:layout_height="48dp" android:text="45 minutes" android:checkable="true" />
+            <com.google.android.material.chip.Chip android:id="@+id/chip_60min" style="@style/Widget.Material3.Chip.Filter" android:layout_width="wrap_content" android:layout_height="48dp" android:text="60 minutes" android:checkable="true" />
+            <com.google.android.material.chip.Chip android:id="@+id/chip_90min" style="@style/Widget.Material3.Chip.Filter" android:layout_width="wrap_content" android:layout_height="48dp" android:text="90 minutes" android:checkable="true" />
         </com.google.android.material.chip.ChipGroup>
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
