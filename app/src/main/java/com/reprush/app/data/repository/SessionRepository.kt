@@ -24,7 +24,8 @@ data class SessionSet(
     val isCompleted: Boolean = false,
     val loggedAt: Long? = null,
     val weightUserEdited: Boolean = false,
-    val repsUserEdited: Boolean = false
+    val repsUserEdited: Boolean = false,
+    val isBodyweight: Boolean = false
 )
 
 data class SessionExercise(
@@ -61,8 +62,10 @@ class SessionRepository @Inject constructor(
             val planExercises = planExerciseDao.getExercisesForDay(dayId)
             planExercises.mapNotNull { pe ->
                 val ex = exerciseDao.getExerciseById(pe.exerciseId) ?: return@mapNotNull null
+                val isBw = ex.equipment.equals("Bodyweight", ignoreCase = true)
+                val restSeconds = if (pe.restSeconds > 0) pe.restSeconds else 60
                 val sets = (1..pe.sets).map { i ->
-                    SessionSet(setNumber = i)
+                    SessionSet(setNumber = i, isBodyweight = isBw)
                 }.toMutableList()
                 SessionExercise(
                     exerciseId = ex.id,
@@ -71,7 +74,7 @@ class SessionRepository @Inject constructor(
                     thumbnailUrl = ex.thumbnailUrl,
                     plannedSets = pe.sets,
                     plannedRepsRange = pe.repsRange,
-                    plannedRestSeconds = pe.restSeconds,
+                    plannedRestSeconds = restSeconds,
                     sets = sets
                 )
             }
@@ -80,6 +83,7 @@ class SessionRepository @Inject constructor(
     suspend fun loadExerciseById(exerciseId: String): SessionExercise? =
         withContext(Dispatchers.IO) {
             val ex = exerciseDao.getExerciseById(exerciseId) ?: return@withContext null
+            val isBw = ex.equipment.equals("Bodyweight", ignoreCase = true)
             SessionExercise(
                 exerciseId = ex.id,
                 exerciseName = ex.name,
@@ -88,7 +92,7 @@ class SessionRepository @Inject constructor(
                 plannedSets = 3,
                 plannedRepsRange = "8-12",
                 plannedRestSeconds = 90,
-                sets = mutableListOf(SessionSet(setNumber = 1))
+                sets = mutableListOf(SessionSet(setNumber = 1, isBodyweight = isBw))
             )
         }
 

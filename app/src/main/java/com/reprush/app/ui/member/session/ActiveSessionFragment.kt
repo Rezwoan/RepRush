@@ -1,5 +1,6 @@
 package com.reprush.app.ui.member.session
 
+import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -8,9 +9,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.TranslateAnimation
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -18,6 +22,7 @@ import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.google.android.material.chip.Chip
 import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import com.reprush.app.R
 import com.reprush.app.data.repository.SessionExercise
 import com.reprush.app.data.repository.SessionSet
@@ -53,6 +58,31 @@ class ActiveSessionFragment : Fragment() {
             } else {
                 viewModel.startBlankSession()
             }
+        }
+
+        // Bug 3 — close button + back-press both show the exit dialog
+        binding.buttonCloseSession.setOnClickListener { showExitDialog() }
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() { showExitDialog() }
+            }
+        )
+
+        // Bug 2 — notes done end-icon and IME Done both dismiss the keyboard
+        binding.textInputLayoutSessionNotes.setEndIconOnClickListener {
+            binding.editTextSessionNotes.clearFocus()
+            hideKeyboard()
+        }
+        binding.editTextSessionNotes.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                binding.editTextSessionNotes.clearFocus()
+                hideKeyboard()
+                true
+            } else false
+        }
+        binding.editTextSessionNotes.setOnFocusChangeListener { _, hasFocus ->
+            if (!hasFocus) hideKeyboard()
         }
 
         viewModel.elapsedTime.observe(viewLifecycleOwner) { time ->
@@ -102,6 +132,31 @@ class ActiveSessionFragment : Fragment() {
                 navigateToFinish()
             }
         }
+    }
+
+    // Bug 3 — exit dialog with Save & Exit / Discard / Cancel
+    private fun showExitDialog() {
+        AlertDialog.Builder(requireContext())
+            .setTitle("End Session?")
+            .setMessage("Your progress will be saved. You can resume this session later.")
+            .setPositiveButton("Save & Exit") { _, _ ->
+                viewModel.clearSession()
+                findNavController().navigate(R.id.action_activeSessionFragment_to_homeFragment)
+            }
+            .setNegativeButton("Discard") { _, _ ->
+                viewModel.discardCurrentSession {
+                    if (isAdded) {
+                        findNavController().navigate(R.id.action_activeSessionFragment_to_homeFragment)
+                    }
+                }
+            }
+            .setNeutralButton("Cancel", null)
+            .show()
+    }
+
+    private fun hideKeyboard() {
+        val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(view?.windowToken, 0)
     }
 
     private fun navigateToFinish() {
@@ -164,15 +219,21 @@ class ActiveSessionFragment : Fragment() {
         set: SessionSet
     ) {
         val setNumberText = rowView.findViewById<TextView>(R.id.textView_setNumber)
+        val weightLayout = rowView.findViewById<TextInputLayout>(R.id.textInputLayout_weight)
         val weightEdit = rowView.findViewById<TextInputEditText>(R.id.editText_weight)
         val repsEdit = rowView.findViewById<TextInputEditText>(R.id.editText_reps)
         val warmupChip = rowView.findViewById<Chip>(R.id.chip_warmup)
+        val bwChip = rowView.findViewById<Chip>(R.id.chip_bodyweight)
         val completeBtn = rowView.findViewById<ImageButton>(R.id.imageButton_completeSet)
 
         setNumberText.text = set.setNumber.toString()
         rowView.alpha = if (set.isWarmup) 0.5f else 1.0f
 
-        if (set.weight > 0) {
+        // Bug 5 — BW chip initial state; listener added after so isChecked = does not trigger it
+        bwChip.isChecked = set.isBodyweight
+        weightLayout.visibility = if (set.isBodyweight) View.GONE else View.VISIBLE
+
+        if (!set.isBodyweight && set.weight > 0) {
             weightEdit.setText(
                 if (set.weight == set.weight.toLong().toDouble()) set.weight.toLong().toString()
                 else set.weight.toString()
@@ -183,6 +244,10 @@ class ActiveSessionFragment : Fragment() {
 
         warmupChip.isChecked = set.isWarmup
         warmupChip.setOnCheckedChangeListener { _, _ -> viewModel.toggleWarmup(exIndex, setIndex) }
+
+        bwChip.setOnCheckedChangeListener { _, _ ->
+            viewModel.toggleBodyweight(exIndex, setIndex)
+        }
 
         completeBtn.setImageResource(
             if (set.isCompleted) android.R.drawable.checkbox_on_background
@@ -216,13 +281,16 @@ class ActiveSessionFragment : Fragment() {
 
         completeBtn.setOnClickListener {
             if (set.isCompleted) return@setOnClickListener
-            val weightText = weightEdit.text?.toString()
+            // BW sets skip weight validation — weight is always 0
+            if (!set.isBodyweight) {
+                val weightText = weightEdit.text?.toString()
+                if (weightText.isNullOrBlank()) { shakeView(weightEdit); return@setOnClickListener }
+                val weight = weightText.toDoubleOrNull()
+                if (weight == null) { shakeView(weightEdit); return@setOnClickListener }
+            }
             val repsText = repsEdit.text?.toString()
-            if (weightText.isNullOrBlank()) { shakeView(weightEdit); return@setOnClickListener }
             if (repsText.isNullOrBlank()) { shakeView(repsEdit); return@setOnClickListener }
-            val weight = weightText.toDoubleOrNull()
             val reps = repsText.toIntOrNull()
-            if (weight == null) { shakeView(weightEdit); return@setOnClickListener }
             if (reps == null || reps <= 0) { shakeView(repsEdit); return@setOnClickListener }
             viewModel.completeSet(exIndex, setIndex)
         }

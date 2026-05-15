@@ -10,6 +10,8 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.chip.Chip
+import com.google.android.material.chip.ChipGroup
 import com.google.android.material.textfield.TextInputEditText
 import com.reprush.app.R
 import com.reprush.app.data.repository.ExerciseRepository
@@ -26,6 +28,12 @@ class ExercisePickerBottomSheet : BottomSheetDialogFragment() {
     @Inject lateinit var sessionRepository: SessionRepository
 
     var onExerciseSelected: ((SessionExercise) -> Unit)? = null
+
+    private var selectedMuscle = ""
+    private var selectedEquipment = ""
+
+    private val muscleChipLabels = listOf("All", "Chest", "Back", "Shoulders", "Biceps", "Triceps", "Legs", "Core")
+    private val equipmentChipLabels = listOf("All", "Barbell", "Dumbbell", "Cable", "Machine", "Bodyweight")
 
     companion object {
         fun newInstance() = ExercisePickerBottomSheet()
@@ -44,10 +52,17 @@ class ExercisePickerBottomSheet : BottomSheetDialogFragment() {
 
         val searchEdit = view.findViewById<TextInputEditText>(R.id.editText_pickerSearch)
         val listContainer = view.findViewById<LinearLayout>(R.id.layout_pickerList)
+        val muscleGroup = view.findViewById<ChipGroup>(R.id.chipGroup_pickerMuscle)
+        val equipmentGroup = view.findViewById<ChipGroup>(R.id.chipGroup_pickerEquipment)
 
-        fun loadExercises(query: String) {
+        fun loadExercises() {
             viewLifecycleOwner.lifecycleScope.launch {
-                val exercises = exerciseRepository.getExercisesFiltered(query = query)
+                val query = searchEdit.text?.toString() ?: ""
+                val exercises = exerciseRepository.getExercisesFiltered(
+                    query = query,
+                    muscle = selectedMuscle,
+                    equipment = selectedEquipment
+                )
                 listContainer.removeAllViews()
                 exercises.take(30).forEach { ex ->
                     val itemView = TextView(requireContext()).apply {
@@ -78,10 +93,46 @@ class ExercisePickerBottomSheet : BottomSheetDialogFragment() {
             }
         }
 
-        loadExercises("")
+        // Muscle chips
+        muscleChipLabels.forEach { label ->
+            val chip = Chip(requireContext()).apply {
+                text = label
+                isCheckable = true
+                id = View.generateViewId()
+            }
+            muscleGroup.addView(chip)
+        }
+        muscleGroup.setOnCheckedStateChangeListener { group, checkedIds ->
+            val chip = if (checkedIds.isEmpty()) null else group.findViewById<Chip>(checkedIds[0])
+            selectedMuscle = when {
+                chip == null || chip.text == "All" -> ""
+                else -> chip.text.toString()
+            }
+            loadExercises()
+        }
+
+        // Equipment chips
+        equipmentChipLabels.forEach { label ->
+            val chip = Chip(requireContext()).apply {
+                text = label
+                isCheckable = true
+                id = View.generateViewId()
+            }
+            equipmentGroup.addView(chip)
+        }
+        equipmentGroup.setOnCheckedStateChangeListener { group, checkedIds ->
+            val chip = if (checkedIds.isEmpty()) null else group.findViewById<Chip>(checkedIds[0])
+            selectedEquipment = when {
+                chip == null || chip.text == "All" -> ""
+                else -> chip.text.toString()
+            }
+            loadExercises()
+        }
+
+        loadExercises()
 
         searchEdit.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) { loadExercises(s?.toString() ?: "") }
+            override fun afterTextChanged(s: Editable?) { loadExercises() }
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
