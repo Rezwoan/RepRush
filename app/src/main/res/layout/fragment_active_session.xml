@@ -92,7 +92,7 @@
                     android:layout_height="wrap_content"
                     android:inputType="textMultiLine"
                     android:imeOptions="actionDone"
-                    android:maxLines="3"
+                    android:maxLines="1"
                     android:textColor="@color/on_surface" />
             </com.google.android.material.textfield.TextInputLayout>
 
