@@ -64,7 +64,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             _streak.postValue(streakDao.getStreakForUser(uid))
 
-            // Bug 5: resolve exercise name before posting to LiveData
+            // Resolve exercise names for recent PRs (Bug 5)
             val rawPRs = prRecordDao.getRecentPRs(uid, 3)
             val prDisplays = rawPRs.mapNotNull { pr ->
                 val ex = exerciseDao.getExerciseById(pr.exerciseId)
@@ -72,29 +72,34 @@ class HomeViewModel @Inject constructor(
             }
             _recentPRs.postValue(prDisplays)
 
-            // Bug 6: resolve package name from MembershipPackageDao
-            val user = userDao.getUserById(uid)
-            if (user?.membershipEndDate != null) {
-                val packageName = user.packageId?.let { pid ->
+            // Read Room user first, then Firestore for anything missing
+            val roomUser = userDao.getUserById(uid)
+            val fsData = (gameRepository.getUserData(uid) as? Result.Success)?.data
+
+            // Monthly points from Firestore (Bug 3)
+            _monthlyPoints.postValue(fsData?.monthlyPoints ?: 0)
+
+            // Membership: prefer Room, fall back to Firestore (Bug 4 / Bug 6)
+            val endDateStr = roomUser?.membershipEndDate?.takeIf { it.isNotBlank() }
+                ?: fsData?.membershipEndDate
+            val pkgId = roomUser?.packageId?.takeIf { it.isNotBlank() }
+                ?: fsData?.packageId
+
+            if (!endDateStr.isNullOrBlank()) {
+                val packageName = pkgId?.let { pid ->
                     membershipPackageDao.getPackageById(pid)?.name
                 } ?: "Membership"
                 val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.US)
-                val endDate = try { sdf.parse(user.membershipEndDate) } catch (_: Exception) { null }
+                val endDate = try { sdf.parse(endDateStr) } catch (_: Exception) { null }
                 val daysLeft = if (endDate != null)
                     TimeUnit.MILLISECONDS.toDays(endDate.time - System.currentTimeMillis())
                 else -1L
-                _membershipDisplay.postValue(MembershipDisplay(packageName, user.membershipEndDate, daysLeft))
+                _membershipDisplay.postValue(MembershipDisplay(packageName, endDateStr, daysLeft))
             } else {
                 _membershipDisplay.postValue(null)
             }
 
-            // Bug 3: monthly points from Firestore users/{uid}
-            when (val result = gameRepository.getMonthlyPoints(uid)) {
-                is Result.Success -> _monthlyPoints.postValue(result.data)
-                is Result.Error -> _monthlyPoints.postValue(0)
-            }
-
-            // Bug 4: user rank from Firestore leaderboard
+            // User rank from leaderboard (Bug 4 — rank badge)
             when (val result = gameRepository.getLeaderboard()) {
                 is Result.Success -> {
                     val rank = result.data.indexOfFirst { it.uid == uid }
