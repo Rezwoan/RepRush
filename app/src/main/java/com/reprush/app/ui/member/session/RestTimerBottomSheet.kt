@@ -9,6 +9,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.reprush.app.R
 import com.reprush.app.databinding.FragmentTimerSheetBinding
@@ -36,6 +38,11 @@ class RestTimerBottomSheet : BottomSheetDialogFragment() {
         }
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        isCancelable = false
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -45,8 +52,18 @@ class RestTimerBottomSheet : BottomSheetDialogFragment() {
         return binding.root
     }
 
+    override fun onStart() {
+        super.onStart()
+        // Prevent swipe-down dismissal and back-button dismissal
+        (dialog as? BottomSheetDialog)?.behavior?.apply {
+            isHideable = false
+            skipCollapsed = true
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        dialog?.setCanceledOnTouchOutside(false)
 
         val exerciseName = arguments?.getString(ARG_EXERCISE_NAME) ?: ""
         val durationSeconds = arguments?.getInt(ARG_DURATION) ?: 90
