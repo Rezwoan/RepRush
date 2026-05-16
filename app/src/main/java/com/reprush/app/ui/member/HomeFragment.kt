@@ -17,11 +17,11 @@ import com.reprush.app.R
 import com.reprush.app.data.local.dao.PlanDayDao
 import com.reprush.app.data.local.dao.WorkoutPlanDao
 import com.reprush.app.data.local.datastore.AppPreferences
-import com.reprush.app.data.local.entity.PrRecordEntity
-import com.reprush.app.data.local.entity.UserEntity
 import com.reprush.app.data.repository.SessionRepository
 import com.reprush.app.databinding.FragmentHomeBinding
 import com.reprush.app.ui.member.home.HomeViewModel
+import com.reprush.app.ui.member.home.MembershipDisplay
+import com.reprush.app.ui.member.home.PrDisplay
 import com.reprush.app.ui.member.session.SessionState
 import com.reprush.app.ui.member.session.SessionViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -30,7 +30,6 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -92,6 +91,7 @@ class HomeFragment : Fragment() {
             }
         }
 
+        // Bug 5: recentPRs now contains resolved exercise names
         homeViewModel.recentPRs.observe(viewLifecycleOwner) { prs ->
             if (prs.isEmpty()) {
                 binding.sectionRecentPRs.visibility = View.GONE
@@ -101,17 +101,37 @@ class HomeFragment : Fragment() {
             }
         }
 
-        homeViewModel.membershipInfo.observe(viewLifecycleOwner) { user ->
-            user ?: return@observe
-            bindMembershipCard(user)
+        // Bug 6: membershipDisplay has resolved package name
+        homeViewModel.membershipDisplay.observe(viewLifecycleOwner) { display ->
+            if (display == null) {
+                binding.cardMembership.visibility = View.GONE
+            } else {
+                bindMembershipCard(display)
+            }
+        }
+
+        // Bug 3: monthly points from Firestore
+        homeViewModel.monthlyPoints.observe(viewLifecycleOwner) { points ->
+            binding.textViewHomeMonthlyPoints.text = if (points > 0) points.toString() else "—"
+        }
+
+        // Bug 4: rank badge
+        homeViewModel.userRank.observe(viewLifecycleOwner) { rank ->
+            if (rank != null && rank > 0) {
+                binding.textViewHomeUserRank.visibility = View.VISIBLE
+                binding.textViewHomeUserRank.text = "Rank #$rank"
+            } else {
+                binding.textViewHomeUserRank.visibility = View.GONE
+            }
         }
     }
 
-    private fun bindRecentPRs(prs: List<PrRecordEntity>) {
+    // Bug 5: uses PrDisplay with resolved exercise name
+    private fun bindRecentPRs(prs: List<PrDisplay>) {
         binding.containerRecentPRs.removeAllViews()
         for (pr in prs) {
             val row = TextView(requireContext()).apply {
-                text = "${pr.exerciseId}  ${pr.repCount}×${pr.weight}kg"
+                text = "${pr.exerciseName}  ${pr.weight}kg × ${pr.repCount}"
                 textSize = 13f
                 setTextColor(requireContext().getColor(R.color.on_surface))
                 setPadding(0, 4, 0, 4)
@@ -120,16 +140,13 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun bindMembershipCard(user: UserEntity) {
-        val endDateStr = user.membershipEndDate ?: return
+    // Bug 6: uses MembershipDisplay with resolved package name
+    private fun bindMembershipCard(display: MembershipDisplay) {
         binding.cardMembership.visibility = View.VISIBLE
+        binding.textViewMembershipPackage.text = display.packageName
 
-        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.US)
-        val endDate = try { sdf.parse(endDateStr) } catch (_: Exception) { null } ?: return
-        val now = Date()
-        val daysLeft = TimeUnit.MILLISECONDS.toDays(endDate.time - now.time)
-
-        binding.textViewMembershipExpiry.text = "Expires: $endDateStr"
+        val daysLeft = display.daysLeft
+        binding.textViewMembershipExpiry.text = "Expires: ${display.endDateStr}"
         binding.textViewMembershipDaysLeft.text = when {
             daysLeft < 0 -> "Expired"
             daysLeft == 0L -> "Expires today"
@@ -140,13 +157,9 @@ class HomeFragment : Fragment() {
             daysLeft < 0 -> requireContext().getColor(R.color.miss_red)
             daysLeft <= 3 -> requireContext().getColor(R.color.miss_red)
             daysLeft <= 10 -> requireContext().getColor(R.color.amber)
-            else -> Color.TRANSPARENT
+            else -> requireContext().getColor(R.color.surface)
         }
-        binding.cardMembership.setCardBackgroundColor(
-            if (cardColor == Color.TRANSPARENT)
-                requireContext().getColor(R.color.surface)
-            else cardColor
-        )
+        binding.cardMembership.setCardBackgroundColor(cardColor)
 
         val daysTextColor = when {
             daysLeft < 0 -> requireContext().getColor(R.color.error)
