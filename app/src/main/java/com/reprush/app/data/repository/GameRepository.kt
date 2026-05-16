@@ -96,6 +96,16 @@ class GameRepository @Inject constructor(
         }
     }
 
+    suspend fun getMonthlyPoints(uid: String): Result<Int> = withContext(Dispatchers.IO) {
+        try {
+            val doc = firestore.collection("users").document(uid).get().await()
+            val points = doc.getLong("monthlyPoints")?.toInt() ?: 0
+            Result.Success(points)
+        } catch (e: Exception) {
+            Result.Error(e.message ?: "Failed to get monthly points")
+        }
+    }
+
     suspend fun getLeaderboard(): Result<List<LeaderboardEntry>> = withContext(Dispatchers.IO) {
         try {
             val snapshot = firestore
