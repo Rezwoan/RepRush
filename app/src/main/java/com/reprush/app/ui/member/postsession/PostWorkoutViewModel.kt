@@ -1,5 +1,6 @@
 package com.reprush.app.ui.member.postsession
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -112,15 +113,20 @@ class PostWorkoutViewModel @Inject constructor(
                 val totalPRsCount = prRecordDao.getTotalPrCount(uid)
                 val user = auth.currentUser
 
-                gameRepository.writeLeaderboardEntry(
+                val lbResult = gameRepository.writeLeaderboardEntry(
                     uid = uid,
                     displayName = user?.displayName ?: "",
                     photoUrl = user?.photoUrl?.toString(),
                     pointsToAdd = breakdown.totalPoints,
                     totalPRs = totalPRsCount
                 )
+                if (lbResult is Result.Error) {
+                    Log.e("PostWorkout", "writeLeaderboardEntry failed: ${lbResult.message}")
+                } else {
+                    Log.d("PostWorkout", "writeLeaderboardEntry OK — points=${breakdown.totalPoints}")
+                }
 
-                gameRepository.updateUserDoc(
+                val udResult = gameRepository.updateUserDoc(
                     uid = uid,
                     pointsToAdd = breakdown.totalPoints,
                     totalWorkouts = totalSessions,
@@ -128,6 +134,11 @@ class PostWorkoutViewModel @Inject constructor(
                     currentStreak = streakUpdate.currentStreak,
                     longestStreak = streakUpdate.longestStreak
                 )
+                if (udResult is Result.Error) {
+                    Log.e("PostWorkout", "updateUserDoc failed: ${udResult.message}")
+                } else {
+                    Log.d("PostWorkout", "updateUserDoc OK")
+                }
 
                 _result.postValue(
                     Result.Success(
