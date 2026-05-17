@@ -13,4 +13,7 @@ interface PlanDayDao {
 
     @Query("SELECT * FROM plan_days WHERE planId = :planId ORDER BY dayNumber ASC")
     suspend fun getDaysForPlan(planId: String): List<PlanDayEntity>
+
+    @Query("SELECT * FROM plan_days WHERE id = :dayId LIMIT 1")
+    suspend fun getPlanDayById(dayId: String): PlanDayEntity?
 }

@@ -16,4 +16,7 @@ interface BodyWeightLogDao {
 
     @Update
     suspend fun updateWeightLog(log: BodyWeightLogEntity)
+
+    @Query("SELECT * FROM body_weight_logs WHERE userId = :userId ORDER BY loggedDate DESC LIMIT 1")
+    suspend fun getLatestWeightLog(userId: String): BodyWeightLogEntity?
 }
