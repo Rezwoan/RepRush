@@ -14,6 +14,12 @@ import java.time.LocalDate
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
+data class HeatmapDayData(
+    val intensity: Float,
+    val exerciseCount: Int,
+    val volumeKg: Double
+)
+
 @HiltViewModel
 class HeatmapViewModel @Inject constructor(
     private val loggedSetDao: LoggedSetDao,
@@ -23,8 +29,8 @@ class HeatmapViewModel @Inject constructor(
     private val _heatmapIntensity = MutableLiveData<Map<LocalDate, Float>>()
     val heatmapIntensity: LiveData<Map<LocalDate, Float>> = _heatmapIntensity
 
-    private val _heatmapDetail = MutableLiveData<Map<LocalDate, Pair<Float, Int>>>()
-    val heatmapDetail: LiveData<Map<LocalDate, Pair<Float, Int>>> = _heatmapDetail
+    private val _heatmapDetail = MutableLiveData<Map<LocalDate, HeatmapDayData>>()
+    val heatmapDetail: LiveData<Map<LocalDate, HeatmapDayData>> = _heatmapDetail
 
     fun load() {
         val uid = auth.currentUser?.uid ?: return
@@ -36,14 +42,14 @@ class HeatmapViewModel @Inject constructor(
             val maxVolume = raw.maxOfOrNull { it.totalVolume }?.takeIf { it > 0.0 } ?: 1.0
 
             val intensityMap = mutableMapOf<LocalDate, Float>()
-            val detailMap = mutableMapOf<LocalDate, Pair<Float, Int>>()
+            val detailMap = mutableMapOf<LocalDate, HeatmapDayData>()
 
             for (entry in raw) {
                 try {
                     val date = LocalDate.parse(entry.workoutDate)
                     val intensity = (entry.totalVolume / maxVolume).toFloat().coerceIn(0f, 1f)
                     intensityMap[date] = intensity
-                    detailMap[date] = Pair(intensity, entry.exerciseCount)
+                    detailMap[date] = HeatmapDayData(intensity, entry.exerciseCount, entry.totalVolume)
                 } catch (_: Exception) { /* skip malformed dates */ }
             }
 
