@@ -107,6 +107,56 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Workout Activity Heatmap -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_heatmap"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_md"
+            app:cardBackgroundColor="@color/surface"
+            app:cardCornerRadius="@dimen/shape_md"
+            app:strokeColor="@color/outline"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/spacing_md">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Activity"
+                    android:textColor="@color/on_surface_variant"
+                    android:textSize="12sp"
+                    android:layout_marginBottom="@dimen/spacing_sm" />
+
+                <com.kizitonwose.calendar.view.CalendarView
+                    android:id="@+id/heatmap_calendar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cv_dayViewResource="@layout/item_heatmap_day"
+                    app:cv_monthHeaderResource="@layout/item_heatmap_month_header"
+                    app:cv_orientation="horizontal"
+                    app:cv_scrollPaged="true"
+                    app:cv_outDateStyle="endOfGrid"
+                    app:cv_daySize="seventhWidth" />
+
+                <TextView
+                    android:id="@+id/text_heatmap_empty"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Start training to see your workout history"
+                    android:textColor="@color/on_surface_variant"
+                    android:textSize="13sp"
+                    android:gravity="center"
+                    android:padding="@dimen/spacing_md"
+                    android:visibility="gone" />
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
         <!-- Monthly points card -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/card_monthlyPoints"

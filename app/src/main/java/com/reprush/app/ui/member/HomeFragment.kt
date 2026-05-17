@@ -1,17 +1,31 @@
 package com.reprush.app.ui.member
 
+import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
+import android.widget.LinearLayout
+import android.widget.PopupWindow
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.firebase.auth.FirebaseAuth
+import com.kizitonwose.calendar.core.CalendarDay
+import com.kizitonwose.calendar.core.CalendarMonth
+import com.kizitonwose.calendar.core.DayPosition
+import com.kizitonwose.calendar.view.CalendarView
+import com.kizitonwose.calendar.view.MonthDayBinder
+import com.kizitonwose.calendar.view.MonthHeaderFooterBinder
+import com.kizitonwose.calendar.view.ViewContainer
 import com.reprush.app.R
 import com.reprush.app.data.local.dao.PlanDayDao
 import com.reprush.app.data.local.dao.WorkoutPlanDao
@@ -21,12 +35,17 @@ import com.reprush.app.databinding.FragmentHomeBinding
 import com.reprush.app.ui.member.home.HomeViewModel
 import com.reprush.app.ui.member.home.MembershipDisplay
 import com.reprush.app.ui.member.home.PrDisplay
+import com.reprush.app.ui.member.progress.HeatmapViewModel
 import com.reprush.app.ui.member.session.SessionState
 import com.reprush.app.ui.member.session.SessionViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
+import java.time.DayOfWeek
+import java.time.LocalDate
+import java.time.YearMonth
+import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
@@ -39,6 +58,7 @@ class HomeFragment : Fragment() {
 
     private val sessionViewModel: SessionViewModel by activityViewModels()
     private val homeViewModel: HomeViewModel by viewModels()
+    private val heatmapViewModel: HeatmapViewModel by activityViewModels()
 
     @Inject lateinit var appPreferences: AppPreferences
     @Inject lateinit var sessionRepository: SessionRepository
@@ -77,7 +97,154 @@ class HomeFragment : Fragment() {
 
         observeGamification()
         homeViewModel.loadData()
+        setupHeatmap()
+        heatmapViewModel.load()
     }
+
+    // ── Heatmap ──────────────────────────────────────────────────────────────
+
+    private fun setupHeatmap() {
+        val calendar = binding.heatmapCalendar
+        val endMonth = YearMonth.now()
+        val startMonth = endMonth.minusMonths(5)
+
+        calendar.dayBinder = object : MonthDayBinder<HeatmapDayContainer> {
+            override fun create(view: View) = HeatmapDayContainer(view)
+            override fun bind(container: HeatmapDayContainer, data: CalendarDay) {
+                val intensityMap = heatmapViewModel.heatmapIntensity.value ?: emptyMap()
+                val detailMap = heatmapViewModel.heatmapDetail.value ?: emptyMap()
+                val date = data.date
+                val intensity = if (data.position == DayPosition.MonthDate) {
+                    intensityMap[date] ?: 0f
+                } else 0f
+
+                val color = interpolateHeatmapColor(intensity)
+                val drawable = GradientDrawable().apply {
+                    shape = GradientDrawable.RECTANGLE
+                    cornerRadius = resources.getDimension(R.dimen.shape_xs)
+                    setColor(color)
+                }
+                container.cellView.background = drawable
+
+                val label = buildCellContentDescription(date, intensityMap, detailMap)
+                container.cellView.contentDescription = label
+
+                if (data.position == DayPosition.MonthDate) {
+                    container.cellView.setOnClickListener { anchor ->
+                        showTooltip(anchor, date, intensityMap, detailMap)
+                    }
+                } else {
+                    container.cellView.setOnClickListener(null)
+                }
+            }
+        }
+
+        calendar.monthHeaderBinder = object : MonthHeaderFooterBinder<MonthHeaderContainer> {
+            override fun create(view: View) = MonthHeaderContainer(view)
+            override fun bind(container: MonthHeaderContainer, data: CalendarMonth) {
+                val fmt = DateTimeFormatter.ofPattern("MMM", Locale.getDefault())
+                container.textView.text = data.yearMonth.format(fmt)
+            }
+        }
+
+        calendar.setup(startMonth, endMonth, DayOfWeek.MONDAY)
+        calendar.scrollToMonth(endMonth)
+
+        heatmapViewModel.heatmapIntensity.observe(viewLifecycleOwner) { map ->
+            calendar.notifyCalendarChanged()
+            val hasData = map.values.any { it > 0f }
+            binding.textHeatmapEmpty.visibility = if (map.size < 7 || !hasData) View.VISIBLE else View.GONE
+        }
+    }
+
+    private fun interpolateHeatmapColor(intensity: Float): Int {
+        val surfaceVariant = ContextCompat.getColor(requireContext(), R.color.surface_variant)
+        val primaryContainer = ContextCompat.getColor(requireContext(), R.color.primary_container)
+        val primary = ContextCompat.getColor(requireContext(), R.color.primary)
+        return when {
+            intensity <= 0f -> surfaceVariant
+            intensity < 0.5f -> blendColors(surfaceVariant, primaryContainer, intensity * 2f)
+            else -> blendColors(primaryContainer, primary, (intensity - 0.5f) * 2f)
+        }
+    }
+
+    private fun blendColors(start: Int, end: Int, fraction: Float): Int {
+        val f = fraction.coerceIn(0f, 1f)
+        val aS = (start ushr 24) and 0xff
+        val rS = (start ushr 16) and 0xff
+        val gS = (start ushr 8) and 0xff
+        val bS = start and 0xff
+        val aE = (end ushr 24) and 0xff
+        val rE = (end ushr 16) and 0xff
+        val gE = (end ushr 8) and 0xff
+        val bE = end and 0xff
+        return Color.argb(
+            (aS + (aE - aS) * f).toInt(),
+            (rS + (rE - rS) * f).toInt(),
+            (gS + (gE - gS) * f).toInt(),
+            (bS + (bE - bS) * f).toInt()
+        )
+    }
+
+    private fun buildCellContentDescription(
+        date: LocalDate,
+        intensityMap: Map<LocalDate, Float>,
+        detailMap: Map<LocalDate, Pair<Float, Int>>
+    ): String {
+        val dateFmt = DateTimeFormatter.ofPattern("MMM d, yyyy", Locale.getDefault())
+        val dateStr = date.format(dateFmt)
+        val detail = detailMap[date]
+        return if (detail == null || detail.first <= 0f) {
+            "Date $dateStr. No workout recorded."
+        } else {
+            val volumeKg = String.format(Locale.getDefault(), "%.1f", (detail.first * 1000).toInt())
+            "Date $dateStr. Volume: ${volumeKg}kg. ${detail.second} exercises."
+        }
+    }
+
+    private fun showTooltip(
+        anchor: View,
+        date: LocalDate,
+        intensityMap: Map<LocalDate, Float>,
+        detailMap: Map<LocalDate, Pair<Float, Int>>
+    ) {
+        val inflater = LayoutInflater.from(requireContext())
+        val tooltipView = inflater.inflate(R.layout.popup_heatmap_tooltip, null)
+
+        val dateFmt = DateTimeFormatter.ofPattern("MMM d, yyyy", Locale.getDefault())
+        val dateStr = date.format(dateFmt)
+        val detail = detailMap[date]
+
+        tooltipView.findViewById<TextView>(R.id.text_tooltip_date).text = dateStr
+
+        if (detail == null || detail.first <= 0f) {
+            tooltipView.findViewById<TextView>(R.id.text_tooltip_volume).text = "No workout recorded"
+            tooltipView.findViewById<TextView>(R.id.text_tooltip_exercises).visibility = View.GONE
+        } else {
+            tooltipView.findViewById<TextView>(R.id.text_tooltip_volume).text =
+                "Volume: ${String.format(Locale.getDefault(), "%.0f", detail.first * 10000)} kg"
+            tooltipView.findViewById<TextView>(R.id.text_tooltip_exercises).text =
+                "${detail.second} exercise${if (detail.second != 1) "s" else ""}"
+        }
+
+        val popup = PopupWindow(
+            tooltipView,
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            true
+        )
+        popup.elevation = 8f
+        popup.isOutsideTouchable = true
+        popup.setWindowLayoutMode(
+            WindowManager.LayoutParams.WRAP_CONTENT,
+            WindowManager.LayoutParams.WRAP_CONTENT
+        )
+
+        tooltipView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
+        popup.showAsDropDown(anchor, 0, -anchor.height - tooltipView.measuredHeight)
+    }
+
+    // ── Gamification ─────────────────────────────────────────────────────────
 
     private fun observeGamification() {
         homeViewModel.streak.observe(viewLifecycleOwner) { streak ->
@@ -90,7 +257,6 @@ class HomeFragment : Fragment() {
             }
         }
 
-        // Bug 5: recentPRs now contains resolved exercise names
         homeViewModel.recentPRs.observe(viewLifecycleOwner) { prs ->
             if (prs.isEmpty()) {
                 binding.sectionRecentPRs.visibility = View.GONE
@@ -100,7 +266,6 @@ class HomeFragment : Fragment() {
             }
         }
 
-        // Bug 6: membershipDisplay has resolved package name
         homeViewModel.membershipDisplay.observe(viewLifecycleOwner) { display ->
             if (display == null) {
                 binding.cardMembership.visibility = View.GONE
@@ -109,12 +274,10 @@ class HomeFragment : Fragment() {
             }
         }
 
-        // Bug 3: monthly points from Firestore
         homeViewModel.monthlyPoints.observe(viewLifecycleOwner) { points ->
             binding.textViewHomeMonthlyPoints.text = if (points > 0) points.toString() else "—"
         }
 
-        // Bug 4: rank badge
         homeViewModel.userRank.observe(viewLifecycleOwner) { rank ->
             if (rank != null && rank > 0) {
                 binding.textViewHomeUserRank.visibility = View.VISIBLE
@@ -125,7 +288,6 @@ class HomeFragment : Fragment() {
         }
     }
 
-    // Bug 5: uses PrDisplay with resolved exercise name
     private fun bindRecentPRs(prs: List<PrDisplay>) {
         binding.containerRecentPRs.removeAllViews()
         for (pr in prs) {
@@ -139,7 +301,6 @@ class HomeFragment : Fragment() {
         }
     }
 
-    // Bug 6: uses MembershipDisplay with resolved package name
     private fun bindMembershipCard(display: MembershipDisplay) {
         binding.cardMembership.visibility = View.VISIBLE
         binding.textViewMembershipPackage.text = display.packageName
@@ -168,6 +329,8 @@ class HomeFragment : Fragment() {
         }
         binding.textViewMembershipDaysLeft.setTextColor(daysTextColor)
     }
+
+    // ── Session recovery ─────────────────────────────────────────────────────
 
     private fun checkForIncompleteSession() {
         val userId = auth.currentUser?.uid ?: return
@@ -220,5 +383,15 @@ class HomeFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    // ── ViewContainer helpers ─────────────────────────────────────────────────
+
+    private inner class HeatmapDayContainer(view: View) : ViewContainer(view) {
+        val cellView: View = view.findViewById(R.id.view_heatmap_cell)
+    }
+
+    private inner class MonthHeaderContainer(view: View) : ViewContainer(view) {
+        val textView: TextView = view.findViewById(R.id.text_month_label)
     }
 }
