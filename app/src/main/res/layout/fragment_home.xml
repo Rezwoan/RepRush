@@ -135,13 +135,13 @@
                 <com.kizitonwose.calendar.view.CalendarView
                     android:id="@+id/heatmap_calendar"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="260dp"
                     app:cv_dayViewResource="@layout/item_heatmap_day"
                     app:cv_monthHeaderResource="@layout/item_heatmap_month_header"
                     app:cv_orientation="horizontal"
                     app:cv_scrollPaged="true"
                     app:cv_outDateStyle="endOfGrid"
-                    app:cv_daySize="seventhWidth" />
+                    app:cv_daySize="rectangle" />
 
                 <TextView
                     android:id="@+id/text_heatmap_empty"

@@ -12,11 +12,11 @@ import com.reprush.app.data.local.dao.WeeklyVolume
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.time.LocalDate
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 data class LiftCardItem(
+    val groupLabel: String,
     val exerciseName: String,
     val currentOneRm: Double,
     val delta30Day: Double?,
@@ -42,9 +42,7 @@ class StrengthViewModel @Inject constructor(
     private val _strengthData = MutableLiveData<StrengthData>()
     val strengthData: LiveData<StrengthData> = _strengthData
 
-    private val keyLifts = listOf(
-        "Bench Press", "Squat", "Deadlift", "Overhead Press", "Barbell Row"
-    )
+    private val keyLifts = listOf("Bench Press", "Squat", "Deadlift")
 
     fun load() {
         val uid = auth.currentUser?.uid ?: return
@@ -54,25 +52,40 @@ class StrengthViewModel @Inject constructor(
             val liftCards = mutableListOf<LiftCardItem>()
             val thirtyDaysAgo = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(30)
 
-            for (liftName in keyLifts) {
-                val exercise = exerciseDao.getExerciseByName(liftName) ?: continue
-                val best = prRecordDao.getBestOneRepMax(uid, exercise.id) ?: continue
+            for (groupLabel in keyLifts) {
+                val matchingExercises = exerciseDao.getExercisesByNameContaining(groupLabel)
+                if (matchingExercises.isEmpty()) continue
 
-                totalScore += best.oneRepMax
+                // Find the exercise with the best 1RM across all name variants in this group
+                var bestOneRm = 0.0
+                var bestExerciseName = groupLabel
+                var bestExerciseId = ""
+
+                for (exercise in matchingExercises) {
+                    val pr = prRecordDao.getBestOneRepMax(uid, exercise.id) ?: continue
+                    if (pr.oneRepMax > bestOneRm) {
+                        bestOneRm = pr.oneRepMax
+                        bestExerciseName = exercise.name
+                        bestExerciseId = exercise.id
+                    }
+                }
+
+                if (bestOneRm <= 0.0) continue
+
+                totalScore += bestOneRm
                 liftCount++
 
-                val history = prRecordDao.getPrHistoryForExercise(uid, exercise.id)
+                val history = prRecordDao.getPrHistoryForExercise(uid, bestExerciseId)
                 val sparkline = history.map { it.oneRepMax.toFloat() }
-
-                val delta = run {
-                    val thirtyDayEntry = history.filter { it.achievedAt <= thirtyDaysAgo }.lastOrNull()
-                    thirtyDayEntry?.let { best.oneRepMax - it.oneRepMax }
-                }
+                val delta = history.filter { it.achievedAt <= thirtyDaysAgo }
+                    .lastOrNull()
+                    ?.let { bestOneRm - it.oneRepMax }
 
                 liftCards.add(
                     LiftCardItem(
-                        exerciseName = liftName,
-                        currentOneRm = best.oneRepMax,
+                        groupLabel = groupLabel,
+                        exerciseName = bestExerciseName,
+                        currentOneRm = bestOneRm,
                         delta30Day = delta,
                         recentHistory = sparkline.takeLast(10)
                     )

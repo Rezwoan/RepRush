@@ -37,4 +37,7 @@ interface ExerciseDao {
 
     @Query("SELECT COUNT(*) FROM exercises")
     suspend fun getExerciseCount(): Int
+
+    @Query("SELECT * FROM exercises WHERE LOWER(name) LIKE '%' || LOWER(:keyword) || '%' ORDER BY name ASC")
+    suspend fun getExercisesByNameContaining(keyword: String): List<ExerciseEntity>
 }

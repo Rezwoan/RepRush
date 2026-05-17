@@ -17,7 +17,7 @@
             android:id="@+id/text_strength_insufficient"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Log the 5 main compound lifts to unlock your Strength Score."
+            android:text="Log the 3 main compound lifts (Bench Press, Squat, Deadlift) to unlock your Strength Score."
             android:textColor="@color/on_surface_variant"
             android:textSize="14sp"
             android:gravity="center"
