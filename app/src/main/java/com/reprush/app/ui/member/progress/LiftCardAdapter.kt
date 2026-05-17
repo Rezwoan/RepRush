@@ -1,6 +1,5 @@
 package com.reprush.app.ui.member.progress
 
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -32,14 +31,24 @@ class LiftCardAdapter : ListAdapter<LiftCardItem, LiftCardAdapter.ViewHolder>(DI
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: LiftCardItem) {
-            binding.textLiftName.text = item.exerciseName
-            binding.textLiftOneRm.text = String.format(Locale.getDefault(), "%.1f kg", item.currentOneRm)
+            binding.textLiftName.text = item.groupLabel
+
+            if (item.exerciseName != item.groupLabel) {
+                binding.textLiftExerciseName.visibility = View.VISIBLE
+                binding.textLiftExerciseName.text = item.exerciseName
+            } else {
+                binding.textLiftExerciseName.visibility = View.GONE
+            }
+
+            binding.textLiftOneRm.text =
+                String.format(Locale.getDefault(), "%.1f kg", item.currentOneRm)
 
             val delta = item.delta30Day
             if (delta != null) {
                 binding.textLiftDelta.visibility = View.VISIBLE
                 val sign = if (delta >= 0) "+" else ""
-                binding.textLiftDelta.text = String.format(Locale.getDefault(), "%s%.1f kg", sign, delta)
+                binding.textLiftDelta.text =
+                    String.format(Locale.getDefault(), "%s%.1f kg", sign, delta)
                 binding.textLiftDelta.setTextColor(
                     ContextCompat.getColor(
                         binding.root.context,
@@ -88,7 +97,7 @@ class LiftCardAdapter : ListAdapter<LiftCardItem, LiftCardAdapter.ViewHolder>(DI
     companion object {
         private val DIFF = object : DiffUtil.ItemCallback<LiftCardItem>() {
             override fun areItemsTheSame(a: LiftCardItem, b: LiftCardItem) =
-                a.exerciseName == b.exerciseName
+                a.groupLabel == b.groupLabel
             override fun areContentsTheSame(a: LiftCardItem, b: LiftCardItem) = a == b
         }
     }
