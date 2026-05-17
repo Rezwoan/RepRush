@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/spacing_md">
+
+        <!-- Insufficient data message -->
+        <TextView
+            android:id="@+id/text_strength_insufficient"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Log the 5 main compound lifts to unlock your Strength Score."
+            android:textColor="@color/on_surface_variant"
+            android:textSize="14sp"
+            android:gravity="center"
+            android:padding="@dimen/spacing_xl"
+            android:visibility="gone" />
+
+        <!-- Strength Score Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_strength_score"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_md"
+            app:cardBackgroundColor="@color/surface"
+            app:cardCornerRadius="@dimen/shape_md"
+            app:strokeColor="@color/outline"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/spacing_md"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Strength Score"
+                    android:textColor="@color/on_surface_variant"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="@dimen/spacing_xs" />
+
+                <TextView
+                    android:id="@+id/text_strength_score"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textColor="@color/primary"
+                    android:textSize="48sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="@dimen/spacing_xs" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_strength_level"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Beginner"
+                    android:textColor="@color/on_primary"
+                    app:chipBackgroundColor="@color/primary"
+                    style="@style/Widget.Material3.Chip.Assist" />
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Lift Cards -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Key Lifts"
+            android:textColor="@color/on_surface"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="@dimen/spacing_sm" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_lift_cards"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false"
+            android:layout_marginBottom="@dimen/spacing_md" />
+
+        <!-- 12-Week Volume Chart -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="12-Week Volume"
+            android:textColor="@color/on_surface"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="@dimen/spacing_sm" />
+
+        <com.github.mikephil.charting.charts.BarChart
+            android:id="@+id/chart_weekly_volume"
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:layout_marginBottom="@dimen/spacing_md" />
+
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>

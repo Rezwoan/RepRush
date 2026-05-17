@@ -60,7 +60,21 @@
     <fragment
         android:id="@+id/progressFragment"
         android:name="com.reprush.app.ui.member.ProgressFragment"
-        android:label="Progress" />
+        android:label="Progress">
+        <action
+            android:id="@+id/action_progressFragment_to_sessionDetailFragment"
+            app:destination="@id/sessionDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/sessionDetailFragment"
+        android:name="com.reprush.app.ui.member.progress.SessionDetailFragment"
+        android:label="Session Detail">
+        <argument
+            android:name="sessionId"
+            app:argType="string"
+            android:defaultValue="" />
+    </fragment>
 
     <fragment
         android:id="@+id/profileFragment"
