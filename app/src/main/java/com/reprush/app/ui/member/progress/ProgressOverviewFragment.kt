@@ -25,7 +25,6 @@ import com.kizitonwose.calendar.view.MonthHeaderFooterBinder
 import com.kizitonwose.calendar.view.ViewContainer
 import com.reprush.app.R
 import com.reprush.app.databinding.FragmentProgressOverviewBinding
-import com.reprush.app.databinding.ItemHeatmapMonthHeaderBinding
 import dagger.hilt.android.AndroidEntryPoint
 import java.time.DayOfWeek
 import java.time.LocalDate
