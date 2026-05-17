@@ -45,7 +45,7 @@
                     app:cv_orientation="horizontal"
                     app:cv_scrollPaged="true"
                     app:cv_outDateStyle="endOfGrid"
-                    app:cv_daySize="seventhWidth" />
+                    app:cv_daySize="rectangle" />
 
                 <TextView
                     android:id="@+id/text_heatmap_empty_overview"
