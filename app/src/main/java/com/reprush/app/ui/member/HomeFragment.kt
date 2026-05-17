@@ -35,6 +35,7 @@ import com.reprush.app.databinding.FragmentHomeBinding
 import com.reprush.app.ui.member.home.HomeViewModel
 import com.reprush.app.ui.member.home.MembershipDisplay
 import com.reprush.app.ui.member.home.PrDisplay
+import com.reprush.app.ui.member.progress.HeatmapDayData
 import com.reprush.app.ui.member.progress.HeatmapViewModel
 import com.reprush.app.ui.member.session.SessionState
 import com.reprush.app.ui.member.session.SessionViewModel
@@ -112,7 +113,7 @@ class HomeFragment : Fragment() {
             override fun create(view: View) = HeatmapDayContainer(view)
             override fun bind(container: HeatmapDayContainer, data: CalendarDay) {
                 val intensityMap = heatmapViewModel.heatmapIntensity.value ?: emptyMap()
-                val detailMap = heatmapViewModel.heatmapDetail.value ?: emptyMap()
+                val detailMap: Map<LocalDate, HeatmapDayData> = heatmapViewModel.heatmapDetail.value ?: emptyMap()
                 val date = data.date
                 val intensity = if (data.position == DayPosition.MonthDate) {
                     intensityMap[date] ?: 0f
@@ -189,16 +190,16 @@ class HomeFragment : Fragment() {
     private fun buildCellContentDescription(
         date: LocalDate,
         intensityMap: Map<LocalDate, Float>,
-        detailMap: Map<LocalDate, Pair<Float, Int>>
+        detailMap: Map<LocalDate, HeatmapDayData>
     ): String {
         val dateFmt = DateTimeFormatter.ofPattern("MMM d, yyyy", Locale.getDefault())
         val dateStr = date.format(dateFmt)
         val detail = detailMap[date]
-        return if (detail == null || detail.first <= 0f) {
+        return if (detail == null || detail.intensity <= 0f) {
             "Date $dateStr. No workout recorded."
         } else {
-            val volumeKg = String.format(Locale.getDefault(), "%.1f", (detail.first * 1000).toInt())
-            "Date $dateStr. Volume: ${volumeKg}kg. ${detail.second} exercises."
+            val volumeKg = String.format(Locale.getDefault(), "%.1f", detail.volumeKg)
+            "Date $dateStr. Volume: ${volumeKg}kg. ${detail.exerciseCount} exercises."
         }
     }
 
@@ -206,7 +207,7 @@ class HomeFragment : Fragment() {
         anchor: View,
         date: LocalDate,
         intensityMap: Map<LocalDate, Float>,
-        detailMap: Map<LocalDate, Pair<Float, Int>>
+        detailMap: Map<LocalDate, HeatmapDayData>
     ) {
         val inflater = LayoutInflater.from(requireContext())
         val tooltipView = inflater.inflate(R.layout.popup_heatmap_tooltip, null)
@@ -217,14 +218,14 @@ class HomeFragment : Fragment() {
 
         tooltipView.findViewById<TextView>(R.id.text_tooltip_date).text = dateStr
 
-        if (detail == null || detail.first <= 0f) {
+        if (detail == null || detail.intensity <= 0f) {
             tooltipView.findViewById<TextView>(R.id.text_tooltip_volume).text = "No workout recorded"
             tooltipView.findViewById<TextView>(R.id.text_tooltip_exercises).visibility = View.GONE
         } else {
             tooltipView.findViewById<TextView>(R.id.text_tooltip_volume).text =
-                "Volume: ${String.format(Locale.getDefault(), "%.0f", detail.first * 10000)} kg"
+                "Volume: ${String.format(Locale.getDefault(), "%.0f", detail.volumeKg)} kg"
             tooltipView.findViewById<TextView>(R.id.text_tooltip_exercises).text =
-                "${detail.second} exercise${if (detail.second != 1) "s" else ""}"
+                "${detail.exerciseCount} exercise${if (detail.exerciseCount != 1) "s" else ""}"
         }
 
         val popup = PopupWindow(
