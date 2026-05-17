@@ -43,7 +43,7 @@ class StrengthViewModel @Inject constructor(
     val strengthData: LiveData<StrengthData> = _strengthData
 
     private val keyLifts = listOf(
-        "Bench Press", "Squat", "Deadlift", "Overhead Press", "Barbell Row"
+        "Bench Press", "Squat", "Deadlift"
     )
 
     fun load() {
