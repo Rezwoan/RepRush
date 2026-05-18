@@ -19,6 +19,7 @@ import com.reprush.app.data.local.dao.WorkoutSessionDao
 import com.reprush.app.data.repository.GameRepository
 import com.reprush.app.data.repository.PRRecordRepository
 import com.reprush.app.data.repository.Result
+import com.reprush.app.data.repository.SessionRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -32,6 +33,7 @@ class PostWorkoutViewModel @Inject constructor(
     private val streakCalculator: StreakCalculator,
     private val achievementChecker: AchievementChecker,
     private val gameRepository: GameRepository,
+    private val sessionRepository: SessionRepository,
     private val workoutSessionDao: WorkoutSessionDao,
     private val loggedSetDao: LoggedSetDao,
     private val exerciseDao: ExerciseDao,
@@ -108,7 +110,10 @@ class PostWorkoutViewModel @Inject constructor(
                     planDayId = session.planDayId
                 )
 
-                // Steps 7 & 8: Firestore writes (best-effort — don't fail pipeline)
+                // Step 7: Push session + sets to Firestore for cross-device sync
+                sessionRepository.pushCompletedSession(uid, sessionId)
+
+                // Steps 8 & 9: Firestore writes (best-effort — don't fail pipeline)
                 val totalSessions = workoutSessionDao.getCompletedSessionCount(uid)
                 val totalPRsCount = prRecordDao.getTotalPrCount(uid)
                 val user = auth.currentUser

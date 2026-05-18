@@ -48,5 +48,9 @@ service cloud.firestore {
       allow write: if request.auth.uid == uid;
     }
 
+    match /workouts/{uid}/sessions/{sessionId} {
+      allow read, write: if request.auth.uid == uid;
+    }
+
   }
 }

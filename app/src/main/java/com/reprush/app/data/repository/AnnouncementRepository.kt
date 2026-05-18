@@ -2,9 +2,12 @@ package com.reprush.app.data.repository
 
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.reprush.app.BuildConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import java.net.HttpURLConnection
+import java.net.URL
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -54,8 +57,9 @@ class AnnouncementRepository @Inject constructor(
                 .get()
                 .await()
 
-            val batch = firestore.batch()
+            var batch = firestore.batch()
             var count = 0
+            var batchCount = 0
 
             for (memberDoc in activeMembers.documents) {
                 val notifRef = firestore.collection("notifications")
@@ -73,19 +77,49 @@ class AnnouncementRepository @Inject constructor(
                 )
                 batch.set(notifRef, notification)
                 count++
+                batchCount++
 
-                if (count % 500 == 0) {
+                if (batchCount == 500) {
                     batch.commit().await()
+                    batch = firestore.batch()
+                    batchCount = 0
                 }
             }
 
-            if (count % 500 != 0) {
+            if (batchCount > 0) {
                 batch.commit().await()
             }
+
+            sendFcmToTopic(title, body)
 
             Result.Success(count)
         } catch (e: Exception) {
             Result.Error(e.message ?: "Failed to send notifications")
+        }
+    }
+
+    private suspend fun sendFcmToTopic(title: String, body: String) = withContext(Dispatchers.IO) {
+        val serverKey = BuildConfig.FCM_SERVER_KEY
+        if (serverKey.isBlank()) return@withContext
+        try {
+            val conn = URL("https://fcm.googleapis.com/fcm/send")
+                .openConnection() as HttpURLConnection
+            conn.apply {
+                requestMethod = "POST"
+                setRequestProperty("Authorization", "key=$serverKey")
+                setRequestProperty("Content-Type", "application/json; charset=UTF-8")
+                doOutput = true
+                connectTimeout = 10_000
+                readTimeout = 10_000
+            }
+            val safeTitle = title.replace("\"", "\\\"")
+            val safeBody = body.replace("\"", "\\\"")
+            val payload = """{"to":"/topics/gym_announcements","notification":{"title":"$safeTitle","body":"$safeBody"},"data":{"type":"announcement"}}"""
+            conn.outputStream.bufferedWriter(Charsets.UTF_8).use { it.write(payload) }
+            conn.responseCode
+            conn.disconnect()
+        } catch (_: Exception) {
+            // FCM failure is non-critical — Firestore notification still delivered
         }
     }
 

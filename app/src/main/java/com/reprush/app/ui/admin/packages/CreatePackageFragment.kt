@@ -17,14 +17,12 @@ class CreatePackageFragment : Fragment() {
 
     private var _binding: FragmentCreatePackageBinding? = null
     private val binding get() = _binding!!
-
     private val viewModel: PackageViewModel by activityViewModels()
     private var isSubmitting = false
+    private var isEditing = false
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         _binding = FragmentCreatePackageBinding.inflate(inflater, container, false)
         return binding.root
@@ -32,9 +30,23 @@ class CreatePackageFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         binding.toolbarCreatePackage.setNavigationOnClickListener {
+            viewModel.setEditTarget(null)
             findNavController().navigateUp()
         }
+
+        val editPkg = viewModel.editTarget.value
+        if (editPkg != null) {
+            isEditing = true
+            binding.toolbarCreatePackage.title = "Edit Package"
+            binding.buttonSavePackage.text = "Save Changes"
+            binding.editTextPackageName.setText(editPkg.name)
+            binding.editTextPackagePrice.setText("%.2f".format(editPkg.price))
+            binding.editTextPackageDuration.setText(editPkg.durationDays.toString())
+            binding.editTextPackageDescription.setText(editPkg.description ?: "")
+        }
+
         binding.buttonSavePackage.setOnClickListener { attemptSave() }
         observeViewModel()
     }
@@ -43,11 +55,9 @@ class CreatePackageFragment : Fragment() {
         val name = binding.editTextPackageName.text?.toString().orEmpty().trim()
         val priceStr = binding.editTextPackagePrice.text?.toString().orEmpty().trim()
         val durationStr = binding.editTextPackageDuration.text?.toString().orEmpty().trim()
-        val description = binding.editTextPackageDescription.text?.toString().orEmpty().trim()
-            .ifBlank { null }
+        val description = binding.editTextPackageDescription.text?.toString().orEmpty().trim().ifBlank { null }
 
         var valid = true
-
         binding.textInputLayoutPackageName.error = null
         binding.textInputLayoutPackagePrice.error = null
         binding.textInputLayoutPackageDuration.error = null
@@ -56,45 +66,51 @@ class CreatePackageFragment : Fragment() {
             binding.textInputLayoutPackageName.error = "Package name is required"
             valid = false
         }
-
         val price = priceStr.toDoubleOrNull()
-        if (priceStr.isEmpty() || price == null || price <= 0) {
+        if (price == null || price <= 0) {
             binding.textInputLayoutPackagePrice.error = "Enter a valid price greater than 0"
             valid = false
         }
-
         val duration = durationStr.toIntOrNull()
-        if (durationStr.isEmpty() || duration == null || duration <= 0) {
+        if (duration == null || duration <= 0) {
             binding.textInputLayoutPackageDuration.error = "Enter a valid duration greater than 0"
             valid = false
         }
-
         if (!valid) return
 
         binding.progressBarSavePackage.visibility = View.VISIBLE
         binding.buttonSavePackage.isEnabled = false
         isSubmitting = true
-        viewModel.createPackage(name, price!!, duration!!, description)
+
+        if (isEditing) {
+            val updated = viewModel.editTarget.value!!.copy(
+                name = name, price = price!!, durationDays = duration!!, description = description
+            )
+            viewModel.updatePackage(updated)
+        } else {
+            viewModel.createPackage(name, price!!, duration!!, description)
+        }
     }
 
     private fun observeViewModel() {
         viewModel.operationResult.observe(viewLifecycleOwner) { result ->
             result ?: return@observe
             if (!isSubmitting) return@observe
+            isSubmitting = false
             when (result) {
                 is Result.Success<*> -> {
+                    viewModel.setEditTarget(null)
                     viewModel.clearOperationResult()
+                    val msg = if (isEditing) "Package updated" else "Package created"
                     Snackbar.make(
                         requireActivity().findViewById(android.R.id.content),
-                        "Package created successfully",
-                        Snackbar.LENGTH_LONG
+                        msg, Snackbar.LENGTH_LONG
                     ).show()
                     findNavController().navigateUp()
                 }
                 is Result.Error -> {
                     binding.progressBarSavePackage.visibility = View.GONE
                     binding.buttonSavePackage.isEnabled = true
-                    isSubmitting = false
                     viewModel.clearOperationResult()
                     Snackbar.make(binding.root, result.message, Snackbar.LENGTH_LONG).show()
                 }

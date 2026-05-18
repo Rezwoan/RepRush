@@ -138,6 +138,16 @@
                         android:textAppearance="?attr/textAppearanceBodyMedium"
                         tools:text="22 days remaining" />
 
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/button_changePackage"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="Change Package"
+                        app:icon="@drawable/ic_edit"
+                        app:iconGravity="textStart" />
+
                 </LinearLayout>
 
             </com.google.android.material.card.MaterialCardView>

@@ -7,23 +7,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.chip.Chip
 import com.reprush.app.R
-import com.reprush.app.data.local.datastore.AppPreferences
 import com.reprush.app.databinding.FragmentMemberOnboardingBinding
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MemberOnboardingFragment : Fragment() {
 
     private var _binding: FragmentMemberOnboardingBinding? = null
     private val binding get() = _binding!!
-
-    @Inject lateinit var appPreferences: AppPreferences
+    private val viewModel: MemberOnboardingViewModel by viewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentMemberOnboardingBinding.inflate(inflater, container, false)
@@ -42,12 +38,24 @@ class MemberOnboardingFragment : Fragment() {
         binding.editTextWeight.addTextChangedListener(watcher)
 
         binding.buttonSaveOnboarding.setOnClickListener { saveAndContinue() }
+
+        viewModel.isLoading.observe(viewLifecycleOwner) { loading ->
+            binding.buttonSaveOnboarding.isEnabled = !loading
+            binding.buttonSaveOnboarding.alpha = if (!loading) 1f else 0.5f
+        }
+
+        viewModel.saved.observe(viewLifecycleOwner) { saved ->
+            if (saved && isAdded) {
+                findNavController().navigate(R.id.action_memberOnboardingFragment_to_homeFragment)
+            }
+        }
     }
 
     private fun updateButton() {
         val heightOk = binding.editTextHeight.text?.toString()?.trim()?.toFloatOrNull() != null
         val weightOk = binding.editTextWeight.text?.toString()?.trim()?.toFloatOrNull() != null
-        val enabled = heightOk && weightOk
+        val loading = viewModel.isLoading.value ?: false
+        val enabled = heightOk && weightOk && !loading
         binding.buttonSaveOnboarding.isEnabled = enabled
         binding.buttonSaveOnboarding.alpha = if (enabled) 1f else 0.5f
     }
@@ -67,14 +75,7 @@ class MemberOnboardingFragment : Fragment() {
         val benchKg = binding.editTextBench.text?.toString()?.trim()?.toFloatOrNull()
         val deadliftKg = binding.editTextDeadlift.text?.toString()?.trim()?.toFloatOrNull()
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            appPreferences.saveMemberOnboarding(
-                heightCm, weightKg, experience, lastExercised, squatKg, benchKg, deadliftKg
-            )
-            if (isAdded) {
-                findNavController().navigate(R.id.action_memberOnboardingFragment_to_homeFragment)
-            }
-        }
+        viewModel.saveOnboarding(heightCm, weightKg, experience, lastExercised, squatKg, benchKg, deadliftKg)
     }
 
     override fun onDestroyView() {

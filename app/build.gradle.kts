@@ -31,8 +31,10 @@ android {
             localProperties.load(localPropertiesFile.inputStream())
         }
         val geminiKey = localProperties.getProperty("GEMINI_API_KEY") ?: ""
+        val fcmServerKey = localProperties.getProperty("FCM_SERVER_KEY") ?: ""
 
         buildConfigField("String", "GEMINI_API_KEY", "\"$geminiKey\"")
+        buildConfigField("String", "FCM_SERVER_KEY", "\"$fcmServerKey\"")
     }
 
     buildTypes {
@@ -83,6 +85,7 @@ dependencies {
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.crashlytics)
+    implementation(libs.firebase.messaging)
     implementation(libs.play.services.auth)
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)

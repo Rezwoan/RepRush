@@ -1,6 +1,7 @@
 package com.reprush.app.data.repository
 
 import android.util.Log
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.Dispatchers
@@ -55,22 +56,17 @@ class GameRepository @Inject constructor(
         try {
             val ref = leaderboardEntryRef(uid)
             Log.d("GameRepository", "writeLeaderboardEntry: path=${ref.path} points=$pointsToAdd")
-            firestore.runTransaction { tx ->
-                val snap = tx.get(ref)
-                val existing = if (snap.exists()) snap.getLong("points")?.toInt() ?: 0 else 0
-                tx.set(
-                    ref,
-                    mapOf(
-                        "uid" to uid,
-                        "displayName" to displayName,
-                        "photoUrl" to photoUrl,
-                        "points" to existing + pointsToAdd,
-                        "totalPRs" to totalPRs,
-                        "leaderboardOptIn" to true
-                    ),
-                    SetOptions.merge()
-                )
-            }.await()
+            ref.set(
+                mapOf(
+                    "uid" to uid,
+                    "displayName" to displayName,
+                    "photoUrl" to photoUrl,
+                    "points" to FieldValue.increment(pointsToAdd.toLong()),
+                    "totalPRs" to totalPRs,
+                    "leaderboardOptIn" to true
+                ),
+                SetOptions.merge()
+            ).await()
             Log.d("GameRepository", "writeLeaderboardEntry: SUCCESS uid=$uid")
             Result.Success(Unit)
         } catch (e: Exception) {
@@ -88,24 +84,18 @@ class GameRepository @Inject constructor(
         longestStreak: Int
     ): Result<Unit> = withContext(Dispatchers.IO) {
         try {
-            val ref = firestore.collection("users").document(uid)
-            firestore.runTransaction { tx ->
-                val snap = tx.get(ref)
-                val existingTotal = if (snap.exists()) snap.getLong("totalPoints")?.toInt() ?: 0 else 0
-                val existingMonthly = if (snap.exists()) snap.getLong("monthlyPoints")?.toInt() ?: 0 else 0
-                tx.set(
-                    ref,
+            firestore.collection("users").document(uid)
+                .set(
                     mapOf(
-                        "totalPoints" to existingTotal + pointsToAdd,
-                        "monthlyPoints" to existingMonthly + pointsToAdd,
+                        "totalPoints" to FieldValue.increment(pointsToAdd.toLong()),
+                        "monthlyPoints" to FieldValue.increment(pointsToAdd.toLong()),
                         "totalWorkouts" to totalWorkouts,
                         "totalPRs" to totalPRs,
                         "currentStreak" to currentStreak,
                         "longestStreak" to longestStreak
                     ),
                     SetOptions.merge()
-                )
-            }.await()
+                ).await()
             Result.Success(Unit)
         } catch (e: Exception) {
             Result.Error(e.message ?: "Failed to update user doc")
