@@ -1,7 +1,6 @@
 package com.reprush.app.data.repository
 
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
@@ -77,7 +76,6 @@ class AttendanceRepository @Inject constructor(
         try {
             val snapshot = collection
                 .whereEqualTo("memberId", memberId)
-                .orderBy("date", Query.Direction.DESCENDING)
                 .get()
                 .await()
             val records = snapshot.documents.map { doc ->
@@ -88,7 +86,7 @@ class AttendanceRepository @Inject constructor(
                     markedBy = doc.getString("markedBy") ?: "",
                     createdAt = doc.getLong("createdAt") ?: 0L
                 )
-            }
+            }.sortedByDescending { it.date }
             Result.Success(records)
         } catch (e: Exception) {
             Result.Error(e.message ?: "Failed to fetch member attendance")

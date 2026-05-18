@@ -80,7 +80,10 @@ class MemberDetailViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             when (val result = attendanceRepository.getMemberAttendance(memberId)) {
                 is Result.Success -> _attendance.postValue(result.data)
-                is Result.Error -> _attendance.postValue(emptyList())
+                is Result.Error -> {
+                    _attendance.postValue(emptyList())
+                    _error.postValue(result.message)
+                }
             }
         }
     }

@@ -13,6 +13,7 @@ import com.reprush.app.data.local.dao.UserDao
 import com.reprush.app.data.local.entity.StreakEntity
 import com.reprush.app.data.repository.GameRepository
 import com.reprush.app.data.repository.Result
+import com.reprush.app.data.repository.SessionRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -41,6 +42,7 @@ class HomeViewModel @Inject constructor(
     private val userDao: UserDao,
     private val membershipPackageDao: MembershipPackageDao,
     private val gameRepository: GameRepository,
+    private val sessionRepository: SessionRepository,
     private val auth: FirebaseAuth
 ) : ViewModel() {
 
@@ -68,6 +70,8 @@ class HomeViewModel @Inject constructor(
     fun loadData() {
         val uid = auth.currentUser?.uid ?: return
         viewModelScope.launch(Dispatchers.IO) {
+            sessionRepository.syncSessionsFromFirestore(uid)
+
             _streak.postValue(streakDao.getStreakForUser(uid))
 
             // Resolve exercise names for recent PRs (Bug 5)

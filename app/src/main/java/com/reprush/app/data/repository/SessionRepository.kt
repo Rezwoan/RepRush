@@ -2,6 +2,7 @@ package com.reprush.app.data.repository
 
 import android.util.Log
 import androidx.room.withTransaction
+import com.google.firebase.firestore.FirebaseFirestore
 import com.reprush.app.data.local.AppDatabase
 import com.reprush.app.data.local.dao.ExerciseDao
 import com.reprush.app.data.local.dao.LoggedSetDao
@@ -10,6 +11,7 @@ import com.reprush.app.data.local.dao.WorkoutSessionDao
 import com.reprush.app.data.local.entity.LoggedSetEntity
 import com.reprush.app.data.local.entity.WorkoutSessionEntity
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.util.UUID
 import javax.inject.Inject
@@ -54,7 +56,8 @@ class SessionRepository @Inject constructor(
     private val planExerciseDao: PlanExerciseDao,
     private val exerciseDao: ExerciseDao,
     private val workoutSessionDao: WorkoutSessionDao,
-    private val loggedSetDao: LoggedSetDao
+    private val loggedSetDao: LoggedSetDao,
+    private val firestore: FirebaseFirestore
 ) {
 
     suspend fun loadPlanDayExercises(dayId: String): List<SessionExercise> =
@@ -247,6 +250,97 @@ class SessionRepository @Inject constructor(
             }
         } catch (e: Exception) {
             Log.w("SessionRepository", "Discard session failed: ${e.message}")
+        }
+    }
+
+    suspend fun pushCompletedSession(uid: String, sessionId: String) = withContext(Dispatchers.IO) {
+        try {
+            val session = workoutSessionDao.getSessionById(sessionId) ?: return@withContext
+            if (session.isCompleted != 1) return@withContext
+
+            val sets = loggedSetDao.getSetsForSession(sessionId)
+            val setsData = sets.map { s ->
+                mapOf(
+                    "id" to s.id,
+                    "exerciseId" to s.exerciseId,
+                    "setNumber" to s.setNumber,
+                    "weight" to s.weight,
+                    "reps" to s.reps,
+                    "isWarmup" to s.isWarmup,
+                    "isCompleted" to s.isCompleted,
+                    "isPersonalRecord" to s.isPersonalRecord,
+                    "loggedAt" to s.loggedAt
+                )
+            }
+
+            firestore.collection("workouts").document(uid)
+                .collection("sessions").document(sessionId)
+                .set(
+                    mapOf(
+                        "planDayId" to session.planDayId,
+                        "startTime" to session.startTime,
+                        "endTime" to session.endTime,
+                        "notes" to session.notes,
+                        "totalPoints" to session.totalPoints,
+                        "isCompleted" to 1,
+                        "sets" to setsData
+                    )
+                ).await()
+        } catch (e: Exception) {
+            Log.w("SessionRepository", "pushCompletedSession failed: ${e.message}")
+        }
+    }
+
+    suspend fun syncSessionsFromFirestore(uid: String) = withContext(Dispatchers.IO) {
+        try {
+            val snapshot = firestore.collection("workouts").document(uid)
+                .collection("sessions")
+                .whereEqualTo("isCompleted", 1)
+                .get()
+                .await()
+
+            for (doc in snapshot.documents) {
+                val sessionId = doc.id
+                if (workoutSessionDao.getSessionById(sessionId) != null) continue
+
+                val session = WorkoutSessionEntity(
+                    id = sessionId,
+                    userId = uid,
+                    planDayId = doc.getString("planDayId"),
+                    startTime = doc.getLong("startTime") ?: 0L,
+                    endTime = doc.getLong("endTime"),
+                    notes = doc.getString("notes"),
+                    totalPoints = doc.getLong("totalPoints")?.toInt() ?: 0,
+                    isCompleted = 1
+                )
+                workoutSessionDao.insertSession(session)
+
+                @Suppress("UNCHECKED_CAST")
+                val setsData = doc.get("sets") as? List<Map<String, Any>> ?: continue
+                val sets = setsData.mapNotNull { m ->
+                    try {
+                        LoggedSetEntity(
+                            id = m["id"] as? String ?: return@mapNotNull null,
+                            sessionId = sessionId,
+                            exerciseId = m["exerciseId"] as? String ?: "",
+                            setNumber = (m["setNumber"] as? Long)?.toInt() ?: 0,
+                            weight = when (val w = m["weight"]) {
+                                is Double -> w
+                                is Long -> w.toDouble()
+                                else -> 0.0
+                            },
+                            reps = (m["reps"] as? Long)?.toInt() ?: 0,
+                            isWarmup = (m["isWarmup"] as? Long)?.toInt() ?: 0,
+                            isCompleted = (m["isCompleted"] as? Long)?.toInt() ?: 1,
+                            isPersonalRecord = (m["isPersonalRecord"] as? Long)?.toInt() ?: 0,
+                            loggedAt = m["loggedAt"] as? Long ?: 0L
+                        )
+                    } catch (e: Exception) { null }
+                }
+                if (sets.isNotEmpty()) loggedSetDao.insertAll(sets)
+            }
+        } catch (e: Exception) {
+            Log.w("SessionRepository", "syncSessionsFromFirestore failed: ${e.message}")
         }
     }
 }
