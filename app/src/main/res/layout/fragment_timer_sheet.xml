@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="@color/surface"
+    android:padding="@dimen/spacing_lg">
+
+    <TextView
+        android:id="@+id/textView_restExerciseName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/on_surface_variant"
+        android:textSize="14sp"
+        android:paddingBottom="@dimen/spacing_sm" />
+
+    <com.google.android.material.progressindicator.CircularProgressIndicator
+        android:id="@+id/progressBar_restTimer"
+        android:layout_width="180dp"
+        android:layout_height="180dp"
+        android:layout_marginBottom="@dimen/spacing_md"
+        app:indicatorColor="@color/primary"
+        app:trackColor="@color/surface_variant"
+        app:trackThickness="10dp"
+        app:indicatorDirectionCircular="clockwise" />
+
+    <TextView
+        android:id="@+id/textView_restCountdown"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="01:30"
+        android:textColor="@color/on_surface"
+        android:textSize="48sp"
+        android:textStyle="bold"
+        android:fontFamily="monospace"
+        android:layout_marginBottom="@dimen/spacing_lg" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginBottom="@dimen/spacing_md">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_addThirtySeconds"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/spacing_md"
+            android:text="+30s"
+            android:textColor="@color/primary" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_skipRest"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Skip"
+            android:textColor="@color/on_surface_variant" />
+
+    </LinearLayout>
+
+</LinearLayout>

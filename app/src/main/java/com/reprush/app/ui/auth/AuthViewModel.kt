@@ -18,6 +18,7 @@ sealed class AuthState {
     object MemberActive : AuthState()
     object MemberPending : AuthState()
     object MemberBlocked : AuthState()
+    object MemberRejected : AuthState()
     data class Error(val message: String) : AuthState()
 }
 
@@ -80,6 +81,7 @@ class AuthViewModel @Inject constructor(
         when {
             role == "admin" -> _authState.value = AuthState.Admin
             status == "pending" -> _authState.value = AuthState.MemberPending
+            status == "rejected" -> _authState.value = AuthState.MemberRejected
             status == "suspended" || status == "expired" -> _authState.value = AuthState.MemberBlocked
             else -> _authState.value = AuthState.MemberActive
         }

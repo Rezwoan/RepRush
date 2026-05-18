@@ -154,6 +154,36 @@ class MemberRepository @Inject constructor(
         }
     }
 
+    suspend fun registerMemberAsActive(
+        displayName: String,
+        email: String,
+        phone: String,
+        packageId: String,
+        startDate: String,
+        endDate: String
+    ): Result<Unit> = withContext(Dispatchers.IO) {
+        try {
+            val docRef = firestore.collection("users").document()
+            val newMember = hashMapOf(
+                "displayName" to displayName,
+                "email" to email,
+                "phone" to phone,
+                "photoUrl" to null,
+                "role" to "member",
+                "membershipStatus" to "active",
+                "packageId" to packageId,
+                "membershipStartDate" to startDate,
+                "membershipEndDate" to endDate,
+                "onboardingComplete" to false,
+                "createdAt" to System.currentTimeMillis()
+            )
+            docRef.set(newMember).await()
+            Result.Success(Unit)
+        } catch (e: Exception) {
+            Result.Error(e.message ?: "Failed to register member")
+        }
+    }
+
     suspend fun getMembers(statusFilter: String? = null): Result<List<Member>> = withContext(Dispatchers.IO) {
         try {
             val query = if (statusFilter == null || statusFilter == "all") {

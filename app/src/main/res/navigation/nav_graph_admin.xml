@@ -26,6 +26,18 @@
             android:id="@+id/action_adminDashboardFragment_to_memberDirectoryFragment"
             app:destination="@id/memberDirectoryFragment" />
 
+        <action
+            android:id="@+id/action_adminDashboardFragment_to_attendanceFragment"
+            app:destination="@id/attendanceFragment" />
+
+        <action
+            android:id="@+id/action_adminDashboardFragment_to_recordPaymentFragment"
+            app:destination="@id/recordPaymentFragment" />
+
+        <action
+            android:id="@+id/action_adminDashboardFragment_to_announcementListFragment"
+            app:destination="@id/announcementListFragment" />
+
     </fragment>
 
     <fragment
@@ -48,7 +60,17 @@
     <fragment
         android:id="@+id/paymentLogFragment"
         android:name="com.reprush.app.ui.admin.PaymentLogFragment"
-        android:label="Payments" />
+        android:label="Payments">
+
+        <action
+            android:id="@+id/action_paymentLogFragment_to_recordPaymentFragment"
+            app:destination="@id/recordPaymentFragment" />
+
+        <action
+            android:id="@+id/action_paymentLogFragment_to_receiptViewFragment"
+            app:destination="@id/receiptViewFragment" />
+
+    </fragment>
 
     <fragment
         android:id="@+id/adminSettingsFragment"
@@ -87,7 +109,54 @@
         android:id="@+id/memberDetailFragment"
         android:name="com.reprush.app.ui.admin.members.MemberDetailFragment"
         android:label="Member Profile"
-        tools:layout="@layout/fragment_member_detail" />
+        tools:layout="@layout/fragment_member_detail">
 
+        <action
+            android:id="@+id/action_memberDetailFragment_to_recordPaymentFragment"
+            app:destination="@id/recordPaymentFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/attendanceFragment"
+        android:name="com.reprush.app.ui.admin.attendance.AttendanceFragment"
+        android:label="Attendance"
+        tools:layout="@layout/fragment_attendance" />
+
+    <fragment
+        android:id="@+id/recordPaymentFragment"
+        android:name="com.reprush.app.ui.admin.payments.RecordPaymentFragment"
+        android:label="Record Payment"
+        tools:layout="@layout/fragment_record_payment">
+
+        <action
+            android:id="@+id/action_recordPaymentFragment_to_receiptViewFragment"
+            app:destination="@id/receiptViewFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/receiptViewFragment"
+        android:name="com.reprush.app.ui.admin.payments.ReceiptViewFragment"
+        android:label="Receipt"
+        tools:layout="@layout/fragment_receipt" />
+
+    <fragment
+        android:id="@+id/announcementListFragment"
+        android:name="com.reprush.app.ui.admin.announcements.AnnouncementListFragment"
+        android:label="Announcements"
+        tools:layout="@layout/fragment_announcement_list">
+
+        <action
+            android:id="@+id/action_announcementListFragment_to_postAnnouncementFragment"
+            app:destination="@id/postAnnouncementFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/postAnnouncementFragment"
+        android:name="com.reprush.app.ui.admin.announcements.PostAnnouncementFragment"
+        android:label="New Announcement"
+        tools:layout="@layout/fragment_post_announcement" />
 
 </navigation>

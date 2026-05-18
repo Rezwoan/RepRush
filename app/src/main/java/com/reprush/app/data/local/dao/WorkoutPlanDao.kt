@@ -22,4 +22,7 @@ interface WorkoutPlanDao {
 
     @Delete
     suspend fun deletePlan(plan: WorkoutPlanEntity)
+
+    @Query("SELECT COUNT(*) FROM workout_plans WHERE userId = :userId")
+    suspend fun getPlanCount(userId: String): Int
 }

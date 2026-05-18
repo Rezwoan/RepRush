@@ -6,7 +6,6 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "exercises")
 data class ExerciseEntity(
     @PrimaryKey val id: String,
-    val wgerId: Int?,
     val name: String,
     val primaryMuscle: String,
     val secondaryMuscles: String?,

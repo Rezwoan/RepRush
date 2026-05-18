@@ -80,6 +80,30 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/switch_registerActive"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:text="Register as Active (assign package now)" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/layout_registerPackage"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:hint="Select Package"
+                android:visibility="gone">
+
+                <AutoCompleteTextView
+                    android:id="@+id/editText_selectPackage"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="none" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/button_registerMember"
                 android:layout_width="match_parent"
