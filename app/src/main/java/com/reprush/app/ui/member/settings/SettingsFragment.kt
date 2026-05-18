@@ -113,16 +113,6 @@ class SettingsFragment : Fragment() {
             if (!updatingFromViewModel) viewModel.setLeaderboardOptIn(isChecked)
         }
 
-        binding.buttonSignOut.setOnClickListener {
-            MaterialAlertDialogBuilder(requireContext())
-                .setTitle("Sign Out")
-                .setMessage("Are you sure you want to sign out? All local data will be cleared.")
-                .setPositiveButton("Sign Out") { _, _ ->
-                    viewModel.signOut(requireActivity())
-                }
-                .setNegativeButton("Cancel", null)
-                .show()
-        }
     }
 
     override fun onDestroyView() {

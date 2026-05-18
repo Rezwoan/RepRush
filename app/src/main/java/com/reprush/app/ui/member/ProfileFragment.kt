@@ -20,6 +20,7 @@ import com.reprush.app.databinding.FragmentProfileBinding
 import com.reprush.app.ui.member.profile.AchievementAdapter
 import com.reprush.app.ui.member.profile.AchievementDisplayItem
 import com.reprush.app.ui.member.profile.ProfileViewModel
+import com.reprush.app.ui.member.settings.SettingsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -31,6 +32,7 @@ class ProfileFragment : Fragment() {
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
     private val viewModel: ProfileViewModel by viewModels()
+    private val settingsViewModel: SettingsViewModel by viewModels()
     private lateinit var achievementAdapter: AchievementAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -156,8 +158,15 @@ class ProfileFragment : Fragment() {
         binding.buttonSettings.setOnClickListener {
             findNavController().navigate(R.id.action_profileFragment_to_settingsFragment)
         }
-        binding.buttonNotifications.setOnClickListener {
-            findNavController().navigate(R.id.action_profileFragment_to_notificationsFragment)
+        binding.buttonSignOut.setOnClickListener {
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Sign Out")
+                .setMessage("Are you sure you want to sign out?")
+                .setPositiveButton("Sign Out") { _, _ ->
+                    settingsViewModel.signOut(requireActivity())
+                }
+                .setNegativeButton("Cancel", null)
+                .show()
         }
     }
 

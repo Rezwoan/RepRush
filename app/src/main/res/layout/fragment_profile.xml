@@ -376,13 +376,16 @@
 
         </LinearLayout>
 
-        <!-- Notifications button -->
+        <!-- Sign Out button -->
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/button_notifications"
-            style="@style/Widget.Material3.Button.TextButton"
+            android:id="@+id/button_signOut"
+            style="@style/Widget.Material3.Button.OutlinedButton"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Notifications" />
+            android:layout_height="52dp"
+            android:layout_marginTop="@dimen/spacing_sm"
+            android:text="Sign Out"
+            android:textColor="@color/error"
+            app:strokeColor="@color/error" />
 
     </LinearLayout>
 
