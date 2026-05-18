@@ -2,6 +2,7 @@ package com.reprush.app.data.repository
 
 import android.util.Log
 import com.reprush.app.BuildConfig
+import com.reprush.app.data.local.datastore.MemberProfile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
@@ -49,14 +50,16 @@ class GeminiRepository @Inject constructor() {
         fitnessLevel: String,
         weeks: Int,
         injuries: String,
-        exerciseNames: List<String>
+        exerciseNames: List<String>,
+        profile: MemberProfile? = null
     ): Result<String> = withContext(Dispatchers.IO) {
         try {
             val apiKey = BuildConfig.GEMINI_API_KEY
             if (apiKey.isBlank()) return@withContext Result.Error("Gemini API key not configured.")
 
             val exerciseList = exerciseNames.joinToString("\n") { "- $it" }
-            val prompt = buildPrompt(goal, daysPerWeek, splitType, sessionDuration, equipment, fitnessLevel, weeks, injuries, exerciseList)
+            val effectiveLevel = profile?.experience?.takeIf { it.isNotBlank() } ?: fitnessLevel
+            val prompt = buildPrompt(goal, daysPerWeek, splitType, sessionDuration, equipment, effectiveLevel, weeks, injuries, exerciseList, profile)
 
             val requestBody = JSONObject().apply {
                 put("contents", JSONArray().apply {
@@ -170,8 +173,27 @@ class GeminiRepository @Inject constructor() {
     private fun buildPrompt(
         goal: String, daysPerWeek: Int, splitType: String, sessionDuration: Int,
         equipment: String, fitnessLevel: String, weeks: Int, injuries: String,
-        exerciseList: String
-    ): String = """
+        exerciseList: String, profile: MemberProfile?
+    ): String {
+        val physicalSection = if (profile != null) buildString {
+            append("\nMember physical baseline:")
+            if (profile.heightCm != null) append("\n- Height: ${profile.heightCm.toInt()} cm")
+            if (profile.weightKg != null) append("\n- Body weight: ${profile.weightKg.toInt()} kg")
+            if (profile.lastExercised != null) append("\n- Last exercised: ${profile.lastExercised}")
+
+            val hasPRs = profile.squatKg != null || profile.benchKg != null || profile.deadliftKg != null
+            if (hasPRs) {
+                append("\n\nKnown 1-rep maxes (use these to suggest appropriate starting weights for similar movements):")
+                if (profile.squatKg != null) append("\n- Squat: ${profile.squatKg.toInt()} kg")
+                if (profile.benchKg != null) append("\n- Bench Press: ${profile.benchKg.toInt()} kg")
+                if (profile.deadliftKg != null) append("\n- Deadlift: ${profile.deadliftKg.toInt()} kg")
+                append("\nFor exercises in the plan, include a suggested starting weight in the notes field based on these PRs and the rep targets. If no PR is available for a movement pattern, use fitness-level-appropriate defaults.")
+            } else {
+                append("\nNo personal records provided — use fitness-level-appropriate default weights and rep targets in the notes field.")
+            }
+        } else ""
+
+        return """
 You are a professional fitness trainer. Generate a workout plan using ONLY the exercises from the list below.
 
 Member profile:
@@ -182,11 +204,12 @@ Member profile:
 - Equipment available: $equipment
 - Fitness level: $fitnessLevel
 - Plan duration: $weeks weeks
-- Injuries or restrictions: ${injuries.ifBlank { "None" }}
+- Injuries or restrictions: ${injuries.ifBlank { "None" }}$physicalSection
 
 Available exercises (use ONLY these names exactly as written):
 $exerciseList
 
 Set schema_version to 1. The schedule must have exactly $daysPerWeek day entries. Use only exercise names from the list above.
 """.trimIndent()
+    }
 }

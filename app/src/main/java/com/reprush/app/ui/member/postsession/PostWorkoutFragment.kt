@@ -61,6 +61,7 @@ class PostWorkoutFragment : Fragment() {
             viewModel.clearResult()
         }
 
+        binding.buttonBack.setOnClickListener { navigateHome() }
         binding.buttonBackToHome.setOnClickListener { navigateHome() }
 
         viewModel.runPipeline(sessionId)

@@ -42,11 +42,15 @@ class StrengthViewModel @Inject constructor(
     private val _strengthData = MutableLiveData<StrengthData>()
     val strengthData: LiveData<StrengthData> = _strengthData
 
+    private val _isLoading = MutableLiveData(false)
+    val isLoading: LiveData<Boolean> = _isLoading
+
     private val keyLifts = listOf("Bench Press", "Squat", "Deadlift")
 
     fun load() {
         val uid = auth.currentUser?.uid ?: return
         viewModelScope.launch(Dispatchers.IO) {
+            _isLoading.postValue(true)
             var totalScore = 0.0
             var liftCount = 0
             val liftCards = mutableListOf<LiftCardItem>()
@@ -104,6 +108,7 @@ class StrengthViewModel @Inject constructor(
                     weeklyVolume = weeklyVol
                 )
             )
+            _isLoading.postValue(false)
         }
     }
 

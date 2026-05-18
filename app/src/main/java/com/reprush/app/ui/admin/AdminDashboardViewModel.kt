@@ -12,6 +12,8 @@ import com.reprush.app.data.repository.Result
 import com.reprush.app.service.ExpiryNotificationService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import java.time.YearMonth
 import javax.inject.Inject
@@ -43,40 +45,50 @@ class AdminDashboardViewModel @Inject constructor(
     private val _yearlyRevenue = MutableLiveData(0.0)
     val yearlyRevenue: LiveData<Double> = _yearlyRevenue
 
+    private val _isLoading = MutableLiveData(false)
+    val isLoading: LiveData<Boolean> = _isLoading
+
     fun loadStats() {
         runBackgroundJobs()
         viewModelScope.launch(Dispatchers.IO) {
-            when (val result = memberRepository.getMembers()) {
-                is Result.Success -> {
-                    _totalMembers.postValue(result.data.size)
-                    _activeMembers.postValue(result.data.count { it.membershipStatus == "active" })
-                    _pendingMembers.postValue(result.data.count { it.membershipStatus == "pending" })
+            _isLoading.postValue(true)
+            coroutineScope {
+                val membersDeferred = async {
+                    when (val result = memberRepository.getMembers()) {
+                        is Result.Success -> {
+                            _totalMembers.postValue(result.data.size)
+                            _activeMembers.postValue(result.data.count { it.membershipStatus == "active" })
+                            _pendingMembers.postValue(result.data.count { it.membershipStatus == "pending" })
+                        }
+                        is Result.Error -> {}
+                    }
                 }
-                is Result.Error -> {}
+                val attendanceDeferred = async {
+                    when (val result = attendanceRepository.getCheckedInTodayCount()) {
+                        is Result.Success -> _todayCheckIns.postValue(result.data)
+                        is Result.Error -> {}
+                    }
+                }
+                val monthlyDeferred = async {
+                    val currentMonth = YearMonth.now()
+                    when (val result = paymentRepository.getMonthlyRevenue(currentMonth)) {
+                        is Result.Success -> _monthlyRevenue.postValue(result.data)
+                        is Result.Error -> {}
+                    }
+                }
+                val yearlyDeferred = async {
+                    val currentYear = YearMonth.now().year
+                    when (val result = paymentRepository.getYearlyRevenue(currentYear)) {
+                        is Result.Success -> _yearlyRevenue.postValue(result.data)
+                        is Result.Error -> {}
+                    }
+                }
+                membersDeferred.await()
+                attendanceDeferred.await()
+                monthlyDeferred.await()
+                yearlyDeferred.await()
             }
-        }
-
-        viewModelScope.launch(Dispatchers.IO) {
-            when (val result = attendanceRepository.getCheckedInTodayCount()) {
-                is Result.Success -> _todayCheckIns.postValue(result.data)
-                is Result.Error -> {}
-            }
-        }
-
-        viewModelScope.launch(Dispatchers.IO) {
-            val currentMonth = YearMonth.now()
-            when (val result = paymentRepository.getMonthlyRevenue(currentMonth)) {
-                is Result.Success -> _monthlyRevenue.postValue(result.data)
-                is Result.Error -> {}
-            }
-        }
-
-        viewModelScope.launch(Dispatchers.IO) {
-            val currentYear = YearMonth.now().year
-            when (val result = paymentRepository.getYearlyRevenue(currentYear)) {
-                is Result.Success -> _yearlyRevenue.postValue(result.data)
-                is Result.Error -> {}
-            }
+            _isLoading.postValue(false)
         }
     }
 

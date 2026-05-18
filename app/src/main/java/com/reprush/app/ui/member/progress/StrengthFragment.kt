@@ -1,5 +1,6 @@
 package com.reprush.app.ui.member.progress
 
+import android.animation.ValueAnimator
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -70,6 +71,11 @@ class StrengthFragment : Fragment() {
     }
 
     private fun observeViewModels() {
+        strengthViewModel.isLoading.observe(viewLifecycleOwner) { loading ->
+            binding.progressStrength.visibility = if (loading) View.VISIBLE else View.GONE
+            binding.layoutStrengthContent.visibility = if (loading) View.GONE else View.VISIBLE
+        }
+
         strengthViewModel.strengthData.observe(viewLifecycleOwner) { data ->
             val insufficient = data.liftCount < 2
             binding.textStrengthInsufficient.visibility = if (insufficient) View.VISIBLE else View.GONE
@@ -77,10 +83,9 @@ class StrengthFragment : Fragment() {
             binding.recyclerLiftCards.visibility = if (insufficient) View.GONE else View.VISIBLE
 
             if (!insufficient) {
-                binding.textStrengthScore.text =
-                    String.format(Locale.getDefault(), "%.0f", data.score)
                 binding.chipStrengthLevel.text = data.level
                 liftAdapter.submitList(data.liftCards)
+                animateStrengthScore(data.score)
             }
 
             val weeklyVol = data.weeklyVolume
@@ -95,8 +100,20 @@ class StrengthFragment : Fragment() {
                 }
                 binding.chartWeeklyVolume.data = BarData(dataSet).apply { barWidth = 0.6f }
                 binding.chartWeeklyVolume.xAxis.labelCount = minOf(weeklyVol.size, 6)
+                binding.chartWeeklyVolume.animateY(600)
                 binding.chartWeeklyVolume.invalidate()
             }
+        }
+    }
+
+    private fun animateStrengthScore(target: Double) {
+        ValueAnimator.ofFloat(0f, target.toFloat()).apply {
+            duration = 600
+            addUpdateListener { anim ->
+                binding.textStrengthScore.text =
+                    String.format(Locale.getDefault(), "%.0f", anim.animatedValue as Float)
+            }
+            start()
         }
     }
 

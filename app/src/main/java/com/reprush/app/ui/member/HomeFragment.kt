@@ -47,6 +47,7 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
@@ -68,6 +69,7 @@ class HomeFragment : Fragment() {
     @Inject lateinit var planDayDao: PlanDayDao
 
     private var todayPlanDayId: String? = null
+    private var todayDayLabel: String = ""
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
@@ -83,12 +85,20 @@ class HomeFragment : Fragment() {
                 findNavController().navigate(R.id.action_homeFragment_to_librarySyncFragment)
                 return@launch
             }
+            val onboarded = appPreferences.isMemberOnboardingComplete.first()
+            if (!onboarded && isAdded) {
+                findNavController().navigate(R.id.action_homeFragment_to_memberOnboardingFragment)
+                return@launch
+            }
             checkForIncompleteSession()
             loadTodayPlanDay()
         }
 
         binding.buttonStartWorkout.setOnClickListener {
-            val bundle = Bundle().apply { putString("planDayId", todayPlanDayId ?: "") }
+            val bundle = Bundle().apply {
+                putString("planDayId", todayPlanDayId ?: "")
+                putString("dayLabel", todayDayLabel)
+            }
             findNavController().navigate(R.id.action_homeFragment_to_activeSessionFragment, bundle)
         }
 
@@ -96,6 +106,7 @@ class HomeFragment : Fragment() {
             findNavController().navigate(R.id.action_homeFragment_to_leaderboardFragment)
         }
 
+        binding.textViewMemberGreeting.text = getGreeting()
         observeGamification()
         homeViewModel.loadData()
         setupHeatmap()
@@ -126,6 +137,13 @@ class HomeFragment : Fragment() {
                     setColor(color)
                 }
                 container.cellView.background = drawable
+
+                if (data.position == DayPosition.MonthDate) {
+                    container.dayText.text = date.dayOfMonth.toString()
+                    container.dayText.visibility = View.VISIBLE
+                } else {
+                    container.dayText.visibility = View.INVISIBLE
+                }
 
                 val label = buildCellContentDescription(date, intensityMap, detailMap)
                 container.cellView.contentDescription = label
@@ -378,7 +396,18 @@ class HomeFragment : Fragment() {
         val todayIndex = daysSinceStart % plan.daysPerWeek
         val todayDay = planDays.getOrNull(todayIndex) ?: planDays.first()
         todayPlanDayId = todayDay.id
+        todayDayLabel = todayDay.dayLabel
         if (isAdded) binding.textViewTodayDayLabel.text = todayDay.dayLabel
+    }
+
+    private fun getGreeting(): String {
+        val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+        return when {
+            hour < 12 -> "Good morning!"
+            hour < 17 -> "Good afternoon!"
+            hour < 21 -> "Good evening!"
+            else -> "Good night!"
+        }
     }
 
     override fun onDestroyView() {
@@ -390,6 +419,7 @@ class HomeFragment : Fragment() {
 
     private inner class HeatmapDayContainer(view: View) : ViewContainer(view) {
         val cellView: View = view.findViewById(R.id.view_heatmap_cell)
+        val dayText: TextView = view.findViewById(R.id.text_heatmap_day)
     }
 
     private inner class MonthHeaderContainer(view: View) : ViewContainer(view) {

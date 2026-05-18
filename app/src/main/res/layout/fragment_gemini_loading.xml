@@ -7,6 +7,18 @@
     android:background="@color/background"
     android:padding="@dimen/spacing_lg">
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_back"
+        style="@style/Widget.Material3.Button.IconButton"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="@dimen/spacing_xs"
+        android:layout_marginStart="@dimen/spacing_xs"
+        android:contentDescription="Go back"
+        app:icon="@drawable/ic_arrow_back"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
         android:id="@+id/textView_appTitle"
         android:layout_width="wrap_content"

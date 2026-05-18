@@ -40,6 +40,17 @@ interface LoggedSetDao {
     suspend fun deleteSetsForSession(sessionId: String)
 
     @Query("""
+        SELECT COALESCE(SUM(ls.weight * ls.reps), 0.0)
+        FROM logged_sets ls
+        INNER JOIN workout_sessions ws ON ls.sessionId = ws.id
+        WHERE ws.userId = :userId
+          AND ws.isCompleted = 1
+          AND ls.isWarmup = 0
+          AND ls.isCompleted = 1
+    """)
+    suspend fun getTotalVolume(userId: String): Double
+
+    @Query("""
         SELECT DATE(loggedAt / 1000, 'unixepoch') as workoutDate,
                SUM(weight * reps) as totalVolume,
                COUNT(DISTINCT exerciseId) as exerciseCount

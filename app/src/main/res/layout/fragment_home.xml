@@ -17,7 +17,7 @@
             android:id="@+id/textView_memberGreeting"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Good morning!"
+            android:text=""
             android:textColor="@color/on_surface"
             android:textSize="22sp"
             android:textStyle="bold"

@@ -7,13 +7,19 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
+import com.reprush.app.BuildConfig
+import com.reprush.app.data.debug.DemoDataSeeder
 import com.reprush.app.data.repository.Result
 import com.reprush.app.databinding.FragmentAdminSettingsBinding
 import com.reprush.app.ui.auth.SignInActivity
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -24,6 +30,7 @@ class AdminSettingsFragment : Fragment() {
     private val viewModel: AdminSettingsViewModel by viewModels()
 
     @Inject lateinit var auth: FirebaseAuth
+    @Inject lateinit var demoDataSeeder: DemoDataSeeder
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -95,6 +102,23 @@ class AdminSettingsFragment : Fragment() {
                 }
                 .setNegativeButton("Cancel", null)
                 .show()
+        }
+
+        if (BuildConfig.DEBUG) {
+            binding.buttonSeedDemoData.visibility = View.VISIBLE
+            binding.buttonSeedDemoData.setOnClickListener {
+                binding.buttonSeedDemoData.isEnabled = false
+                binding.buttonSeedDemoData.text = "Seeding…"
+                viewLifecycleOwner.lifecycleScope.launch {
+                    val result = withContext(Dispatchers.IO) { demoDataSeeder.seedAll() }
+                    binding.buttonSeedDemoData.isEnabled = true
+                    binding.buttonSeedDemoData.text = "Seed Demo Data"
+                    when (result) {
+                        is Result.Success -> Snackbar.make(binding.root, result.data, Snackbar.LENGTH_LONG).show()
+                        is Result.Error -> Snackbar.make(binding.root, result.message, Snackbar.LENGTH_LONG).show()
+                    }
+                }
+            }
         }
 
         viewModel.loadSettings()

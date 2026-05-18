@@ -32,7 +32,7 @@ class ProgressFragment : Fragment() {
         TabLayoutMediator(binding.tabLayoutProgress, binding.viewPagerProgress) { tab, position ->
             tab.text = when (position) {
                 0 -> "Overview"
-                1 -> "Body"
+                1 -> "Weight"
                 2 -> "Strength"
                 else -> ""
             }

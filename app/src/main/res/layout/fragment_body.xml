@@ -77,14 +77,51 @@
         <com.github.mikephil.charting.charts.LineChart
             android:id="@+id/chart_body_weight"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:layout_marginBottom="@dimen/spacing_md" />
+            android:layout_height="300dp"
+            android:layout_marginBottom="@dimen/spacing_xs" />
+
+        <!-- Selected point info (shown on tap) -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_selected_point"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_md"
+            android:visibility="gone"
+            app:cardBackgroundColor="@color/primary_container"
+            app:cardCornerRadius="@dimen/shape_sm">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="@dimen/spacing_md"
+                android:paddingVertical="@dimen/spacing_sm">
+
+                <TextView
+                    android:id="@+id/text_selected_date"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textColor="@color/on_primary_container"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/text_selected_weight"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/on_primary_container"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
         <TextView
             android:id="@+id/text_weight_insufficient"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Log at least 3 days to see your weight trend."
+            android:text="Log at least 2 days to see your weight trend."
             android:textColor="@color/on_surface_variant"
             android:textSize="13sp"
             android:gravity="center"

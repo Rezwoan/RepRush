@@ -23,7 +23,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:contentDescription="Go back"
-            app:icon="@android:drawable/ic_media_previous" />
+            app:icon="@drawable/ic_arrow_back" />
 
         <TextView
             android:layout_width="0dp"
@@ -36,11 +36,20 @@
             android:textStyle="bold" />
 
         <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_buildManually"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:text="Manual"
+            android:textSize="12sp"
+            android:layout_marginEnd="@dimen/spacing_xs" />
+
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/button_generatePlan"
             android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:text="Generate"
-            android:textSize="13sp" />
+            android:layout_height="40dp"
+            android:text="AI Plan"
+            android:textSize="12sp" />
 
     </LinearLayout>
 
@@ -79,7 +88,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/spacing_sm"
-            android:text="Tap Generate to create your first AI workout plan"
+            android:text="Use AI Plan to generate one automatically, or Manual to build your own."
             android:textColor="@color/on_surface_variant"
             android:textSize="14sp"
             android:gravity="center" />

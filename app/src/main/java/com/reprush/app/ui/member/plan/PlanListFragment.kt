@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -38,6 +39,12 @@ class PlanListFragment : Fragment() {
                     .setPositiveButton("Delete") { _, _ -> viewModel.deletePlan(plan) }
                     .setNegativeButton("Cancel", null)
                     .show()
+            },
+            onViewDetail = { plan ->
+                findNavController().navigate(
+                    R.id.action_planListFragment_to_planDetailFragment,
+                    bundleOf("planId" to plan.id)
+                )
             }
         )
 
@@ -52,6 +59,10 @@ class PlanListFragment : Fragment() {
 
         binding.buttonGeneratePlan.setOnClickListener {
             findNavController().navigate(R.id.action_planListFragment_to_planQuestionnaireFragment)
+        }
+
+        binding.buttonBuildManually.setOnClickListener {
+            findNavController().navigate(R.id.action_planListFragment_to_manualPlanBuilderFragment)
         }
 
         binding.buttonBack.setOnClickListener { findNavController().popBackStack() }

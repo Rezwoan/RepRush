@@ -1,7 +1,6 @@
 package com.reprush.app.data.repository
 
 import android.content.Context
-import android.util.Log
 import com.reprush.app.data.local.datastore.AppPreferences
 import com.reprush.app.data.local.dao.ExerciseDao
 import com.reprush.app.data.local.entity.ExerciseEntity
@@ -10,15 +9,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
-import java.io.File
-import java.io.FileOutputStream
-import java.net.HttpURLConnection
-import java.net.URL
 import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
-
-data class SyncProgress(val currentCount: Int, val totalCount: Int)
 
 @Singleton
 class ExerciseRepository @Inject constructor(
@@ -26,13 +19,6 @@ class ExerciseRepository @Inject constructor(
     private val exerciseDao: ExerciseDao,
     private val appPreferences: AppPreferences
 ) {
-    private val imageBaseUrl = "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/"
-    private val imageDir: File get() {
-        val dir = File(context.filesDir, "exercise_images")
-        if (!dir.exists()) dir.mkdirs()
-        return dir
-    }
-
     // Maps user-visible filter chip labels to the exact primaryMuscle values stored in Room.
     // All DB values are title-cased during sync (e.g. "lats" → "Lats").
     val MUSCLE_FILTER_MAP: Map<String, List<String>> = mapOf(
@@ -49,15 +35,12 @@ class ExerciseRepository @Inject constructor(
 
     suspend fun isLibrarySynced(): Boolean = appPreferences.isLibrarySynced.first()
 
-    suspend fun syncExercises(
-        onProgress: (SyncProgress) -> Unit
-    ): Result<Unit> = withContext(Dispatchers.IO) {
+    suspend fun syncExercises(): Result<Unit> = withContext(Dispatchers.IO) {
         try {
             val jsonText = context.assets.open("exercises.json").bufferedReader().use { it.readText() }
             val jsonArray = JSONArray(jsonText)
 
             val exercises = mutableListOf<ExerciseEntity>()
-            val imagePaths = mutableListOf<Pair<String, List<String>>>()
 
             for (i in 0 until jsonArray.length()) {
                 val obj = jsonArray.getJSONObject(i)
@@ -90,63 +73,31 @@ class ExerciseRepository @Inject constructor(
                     (0 until imagesArr.length()).map { j -> imagesArr.getString(j) }
                 } else emptyList()
 
-                val id = UUID.randomUUID().toString()
+                val imageUrl = if (paths.isNotEmpty()) "exercise_images/${paths[0]}" else null
+                val thumbnailUrl = when {
+                    paths.size >= 2 -> "exercise_images/${paths[1]}"
+                    paths.isNotEmpty() -> "exercise_images/${paths[0]}"
+                    else -> null
+                }
+
                 exercises.add(
                     ExerciseEntity(
-                        id = id,
+                        id = UUID.randomUUID().toString(),
                         name = name,
                         primaryMuscle = primaryMuscle,
                         secondaryMuscles = secondaryMuscles,
                         equipment = equipment,
                         category = category,
-                        imageUrl = null,
-                        thumbnailUrl = null,
+                        imageUrl = imageUrl,
+                        thumbnailUrl = thumbnailUrl,
                         muscleImageUrl = null,
                         isCustom = 0,
                         isVerified = 1
                     )
                 )
-                if (paths.isNotEmpty()) {
-                    imagePaths.add(Pair(id, paths))
-                }
             }
 
             exerciseDao.insertAll(exercises)
-
-            val resumeFrom = appPreferences.syncProgressCount.first()
-            val totalImages = imagePaths.size
-
-            onProgress(SyncProgress(resumeFrom, totalImages))
-
-            for (idx in resumeFrom until imagePaths.size) {
-                val (exerciseId, paths) = imagePaths[idx]
-                if (paths.isEmpty()) continue
-
-                val imagePath = paths[0]
-                val localFile = File(imageDir, "${exerciseId}.jpg")
-                try {
-                    val url = URL(imageBaseUrl + imagePath)
-                    val conn = url.openConnection() as HttpURLConnection
-                    conn.connectTimeout = 30_000
-                    conn.readTimeout = 30_000
-                    conn.connect()
-                    if (conn.responseCode == HttpURLConnection.HTTP_OK) {
-                        conn.inputStream.use { input ->
-                            FileOutputStream(localFile).use { output ->
-                                input.copyTo(output)
-                            }
-                        }
-                        exerciseDao.updateImageUrl(exerciseId, localFile.absolutePath)
-                    }
-                    conn.disconnect()
-                } catch (e: Exception) {
-                    Log.w("ExerciseSync", "Failed to download image for $exerciseId: ${e.message}")
-                }
-
-                appPreferences.setSyncProgressCount(idx + 1)
-                onProgress(SyncProgress(idx + 1, totalImages))
-            }
-
             appPreferences.setLibrarySynced(true)
             Result.Success(Unit)
         } catch (e: Exception) {

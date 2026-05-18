@@ -25,7 +25,7 @@
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:contentDescription="Go back"
-                app:icon="@android:drawable/ic_media_previous" />
+                app:icon="@drawable/ic_arrow_back" />
 
             <TextView
                 android:layout_width="wrap_content"
