@@ -34,6 +34,9 @@
         <action
             android:id="@+id/action_homeFragment_to_leaderboardFragment"
             app:destination="@id/leaderboardFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
     </fragment>
 
     <fragment
@@ -131,7 +134,29 @@
     <fragment
         android:id="@+id/notificationsFragment"
         android:name="com.reprush.app.ui.member.notifications.NotificationsFragment"
-        android:label="Notifications" />
+        android:label="Notifications">
+        <action
+            android:id="@+id/action_notificationsFragment_to_notificationDetailFragment"
+            app:destination="@id/notificationDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/notificationDetailFragment"
+        android:name="com.reprush.app.ui.member.notifications.NotificationDetailFragment"
+        android:label="Notification Detail">
+        <argument
+            android:name="title"
+            app:argType="string"
+            android:defaultValue="" />
+        <argument
+            android:name="body"
+            app:argType="string"
+            android:defaultValue="" />
+        <argument
+            android:name="createdAt"
+            app:argType="long"
+            android:defaultValue="0L" />
+    </fragment>
 
     <!-- Exercise Library -->
     <fragment

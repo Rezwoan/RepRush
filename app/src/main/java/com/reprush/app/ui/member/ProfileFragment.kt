@@ -63,12 +63,21 @@ class ProfileFragment : Fragment() {
     private fun observeViewModel() {
         viewModel.isLoading.observe(viewLifecycleOwner) { loading ->
             binding.progressProfile.visibility = if (loading) View.VISIBLE else View.GONE
-            binding.layoutProfileContent.visibility = if (loading) View.GONE else View.VISIBLE
+            if (!loading) {
+                binding.layoutProfileContent.apply {
+                    alpha = 0f
+                    visibility = View.VISIBLE
+                    animate().alpha(1f).setDuration(400).start()
+                }
+            } else {
+                binding.layoutProfileContent.visibility = View.GONE
+            }
         }
 
         viewModel.user.observe(viewLifecycleOwner) { user ->
             if (user != null) {
                 binding.textViewDisplayName.text = user.displayName
+                binding.textViewEmail.text = user.email
                 binding.textViewFitnessLevel.text = buildString {
                     append(user.fitnessLevel?.replaceFirstChar { it.uppercase() } ?: "")
                     if (!user.primaryGoal.isNullOrBlank()) {
