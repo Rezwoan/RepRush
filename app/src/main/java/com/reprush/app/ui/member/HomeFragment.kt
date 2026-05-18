@@ -82,12 +82,14 @@ class HomeFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             val synced = appPreferences.isLibrarySynced.first()
-            if (!synced && isAdded) {
+            if (!isAdded || findNavController().currentDestination?.id != R.id.homeFragment) return@launch
+            if (!synced) {
                 findNavController().navigate(R.id.action_homeFragment_to_librarySyncFragment)
                 return@launch
             }
             val onboarded = appPreferences.isMemberOnboardingComplete.first()
-            if (!onboarded && isAdded) {
+            if (!isAdded || findNavController().currentDestination?.id != R.id.homeFragment) return@launch
+            if (!onboarded) {
                 findNavController().navigate(R.id.action_homeFragment_to_memberOnboardingFragment)
                 return@launch
             }
@@ -374,13 +376,14 @@ class HomeFragment : Fragment() {
     // ── Session recovery ─────────────────────────────────────────────────────
 
     private fun checkForIncompleteSession() {
+        if (!isAdded || view == null) return
         val userId = auth.currentUser?.uid ?: return
         val alreadyActive = sessionViewModel.sessionState.value is SessionState.Active
         if (alreadyActive) return
 
         viewLifecycleOwner.lifecycleScope.launch {
             val incompleteSession = sessionRepository.getIncompleteSession(userId)
-            if (incompleteSession != null && isAdded) {
+            if (incompleteSession != null && isAdded && view != null) {
                 val startDateStr = SimpleDateFormat("MMM dd, hh:mm a", Locale.getDefault())
                     .format(Date(incompleteSession.startTime))
                 AlertDialog.Builder(requireContext())
@@ -390,6 +393,7 @@ class HomeFragment : Fragment() {
                         "Would you like to resume or discard it?"
                     )
                     .setPositiveButton("Resume") { _, _ ->
+                        if (!isAdded || view == null) return@setPositiveButton
                         viewLifecycleOwner.lifecycleScope.launch {
                             val recoveredState = sessionRepository.recoverSession(incompleteSession)
                             sessionViewModel.resumeSession(recoveredState)
@@ -399,6 +403,7 @@ class HomeFragment : Fragment() {
                         }
                     }
                     .setNegativeButton("Discard") { _, _ ->
+                        if (!isAdded || view == null) return@setNegativeButton
                         viewLifecycleOwner.lifecycleScope.launch {
                             sessionRepository.discardIncompleteSession(incompleteSession.id)
                         }
