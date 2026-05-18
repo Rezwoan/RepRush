@@ -12,7 +12,8 @@ import com.reprush.app.data.model.MembershipPackage
 import com.reprush.app.databinding.ItemPackageBinding
 
 class PackageAdapter(
-    private val onItemClick: (MembershipPackage) -> Unit
+    private val onEdit: (MembershipPackage) -> Unit,
+    private val onDelete: (MembershipPackage) -> Unit
 ) : ListAdapter<MembershipPackage, PackageAdapter.ViewHolder>(DiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -53,7 +54,8 @@ class PackageAdapter(
                 ta.recycle()
             }
 
-            binding.root.setOnClickListener { onItemClick(pkg) }
+            binding.buttonEditPackage.setOnClickListener { onEdit(pkg) }
+            binding.buttonDeletePackage.setOnClickListener { onDelete(pkg) }
         }
     }
 

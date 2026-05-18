@@ -1,6 +1,7 @@
 package com.reprush.app.data.repository
 
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
@@ -84,6 +85,16 @@ class NotificationRepository @Inject constructor(
         } catch (e: Exception) {
             Result.Error(e.message ?: "Failed to mark all as read")
         }
+    }
+
+    fun listenUnreadCount(uid: String, onUpdate: (Int) -> Unit): ListenerRegistration {
+        return firestore.collection("notifications")
+            .document(uid)
+            .collection("items")
+            .whereEqualTo("isRead", false)
+            .addSnapshotListener { snapshot, _ ->
+                onUpdate(snapshot?.size() ?: 0)
+            }
     }
 
     suspend fun getUnreadCount(uid: String): Result<Int> = withContext(Dispatchers.IO) {

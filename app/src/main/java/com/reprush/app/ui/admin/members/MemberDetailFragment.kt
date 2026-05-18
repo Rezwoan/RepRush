@@ -54,6 +54,7 @@ class MemberDetailFragment : Fragment() {
         }
 
         viewModel.loadMember(memberUid)
+        viewModel.loadActivePackages()
 
         paymentAdapter = MemberPaymentAdapter()
         binding.recyclerViewMemberPayments.layoutManager = LinearLayoutManager(requireContext())
@@ -243,6 +244,30 @@ class MemberDetailFragment : Fragment() {
                 bundle
             )
         }
+
+        binding.buttonChangePackage.setOnClickListener {
+            showChangePackageDialog(member.uid, member.displayName)
+        }
+    }
+
+    private fun showChangePackageDialog(uid: String, memberName: String) {
+        val packages = viewModel.activePackages.value
+        if (packages.isNullOrEmpty()) {
+            Snackbar.make(binding.root, "No active packages available", Snackbar.LENGTH_SHORT).show()
+            return
+        }
+        val names = packages.map { "${it.name}  ·  ৳${"%.0f".format(it.price)}  ·  ${it.durationDays}d" }.toTypedArray()
+        var selectedIndex = 0
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Assign Package to $memberName")
+            .setSingleChoiceItems(names, 0) { _, which -> selectedIndex = which }
+            .setNegativeButton("Cancel", null)
+            .setPositiveButton("Assign") { _, _ ->
+                hasPerformedAction = true
+                pendingRemove = false
+                viewModel.assignPackage(uid, packages[selectedIndex])
+            }
+            .show()
     }
 
     private fun switchTab(position: Int) {

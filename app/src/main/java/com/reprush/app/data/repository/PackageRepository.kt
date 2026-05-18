@@ -97,4 +97,13 @@ class PackageRepository @Inject constructor(
             Result.Error(e.message ?: "Failed to deactivate package")
         }
     }
+
+    suspend fun deletePackage(packageId: String): Result<Unit> = withContext(Dispatchers.IO) {
+        try {
+            collection.document(packageId).delete().await()
+            Result.Success(Unit)
+        } catch (e: Exception) {
+            Result.Error(e.message ?: "Failed to delete package")
+        }
+    }
 }

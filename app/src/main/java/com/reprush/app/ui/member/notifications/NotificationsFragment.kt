@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.reprush.app.R
@@ -18,7 +18,7 @@ class NotificationsFragment : Fragment() {
 
     private var _binding: FragmentNotificationsBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: NotificationsViewModel by viewModels()
+    private val viewModel: NotificationsViewModel by activityViewModels()
     private lateinit var adapter: NotificationAdapter
 
     override fun onCreateView(
@@ -34,9 +34,8 @@ class NotificationsFragment : Fragment() {
         binding.buttonBack.setOnClickListener { findNavController().popBackStack() }
 
         adapter = NotificationAdapter { notification ->
-            if (!notification.isRead) {
-                viewModel.markAsRead(notification.id)
-            }
+            if (findNavController().currentDestination?.id != R.id.notificationsFragment) return@NotificationAdapter
+            if (!notification.isRead) viewModel.markAsRead(notification.id)
             findNavController().navigate(
                 R.id.action_notificationsFragment_to_notificationDetailFragment,
                 bundleOf(
@@ -52,15 +51,6 @@ class NotificationsFragment : Fragment() {
 
         viewModel.isLoading.observe(viewLifecycleOwner) { loading ->
             binding.progressBarNotifications.visibility = if (loading) View.VISIBLE else View.GONE
-        }
-
-        viewModel.unreadCount.observe(viewLifecycleOwner) { count ->
-            if (count > 0) {
-                binding.textViewUnreadBadge.text = count.toString()
-                binding.textViewUnreadBadge.visibility = View.VISIBLE
-            } else {
-                binding.textViewUnreadBadge.visibility = View.GONE
-            }
         }
 
         viewModel.notifications.observe(viewLifecycleOwner) { list ->

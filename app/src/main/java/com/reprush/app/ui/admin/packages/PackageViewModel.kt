@@ -26,35 +26,29 @@ class PackageViewModel @Inject constructor(
     private val _operationResult = MutableLiveData<Result<*>?>(null)
     val operationResult: LiveData<Result<*>?> = _operationResult
 
-    fun clearOperationResult() {
-        _operationResult.postValue(null)
-    }
+    private val _editTarget = MutableLiveData<MembershipPackage?>(null)
+    val editTarget: LiveData<MembershipPackage?> = _editTarget
+
+    fun setEditTarget(pkg: MembershipPackage?) { _editTarget.value = pkg }
+
+    fun clearOperationResult() { _operationResult.postValue(null) }
 
     fun loadPackages() {
         viewModelScope.launch(Dispatchers.IO) {
             val result = repository.getAllPackages()
-            if (result is Result.Success) {
-                _packages.postValue(result.data)
-            }
+            if (result is Result.Success) _packages.postValue(result.data)
         }
     }
 
     fun loadActivePackages() {
         viewModelScope.launch(Dispatchers.IO) {
             val result = repository.getActivePackages()
-            if (result is Result.Success) {
-                _activePackages.postValue(result.data)
-            }
+            if (result is Result.Success) _activePackages.postValue(result.data)
         }
     }
 
     fun createPackage(name: String, price: Double, durationDays: Int, description: String?) {
-        val pkg = MembershipPackage(
-            name = name,
-            price = price,
-            durationDays = durationDays,
-            description = description
-        )
+        val pkg = MembershipPackage(name = name, price = price, durationDays = durationDays, description = description)
         viewModelScope.launch(Dispatchers.IO) {
             _operationResult.postValue(repository.createPackage(pkg))
         }
@@ -62,7 +56,17 @@ class PackageViewModel @Inject constructor(
 
     fun updatePackage(pkg: MembershipPackage) {
         viewModelScope.launch(Dispatchers.IO) {
-            _operationResult.postValue(repository.updatePackage(pkg))
+            val result = repository.updatePackage(pkg)
+            _operationResult.postValue(result)
+            if (result is Result.Success) loadPackages()
+        }
+    }
+
+    fun deletePackage(packageId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val result = repository.deletePackage(packageId)
+            _operationResult.postValue(result)
+            if (result is Result.Success) loadPackages()
         }
     }
 

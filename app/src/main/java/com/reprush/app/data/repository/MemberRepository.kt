@@ -2,6 +2,7 @@ package com.reprush.app.data.repository
 
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
@@ -287,6 +288,53 @@ class MemberRepository @Inject constructor(
             Result.Success(Unit)
         } catch (e: Exception) {
             Result.Error(e.message ?: "Failed to remove member")
+        }
+    }
+
+    suspend fun assignPackage(
+        uid: String,
+        packageId: String,
+        durationDays: Int
+    ): Result<Unit> = withContext(Dispatchers.IO) {
+        try {
+            val today = java.time.LocalDate.now()
+            val endDate = today.plusDays(durationDays.toLong())
+            firestore.collection("users").document(uid).update(
+                mapOf(
+                    "packageId" to packageId,
+                    "membershipStartDate" to today.toString(),
+                    "membershipEndDate" to endDate.toString(),
+                    "membershipStatus" to "active"
+                )
+            ).await()
+            Result.Success(Unit)
+        } catch (e: Exception) {
+            Result.Error(e.message ?: "Failed to assign package")
+        }
+    }
+
+    suspend fun saveOnboardingProfile(
+        uid: String,
+        heightCm: Float,
+        weightKg: Float,
+        fitnessLevel: String,
+        lastExercised: String
+    ): Result<Unit> = withContext(Dispatchers.IO) {
+        try {
+            firestore.collection("users").document(uid)
+                .set(
+                    mapOf(
+                        "heightCm" to heightCm,
+                        "weightKg" to weightKg,
+                        "fitnessLevel" to fitnessLevel,
+                        "lastExercised" to lastExercised,
+                        "onboardingComplete" to true
+                    ),
+                    SetOptions.merge()
+                ).await()
+            Result.Success(Unit)
+        } catch (e: Exception) {
+            Result.Error(e.message ?: "Failed to save onboarding profile")
         }
     }
 }
