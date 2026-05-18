@@ -3,22 +3,22 @@
 
     <item
         android:id="@+id/adminDashboardFragment"
-        android:icon="@android:drawable/ic_menu_compass"
+        android:icon="@drawable/ic_dashboard"
         android:title="Dashboard" />
 
     <item
         android:id="@+id/memberDirectoryFragment"
-        android:icon="@android:drawable/ic_menu_myplaces"
+        android:icon="@drawable/ic_people"
         android:title="Members" />
 
     <item
         android:id="@+id/paymentLogFragment"
-        android:icon="@android:drawable/ic_menu_agenda"
+        android:icon="@drawable/ic_payments"
         android:title="Payments" />
 
     <item
         android:id="@+id/adminSettingsFragment"
-        android:icon="@android:drawable/ic_menu_preferences"
+        android:icon="@drawable/ic_settings"
         android:title="Settings" />
 
 

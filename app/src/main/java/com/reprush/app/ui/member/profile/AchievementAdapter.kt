@@ -3,6 +3,7 @@ package com.reprush.app.ui.member.profile
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -15,7 +16,7 @@ class AchievementAdapter(
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val icon: TextView = view.findViewById(R.id.textView_badgeIcon)
-        val lockOverlay: TextView = view.findViewById(R.id.textView_lockOverlay)
+        val lockOverlay: ImageView = view.findViewById(R.id.imageView_lockOverlay)
         val name: TextView = view.findViewById(R.id.textView_badgeName)
     }
 

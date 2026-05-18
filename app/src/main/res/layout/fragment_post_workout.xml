@@ -213,12 +213,12 @@
                     android:gravity="center_vertical"
                     android:padding="@dimen/spacing_md">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="🔥"
-                        android:textSize="24sp"
-                        android:layout_marginEnd="@dimen/spacing_sm" />
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_fire"
+                        android:layout_marginEnd="@dimen/spacing_sm"
+                        android:contentDescription="Streak" />
 
                     <TextView
                         android:id="@+id/textView_streakCount"

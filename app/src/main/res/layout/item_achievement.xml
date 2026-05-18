@@ -19,15 +19,14 @@
             android:gravity="center"
             android:textSize="28sp" />
 
-        <TextView
-            android:id="@+id/textView_lockOverlay"
+        <ImageView
+            android:id="@+id/imageView_lockOverlay"
             android:layout_width="18dp"
             android:layout_height="18dp"
             android:layout_gravity="bottom|end"
-            android:text="🔒"
-            android:textSize="12sp"
-            android:gravity="center"
-            android:visibility="gone" />
+            android:src="@drawable/ic_lock"
+            android:visibility="gone"
+            android:contentDescription="Locked" />
 
     </FrameLayout>
 

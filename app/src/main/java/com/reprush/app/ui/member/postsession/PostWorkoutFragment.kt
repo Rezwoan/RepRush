@@ -145,7 +145,8 @@ class PostWorkoutFragment : Fragment() {
                 LayoutInflater.from(requireContext()), binding.containerAchievements, false
             )
             cardBinding.textViewAchievementName.text = badgeDisplayName(badgeId)
-            cardBinding.textViewAchievementIcon.text = badgeIcon(badgeId)
+            // Use medal icon as placeholder for all achievements since we are replacing emojis
+            cardBinding.imageViewAchievementIcon.setImageResource(R.drawable.ic_medal)
 
             cardBinding.root.scaleX = 0f
             cardBinding.root.scaleY = 0f
@@ -189,21 +190,6 @@ class PostWorkoutFragment : Fragment() {
         "comeback" -> "Comeback"
         "full_house" -> "Full House"
         else -> badgeId
-    }
-
-    private fun badgeIcon(badgeId: String) = when (badgeId) {
-        "first_rep" -> "💪"
-        "on_a_roll" -> "🔥"
-        "unstoppable" -> "⚡"
-        "century" -> "💯"
-        "pr_machine" -> "🏆"
-        "plan_master" -> "📋"
-        "heavy_bench" -> "🏋️"
-        "heavy_squat" -> "🦵"
-        "heavy_deadlift" -> "⬆️"
-        "comeback" -> "🔄"
-        "full_house" -> "✅"
-        else -> "🏅"
     }
 
     private fun navigateHome() {

@@ -12,22 +12,21 @@
         android:layout_height="80dp"
         android:layout_marginBottom="@dimen/spacing_md">
 
-        <TextView
-            android:id="@+id/textView_dialogBadgeIcon"
+        <ImageView
+            android:id="@+id/imageView_dialogBadgeIcon"
             android:layout_width="80dp"
             android:layout_height="80dp"
-            android:gravity="center"
-            android:textSize="36sp" />
+            android:src="@drawable/ic_medal"
+            android:contentDescription="Achievement" />
 
-        <TextView
-            android:id="@+id/textView_dialogLockOverlay"
+        <ImageView
+            android:id="@+id/imageView_dialogLockOverlay"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_gravity="bottom|end"
-            android:text="🔒"
-            android:textSize="16sp"
-            android:gravity="center"
-            android:visibility="gone" />
+            android:src="@drawable/ic_lock"
+            android:visibility="gone"
+            android:contentDescription="Locked" />
 
     </FrameLayout>
 

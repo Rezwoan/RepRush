@@ -163,14 +163,15 @@ class ProfileFragment : Fragment() {
 
     private fun showAchievementDialog(item: AchievementDisplayItem) {
         val dialogView = DialogAchievementBinding.inflate(layoutInflater)
-        dialogView.textViewDialogBadgeIcon.text = item.badge.icon
+        // item.badge.icon is an emoji string, we are replacing it with a static vector for now
+        dialogView.imageViewDialogBadgeIcon.setImageResource(R.drawable.ic_medal)
         dialogView.textViewDialogBadgeName.text = item.badge.name
         dialogView.textViewDialogDescription.text = item.badge.description
         dialogView.textViewDialogCondition.text = "Condition: ${item.badge.unlockCondition}"
 
         if (item.isUnlocked) {
-            dialogView.textViewDialogLockOverlay.visibility = View.GONE
-            dialogView.textViewDialogBadgeIcon.alpha = 1.0f
+            dialogView.imageViewDialogLockOverlay.visibility = View.GONE
+            dialogView.imageViewDialogBadgeIcon.alpha = 1.0f
             if (item.unlockedAt != null) {
                 val dateStr = SimpleDateFormat("MMM d, yyyy", Locale.getDefault())
                     .format(Date(item.unlockedAt))
@@ -180,8 +181,8 @@ class ProfileFragment : Fragment() {
                 )
             }
         } else {
-            dialogView.textViewDialogLockOverlay.visibility = View.VISIBLE
-            dialogView.textViewDialogBadgeIcon.alpha = 0.3f
+            dialogView.imageViewDialogLockOverlay.visibility = View.VISIBLE
+            dialogView.imageViewDialogBadgeIcon.alpha = 0.3f
             dialogView.textViewDialogUnlockDate.text = "Not yet unlocked"
             dialogView.textViewDialogUnlockDate.setTextColor(
                 ContextCompat.getColor(requireContext(), R.color.on_surface_variant)
