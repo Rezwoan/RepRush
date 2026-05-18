@@ -39,14 +39,13 @@
         android:gravity="top"
         android:visibility="gone">
 
-        <TextView
+        <ImageView
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:text="🤖"
-            android:textSize="16sp"
-            android:gravity="center"
+            android:src="@drawable/ic_robot"
             android:layout_marginEnd="@dimen/spacing_xs"
-            android:layout_marginTop="@dimen/spacing_xs" />
+            android:layout_marginTop="@dimen/spacing_xs"
+            android:contentDescription="AI Trainer" />
 
         <TextView
             android:id="@+id/textView_aiContent"

@@ -15,7 +15,8 @@ import javax.inject.Singleton
 data class UserFirestoreData(
     val membershipEndDate: String?,
     val packageId: String?,
-    val monthlyPoints: Int
+    val monthlyPoints: Int,
+    val displayName: String? = null
 )
 
 data class ProfileFirestoreData(
@@ -119,7 +120,8 @@ class GameRepository @Inject constructor(
             Result.Success(UserFirestoreData(
                 membershipEndDate = doc.getString("membershipEndDate"),
                 packageId = doc.getString("packageId"),
-                monthlyPoints = doc.getLong("monthlyPoints")?.toInt() ?: 0
+                monthlyPoints = doc.getLong("monthlyPoints")?.toInt() ?: 0,
+                displayName = doc.getString("displayName")
             ))
         } catch (e: Exception) {
             Log.e("GameRepository", "getUserData: FAILED uid=$uid", e)

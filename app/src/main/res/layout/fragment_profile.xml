@@ -30,48 +30,69 @@
         android:padding="@dimen/spacing_md">
 
         <!-- Avatar and name row -->
-        <LinearLayout
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginBottom="@dimen/spacing_md">
-
-            <ImageView
-                android:id="@+id/imageView_avatar"
-                android:layout_width="@dimen/avatar_md"
-                android:layout_height="@dimen/avatar_md"
-                android:src="@drawable/ic_person"
-                android:scaleType="centerCrop"
-                android:background="@color/surface_variant" />
+            android:layout_marginBottom="@dimen/spacing_md"
+            app:cardBackgroundColor="@color/surface_variant"
+            app:cardCornerRadius="@dimen/shape_lg"
+            app:strokeWidth="0dp">
 
             <LinearLayout
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:layout_marginStart="@dimen/spacing_md">
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="@dimen/spacing_md">
 
-                <TextView
-                    android:id="@+id/textView_displayName"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Member"
-                    android:textColor="@color/on_surface"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/imageView_avatar"
+                    android:layout_width="@dimen/avatar_md"
+                    android:layout_height="@dimen/avatar_md"
+                    android:src="@drawable/ic_person"
+                    android:scaleType="centerCrop"
+                    android:background="@color/surface"
+                    app:shapeAppearanceOverlay="@style/ShapeAppearance.RepRush.Circle"
+                    app:strokeColor="@color/outline"
+                    app:strokeWidth="2dp" />
 
-                <TextView
-                    android:id="@+id/textView_fitnessLevel"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/on_surface_variant"
-                    android:textSize="13sp"
-                    android:layout_marginTop="@dimen/spacing_xs" />
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:layout_marginStart="@dimen/spacing_md">
+
+                    <TextView
+                        android:id="@+id/textView_displayName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Member"
+                        android:textColor="@color/on_surface"
+                        android:textSize="22sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/textView_email"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/on_surface_variant"
+                        android:textSize="14sp"
+                        android:layout_marginTop="2dp" />
+
+                    <TextView
+                        android:id="@+id/textView_fitnessLevel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/primary"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:layout_marginTop="@dimen/spacing_xs" />
+
+                </LinearLayout>
 
             </LinearLayout>
-
-        </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
         <!-- Stats row -->
         <LinearLayout
@@ -231,8 +252,9 @@
             android:layout_height="wrap_content"
             android:text="Achievements"
             android:textColor="@color/on_surface"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:textStyle="bold"
+            android:layout_marginTop="@dimen/spacing_md"
             android:layout_marginBottom="@dimen/spacing_sm" />
 
         <androidx.recyclerview.widget.RecyclerView
@@ -248,8 +270,9 @@
             android:layout_height="wrap_content"
             android:text="Active Plan"
             android:textColor="@color/on_surface"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:textStyle="bold"
+            android:layout_marginTop="@dimen/spacing_md"
             android:layout_marginBottom="@dimen/spacing_sm" />
 
         <com.google.android.material.card.MaterialCardView
@@ -303,9 +326,9 @@
             android:layout_height="wrap_content"
             android:text="Membership"
             android:textColor="@color/on_surface"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:textStyle="bold"
-            android:layout_marginTop="@dimen/spacing_sm"
+            android:layout_marginTop="@dimen/spacing_lg"
             android:layout_marginBottom="@dimen/spacing_sm" />
 
         <com.google.android.material.card.MaterialCardView
@@ -359,11 +382,12 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/button_editProfile"
-                style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Edit Profile" />
+                android:text="Edit Profile"
+                app:icon="@drawable/ic_person"
+                app:iconGravity="textStart" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/button_settings"
@@ -372,17 +396,22 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginStart="@dimen/spacing_sm"
-                android:text="Settings" />
+                android:text="Settings"
+                app:icon="@drawable/ic_settings"
+                app:iconGravity="textStart" />
 
         </LinearLayout>
 
-        <!-- Notifications button -->
+        <!-- Sign Out button -->
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/button_notifications"
-            style="@style/Widget.Material3.Button.TextButton"
+            android:id="@+id/button_signOut"
+            style="@style/Widget.Material3.Button.OutlinedButton"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Notifications" />
+            android:layout_height="52dp"
+            android:layout_marginTop="@dimen/spacing_sm"
+            android:text="Sign Out"
+            android:textColor="@color/error"
+            app:strokeColor="@color/error" />
 
     </LinearLayout>
 

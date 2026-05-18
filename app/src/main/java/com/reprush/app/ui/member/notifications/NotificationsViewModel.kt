@@ -33,8 +33,14 @@ class NotificationsViewModel @Inject constructor(
         _isLoading.value = true
         viewModelScope.launch(Dispatchers.IO) {
             when (val result = notificationRepository.getNotifications(uid)) {
-                is Result.Success -> _notifications.postValue(result.data)
-                is Result.Error -> _notifications.postValue(emptyList())
+                is Result.Success -> {
+                    _notifications.postValue(result.data)
+                    _unreadCount.postValue(result.data.count { !it.isRead })
+                }
+                is Result.Error -> {
+                    _notifications.postValue(emptyList())
+                    _unreadCount.postValue(0)
+                }
             }
             _isLoading.postValue(false)
         }

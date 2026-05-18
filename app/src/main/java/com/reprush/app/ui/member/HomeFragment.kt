@@ -18,6 +18,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.CalendarMonth
@@ -107,6 +108,27 @@ class HomeFragment : Fragment() {
         }
 
         binding.textViewMemberGreeting.text = getGreeting()
+        homeViewModel.userName.observe(viewLifecycleOwner) { name ->
+            if (name.isNotBlank()) {
+                val firstName = name.split(" ").firstOrNull() ?: name
+                binding.textViewMemberGreeting.text = "${getGreeting().removeSuffix("!")}, $firstName!"
+            } else {
+                binding.textViewMemberGreeting.text = getGreeting()
+            }
+        }
+
+        homeViewModel.userPhotoUrl.observe(viewLifecycleOwner) { url ->
+            Glide.with(this)
+                .load(url)
+                .circleCrop()
+                .placeholder(R.drawable.ic_person)
+                .into(binding.imageViewMemberAvatar)
+        }
+
+        binding.imageViewMemberAvatar.setOnClickListener {
+            findNavController().navigate(R.id.action_homeFragment_to_settingsFragment)
+        }
+
         observeGamification()
         homeViewModel.loadData()
         setupHeatmap()

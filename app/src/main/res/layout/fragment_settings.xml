@@ -219,17 +219,7 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@color/surface_variant"
-            android:layout_marginBottom="@dimen/spacing_lg" />
-
-        <!-- Sign Out button -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/button_signOut"
-            style="@style/Widget.Material3.Button.OutlinedButton"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:text="Sign Out"
-            android:textColor="@color/error"
-            app:strokeColor="@color/error" />
+            android:layout_marginBottom="@dimen/spacing_md" />
 
     </LinearLayout>
 

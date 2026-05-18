@@ -20,6 +20,7 @@ import com.reprush.app.databinding.FragmentProfileBinding
 import com.reprush.app.ui.member.profile.AchievementAdapter
 import com.reprush.app.ui.member.profile.AchievementDisplayItem
 import com.reprush.app.ui.member.profile.ProfileViewModel
+import com.reprush.app.ui.member.settings.SettingsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -31,6 +32,7 @@ class ProfileFragment : Fragment() {
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
     private val viewModel: ProfileViewModel by viewModels()
+    private val settingsViewModel: SettingsViewModel by viewModels()
     private lateinit var achievementAdapter: AchievementAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,12 +63,21 @@ class ProfileFragment : Fragment() {
     private fun observeViewModel() {
         viewModel.isLoading.observe(viewLifecycleOwner) { loading ->
             binding.progressProfile.visibility = if (loading) View.VISIBLE else View.GONE
-            binding.layoutProfileContent.visibility = if (loading) View.GONE else View.VISIBLE
+            if (!loading) {
+                binding.layoutProfileContent.apply {
+                    alpha = 0f
+                    visibility = View.VISIBLE
+                    animate().alpha(1f).setDuration(400).start()
+                }
+            } else {
+                binding.layoutProfileContent.visibility = View.GONE
+            }
         }
 
         viewModel.user.observe(viewLifecycleOwner) { user ->
             if (user != null) {
                 binding.textViewDisplayName.text = user.displayName
+                binding.textViewEmail.text = user.email
                 binding.textViewFitnessLevel.text = buildString {
                     append(user.fitnessLevel?.replaceFirstChar { it.uppercase() } ?: "")
                     if (!user.primaryGoal.isNullOrBlank()) {
@@ -156,21 +167,29 @@ class ProfileFragment : Fragment() {
         binding.buttonSettings.setOnClickListener {
             findNavController().navigate(R.id.action_profileFragment_to_settingsFragment)
         }
-        binding.buttonNotifications.setOnClickListener {
-            findNavController().navigate(R.id.action_profileFragment_to_notificationsFragment)
+        binding.buttonSignOut.setOnClickListener {
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Sign Out")
+                .setMessage("Are you sure you want to sign out?")
+                .setPositiveButton("Sign Out") { _, _ ->
+                    settingsViewModel.signOut(requireActivity())
+                }
+                .setNegativeButton("Cancel", null)
+                .show()
         }
     }
 
     private fun showAchievementDialog(item: AchievementDisplayItem) {
         val dialogView = DialogAchievementBinding.inflate(layoutInflater)
-        dialogView.textViewDialogBadgeIcon.text = item.badge.icon
+        // item.badge.icon is an emoji string, we are replacing it with a static vector for now
+        dialogView.imageViewDialogBadgeIcon.setImageResource(R.drawable.ic_medal)
         dialogView.textViewDialogBadgeName.text = item.badge.name
         dialogView.textViewDialogDescription.text = item.badge.description
         dialogView.textViewDialogCondition.text = "Condition: ${item.badge.unlockCondition}"
 
         if (item.isUnlocked) {
-            dialogView.textViewDialogLockOverlay.visibility = View.GONE
-            dialogView.textViewDialogBadgeIcon.alpha = 1.0f
+            dialogView.imageViewDialogLockOverlay.visibility = View.GONE
+            dialogView.imageViewDialogBadgeIcon.alpha = 1.0f
             if (item.unlockedAt != null) {
                 val dateStr = SimpleDateFormat("MMM d, yyyy", Locale.getDefault())
                     .format(Date(item.unlockedAt))
@@ -180,8 +199,8 @@ class ProfileFragment : Fragment() {
                 )
             }
         } else {
-            dialogView.textViewDialogLockOverlay.visibility = View.VISIBLE
-            dialogView.textViewDialogBadgeIcon.alpha = 0.3f
+            dialogView.imageViewDialogLockOverlay.visibility = View.VISIBLE
+            dialogView.imageViewDialogBadgeIcon.alpha = 0.3f
             dialogView.textViewDialogUnlockDate.text = "Not yet unlocked"
             dialogView.textViewDialogUnlockDate.setTextColor(
                 ContextCompat.getColor(requireContext(), R.color.on_surface_variant)

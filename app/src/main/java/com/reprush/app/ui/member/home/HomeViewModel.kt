@@ -59,6 +59,12 @@ class HomeViewModel @Inject constructor(
     private val _userRank = MutableLiveData<Int>()
     val userRank: LiveData<Int> = _userRank
 
+    private val _userName = MutableLiveData<String>()
+    val userName: LiveData<String> = _userName
+
+    private val _userPhotoUrl = MutableLiveData<String?>()
+    val userPhotoUrl: LiveData<String?> = _userPhotoUrl
+
     fun loadData() {
         val uid = auth.currentUser?.uid ?: return
         viewModelScope.launch(Dispatchers.IO) {
@@ -75,6 +81,9 @@ class HomeViewModel @Inject constructor(
             // Read Room user first, then Firestore for anything missing
             val roomUser = userDao.getUserById(uid)
             val fsData = (gameRepository.getUserData(uid) as? Result.Success)?.data
+
+            _userName.postValue(roomUser?.displayName ?: fsData?.displayName ?: "")
+            _userPhotoUrl.postValue(roomUser?.photoUrl ?: auth.currentUser?.photoUrl?.toString())
 
             // Monthly points from Firestore (Bug 3)
             _monthlyPoints.postValue(fsData?.monthlyPoints ?: 0)
