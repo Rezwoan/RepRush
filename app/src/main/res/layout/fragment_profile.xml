@@ -376,15 +376,6 @@
 
         </LinearLayout>
 
-        <!-- AI Trainer button -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/button_aiTrainer"
-            style="@style/Widget.Material3.Button.OutlinedButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/spacing_xs"
-            android:text="AI Trainer" />
-
         <!-- Notifications button -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/button_notifications"

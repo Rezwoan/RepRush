@@ -1,110 +1,105 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:background="@color/background">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appBarLayout"
+    <!-- ── Header ─────────────────────────────────────────────────────── -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/surface">
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@color/background"
+        android:paddingStart="@dimen/spacing_xs"
+        android:paddingEnd="@dimen/spacing_sm"
+        android:paddingTop="@dimen/spacing_sm"
+        android:paddingBottom="@dimen/spacing_sm">
 
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/toolbar_session"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize">
+        <ImageButton
+            android:id="@+id/button_closeSession"
+            android:layout_width="@dimen/min_tap_target"
+            android:layout_height="@dimen/min_tap_target"
+            android:src="@drawable/ic_arrow_back"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Back" />
 
-            <!-- LinearLayout owns all toolbar content so the close button and
-                 timer don't overlap when the nav-icon API would have done so -->
+        <!-- Day label + timer stacked -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="@dimen/spacing_xs">
+
+            <TextView
+                android:id="@+id/textView_dayLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Workout"
+                android:textColor="@color/on_surface"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:paddingStart="@dimen/spacing_xs"
-                android:paddingEnd="@dimen/spacing_sm">
-
-                <ImageButton
-                    android:id="@+id/button_closeSession"
-                    android:layout_width="@dimen/min_tap_target"
-                    android:layout_height="@dimen/min_tap_target"
-                    android:src="@android:drawable/ic_menu_close_clear_cancel"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="Close session" />
+                android:gravity="center_vertical">
 
                 <TextView
                     android:id="@+id/textView_elapsedTimer"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="@dimen/spacing_xs"
-                    android:text="00:00"
-                    android:textColor="@color/on_surface"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:fontFamily="monospace" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/button_finish"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Finish"
-                    android:textColor="@color/on_primary"
-                    app:backgroundTint="@color/primary" />
+                    android:text="00:00"
+                    android:textColor="@color/on_surface_variant"
+                    android:textSize="16sp"
+                    android:fontFamily="monospace" />
 
             </LinearLayout>
-        </com.google.android.material.appbar.MaterialToolbar>
-    </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.core.widget.NestedScrollView
-        android:id="@+id/scrollView_session"
+        </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_finish"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:text="Finish"
+            android:textSize="14sp" />
+
+    </LinearLayout>
+
+    <View
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        android:layout_height="1dp"
+        android:background="@color/outline" />
+
+    <!-- ── Scrollable exercise list ───────────────────────────────────── -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:paddingBottom="16dp">
 
         <LinearLayout
-            android:id="@+id/layout_sessionContent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingBottom="88dp">
+            android:paddingTop="@dimen/spacing_sm">
 
-            <!-- Session notes with Done end-icon to dismiss keyboard -->
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/textInputLayout_sessionNotes"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/spacing_md"
-                android:layout_marginTop="@dimen/spacing_md"
-                android:layout_marginEnd="@dimen/spacing_md"
-                android:hint="Session notes (optional)"
-                app:endIconMode="custom"
-                app:endIconDrawable="@android:drawable/checkbox_on_background"
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/editText_sessionNotes"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="textMultiLine"
-                    android:imeOptions="actionDone"
-                    android:maxLines="1"
-                    android:textColor="@color/on_surface" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <!-- Exercise cards container -->
+            <!-- Exercise cards (dynamically populated) -->
             <LinearLayout
                 android:id="@+id/layout_exerciseContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginTop="@dimen/spacing_md" />
+                android:orientation="vertical" />
 
-            <!-- Empty state shown when no exercises added -->
+            <!-- Empty state -->
             <LinearLayout
                 android:id="@+id/layout_emptySession"
                 android:layout_width="match_parent"
@@ -115,30 +110,53 @@
                 android:visibility="visible">
 
                 <TextView
-                    android:id="@+id/textView_emptySession"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="No exercises added yet.\nTap + to add exercises."
+                    android:text="No exercises added yet."
                     android:textColor="@color/on_surface_variant"
                     android:textSize="16sp"
-                    android:gravity="center"
-                    android:textAlignment="center" />
+                    android:gravity="center" />
+
             </LinearLayout>
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/fab_addExercise"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/spacing_md"
-        android:contentDescription="Add exercise"
-        android:text="Add Exercise"
-        app:icon="@android:drawable/ic_input_add"
-        app:backgroundTint="@color/primary"
-        android:textColor="@color/on_primary"
-        app:iconTint="@color/on_primary" />
+    <!-- ── Bottom bar ─────────────────────────────────────────────────── -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/outline" />
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@color/background"
+        android:paddingStart="@dimen/spacing_sm"
+        android:paddingEnd="@dimen/spacing_sm">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_allSets"
+            style="@style/Widget.Material3.Button.IconButton"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:contentDescription="Complete all sets"
+            app:icon="@android:drawable/checkbox_on_background"
+            app:iconTint="@color/on_surface_variant" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_logNextSet"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_weight="1"
+            android:layout_marginStart="@dimen/spacing_sm"
+            android:text="LOG NEXT SET"
+            android:textColor="@color/on_primary"
+            android:letterSpacing="0.05"
+            app:backgroundTint="@color/primary" />
+
+    </LinearLayout>
+
+</LinearLayout>

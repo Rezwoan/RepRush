@@ -15,7 +15,40 @@ class LeaderboardAdapter : ListAdapter<RankedEntry, LeaderboardAdapter.ViewHolde
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: RankedEntry) {
-            binding.textViewRank.text = "#${item.rank}"
+            val ctx = binding.root.context
+
+            // Medal emoji for top 3, number for the rest
+            binding.textViewRank.text = when (item.rank) {
+                1 -> "🥇"
+                2 -> "🥈"
+                3 -> "🥉"
+                else -> "#${item.rank}"
+            }
+
+            // Rank text color for top 3
+            binding.textViewRank.setTextColor(
+                when (item.rank) {
+                    1 -> ctx.getColor(R.color.rank_gold)
+                    2 -> ctx.getColor(R.color.rank_silver)
+                    3 -> ctx.getColor(R.color.rank_bronze)
+                    else -> ctx.getColor(R.color.on_surface_variant)
+                }
+            )
+
+            // Card background: medal colors for top 3, current-user highlight, or default
+            val bgColor = when {
+                item.rank == 1 -> ctx.getColor(R.color.leaderboard_gold)
+                item.rank == 2 -> ctx.getColor(R.color.leaderboard_silver)
+                item.rank == 3 -> ctx.getColor(R.color.leaderboard_bronze)
+                item.isCurrentUser -> ctx.getColor(R.color.primary_container)
+                else -> ctx.getColor(R.color.surface_variant)
+            }
+            binding.root.setCardBackgroundColor(bgColor)
+
+            // Stroke to highlight current user even when they're in top 3
+            binding.root.strokeWidth = if (item.isCurrentUser) 2 else 0
+            binding.root.strokeColor = ctx.getColor(R.color.primary)
+
             binding.textViewDisplayName.text = item.entry.displayName.ifBlank { "Member" }
             binding.textViewPoints.text = "${item.entry.points} pts"
             binding.textViewPrCount.text = "${item.entry.totalPRs} PRs"
@@ -29,13 +62,6 @@ class LeaderboardAdapter : ListAdapter<RankedEntry, LeaderboardAdapter.ViewHolde
             } else {
                 binding.imageViewAvatar.setImageResource(R.drawable.ic_person)
             }
-
-            binding.root.setBackgroundColor(
-                if (item.isCurrentUser)
-                    binding.root.context.getColor(R.color.primary_container)
-                else
-                    android.graphics.Color.TRANSPARENT
-            )
         }
     }
 
@@ -46,14 +72,11 @@ class LeaderboardAdapter : ListAdapter<RankedEntry, LeaderboardAdapter.ViewHolde
         return ViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(getItem(position))
-    }
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) = holder.bind(getItem(position))
 
     companion object {
         private val DIFF = object : DiffUtil.ItemCallback<RankedEntry>() {
-            override fun areItemsTheSame(a: RankedEntry, b: RankedEntry) =
-                a.entry.uid == b.entry.uid
+            override fun areItemsTheSame(a: RankedEntry, b: RankedEntry) = a.entry.uid == b.entry.uid
             override fun areContentsTheSame(a: RankedEntry, b: RankedEntry) = a == b
         }
     }

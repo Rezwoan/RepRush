@@ -1,132 +1,104 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginStart="@dimen/spacing_md"
-    android:layout_marginEnd="@dimen/spacing_md"
-    android:layout_marginBottom="@dimen/spacing_md"
-    app:cardBackgroundColor="@color/surface"
-    app:cardCornerRadius="@dimen/shape_md"
-    app:strokeColor="@color/outline"
-    app:strokeWidth="1dp">
+    android:orientation="vertical"
+    android:layout_marginBottom="@dimen/spacing_md">
 
+    <!-- Header: collapse | thumbnail | name+done | menu -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="@dimen/spacing_sm"
+        android:paddingEnd="@dimen/spacing_sm"
+        android:paddingTop="@dimen/spacing_sm"
+        android:paddingBottom="@dimen/spacing_sm">
 
-        <!-- Exercise image -->
+        <ImageButton
+            android:id="@+id/imageButton_collapse"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@android:drawable/arrow_up_float"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Collapse exercise" />
+
         <ImageView
             android:id="@+id/imageView_exercisePhoto"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/exercise_image_height"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_marginStart="@dimen/spacing_xs"
             android:scaleType="centerCrop"
-            android:contentDescription="Exercise demonstration"
-            android:background="@color/surface_variant" />
+            android:background="@color/surface_variant"
+            android:contentDescription="Exercise image" />
 
-        <!-- Header row: name + collapse toggle -->
         <LinearLayout
-            android:id="@+id/layout_exerciseHeader"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="@dimen/spacing_md"
-            android:gravity="center_vertical">
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="@dimen/spacing_sm">
 
             <TextView
                 android:id="@+id/textView_exerciseName"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:textColor="@color/on_surface"
-                android:textSize="20sp"
+                android:textSize="16sp"
                 android:textStyle="bold"
                 android:maxLines="1"
                 android:ellipsize="end" />
 
-            <ImageButton
-                android:id="@+id/imageButton_collapse"
-                android:layout_width="@dimen/min_tap_target"
-                android:layout_height="@dimen/min_tap_target"
-                android:src="@android:drawable/arrow_up_float"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="Collapse exercise" />
-
-        </LinearLayout>
-
-        <!-- Collapsible content -->
-        <LinearLayout
-            android:id="@+id/layout_exerciseContent"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <!-- Set row header labels -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingStart="@dimen/spacing_md"
-                android:paddingEnd="@dimen/spacing_md"
-                android:paddingBottom="@dimen/spacing_xs">
-
-                <TextView
-                    android:layout_width="36dp"
-                    android:layout_height="wrap_content"
-                    android:text="Set"
-                    android:textColor="@color/on_surface_variant"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Weight (kg)"
-                    android:textColor="@color/on_surface_variant"
-                    android:textSize="12sp"
-                    android:gravity="center" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Reps"
-                    android:textColor="@color/on_surface_variant"
-                    android:textSize="12sp"
-                    android:gravity="center" />
-
-                <View
-                    android:layout_width="44dp"
-                    android:layout_height="1dp" />
-
-                <View
-                    android:layout_width="48dp"
-                    android:layout_height="1dp" />
-
-            </LinearLayout>
-
-            <!-- Set rows container (dynamically added) -->
-            <LinearLayout
-                android:id="@+id/layout_setContainer"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical" />
-
-            <!-- Add set button -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/button_addSet"
-                style="@style/Widget.Material3.Button.TextButton"
+            <TextView
+                android:id="@+id/textView_setsDone"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="start"
-                android:layout_marginStart="@dimen/spacing_sm"
-                android:layout_marginBottom="@dimen/spacing_sm"
-                android:text="+ Add Set"
-                android:textColor="@color/primary" />
+                android:text="0/0 Done"
+                android:textColor="@color/on_surface_variant"
+                android:textSize="13sp" />
 
         </LinearLayout>
 
+        <ImageButton
+            android:id="@+id/imageButton_exerciseMenu"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@android:drawable/ic_menu_more"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Exercise options" />
+
     </LinearLayout>
-</com.google.android.material.card.MaterialCardView>
+
+    <!-- Collapsible content -->
+    <LinearLayout
+        android:id="@+id/layout_exerciseContent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Set rows container -->
+        <LinearLayout
+            android:id="@+id/layout_setContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="@dimen/spacing_xs" />
+
+        <!-- Add a set button (full width) -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_addSet"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginStart="@dimen/spacing_md"
+            android:layout_marginEnd="@dimen/spacing_md"
+            android:layout_marginTop="@dimen/spacing_xs"
+            android:layout_marginBottom="@dimen/spacing_sm"
+            android:text="+ Add a set"
+            android:textColor="@color/on_surface_variant" />
+
+    </LinearLayout>
+
+</LinearLayout>

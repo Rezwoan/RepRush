@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.Glide
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.transition.MaterialSharedAxis
+import androidx.core.os.bundleOf
 import com.reprush.app.R
 import com.reprush.app.databinding.DialogAchievementBinding
 import com.reprush.app.databinding.FragmentProfileBinding
@@ -101,10 +102,18 @@ class ProfileFragment : Fragment() {
                 binding.cardActivePlan.visibility = View.VISIBLE
                 binding.textViewNoPlan.visibility = View.GONE
                 binding.textViewActivePlanName.text = plan.planName
-                binding.textViewActivePlanMeta.text = "${plan.goal} · ${plan.daysPerWeek} days/week"
+                binding.textViewActivePlanMeta.text =
+                    "${plan.goal} · ${plan.daysPerWeek} days/week · ${plan.totalWeeks} weeks"
+                binding.cardActivePlan.setOnClickListener {
+                    findNavController().navigate(
+                        R.id.action_profileFragment_to_planDetailFragment,
+                        bundleOf("planId" to plan.id)
+                    )
+                }
             } else {
                 binding.cardActivePlan.visibility = View.GONE
                 binding.textViewNoPlan.visibility = View.VISIBLE
+                binding.cardActivePlan.setOnClickListener(null)
             }
         }
 
@@ -147,14 +156,8 @@ class ProfileFragment : Fragment() {
         binding.buttonSettings.setOnClickListener {
             findNavController().navigate(R.id.action_profileFragment_to_settingsFragment)
         }
-        binding.buttonAiTrainer.setOnClickListener {
-            findNavController().navigate(R.id.action_profileFragment_to_chatFragment)
-        }
         binding.buttonNotifications.setOnClickListener {
             findNavController().navigate(R.id.action_profileFragment_to_notificationsFragment)
-        }
-        binding.cardActivePlan.setOnClickListener {
-            findNavController().navigate(R.id.planSummaryFragment)
         }
     }
 

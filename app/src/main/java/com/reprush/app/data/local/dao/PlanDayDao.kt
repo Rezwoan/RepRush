@@ -16,4 +16,10 @@ interface PlanDayDao {
 
     @Query("SELECT * FROM plan_days WHERE id = :dayId LIMIT 1")
     suspend fun getPlanDayById(dayId: String): PlanDayEntity?
+
+    @Update
+    suspend fun updatePlanDay(planDay: PlanDayEntity)
+
+    @Query("DELETE FROM plan_days WHERE planId = :planId")
+    suspend fun deleteDaysForPlan(planId: String)
 }

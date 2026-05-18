@@ -24,11 +24,27 @@
             app:popUpTo="@id/homeFragment"
             app:popUpToInclusive="true" />
         <action
+            android:id="@+id/action_homeFragment_to_memberOnboardingFragment"
+            app:destination="@id/memberOnboardingFragment"
+            app:popUpTo="@id/homeFragment"
+            app:popUpToInclusive="true" />
+        <action
             android:id="@+id/action_homeFragment_to_activeSessionFragment"
             app:destination="@id/activeSessionFragment" />
         <action
             android:id="@+id/action_homeFragment_to_leaderboardFragment"
             app:destination="@id/leaderboardFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/memberOnboardingFragment"
+        android:name="com.reprush.app.ui.auth.onboarding.MemberOnboardingFragment"
+        android:label="Welcome">
+        <action
+            android:id="@+id/action_memberOnboardingFragment_to_homeFragment"
+            app:destination="@id/homeFragment"
+            app:popUpTo="@id/memberOnboardingFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 
     <fragment
@@ -92,6 +108,9 @@
         <action
             android:id="@+id/action_profileFragment_to_notificationsFragment"
             app:destination="@id/notificationsFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_planDetailFragment"
+            app:destination="@id/planDetailFragment" />
     </fragment>
 
     <fragment
@@ -150,6 +169,27 @@
         <action
             android:id="@+id/action_planListFragment_to_planQuestionnaireFragment"
             app:destination="@id/planQuestionnaireFragment" />
+        <action
+            android:id="@+id/action_planListFragment_to_manualPlanBuilderFragment"
+            app:destination="@id/manualPlanBuilderFragment" />
+        <action
+            android:id="@+id/action_planListFragment_to_planDetailFragment"
+            app:destination="@id/planDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/manualPlanBuilderFragment"
+        android:name="com.reprush.app.ui.member.plan.ManualPlanBuilderFragment"
+        android:label="Build Plan" />
+
+    <fragment
+        android:id="@+id/planDetailFragment"
+        android:name="com.reprush.app.ui.member.plan.PlanDetailFragment"
+        android:label="Plan Detail">
+        <argument
+            android:name="planId"
+            app:argType="string"
+            android:defaultValue="" />
     </fragment>
 
     <fragment

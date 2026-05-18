@@ -136,7 +136,33 @@ class ProfileViewModel @Inject constructor(
             _activePlan.postValue(plan)
 
             val roomUser = userDao.getUserById(uid)
-            _user.postValue(roomUser)
+            val firebaseUser = auth.currentUser
+            val mergedUser = roomUser?.let {
+                val name = it.displayName.takeIf { n -> n.isNotBlank() && n != "Member" }
+                    ?: firebaseUser?.displayName?.takeIf { n -> n.isNotBlank() }
+                    ?: it.displayName
+                val photo = it.photoUrl?.takeIf { p -> p.isNotBlank() }
+                    ?: firebaseUser?.photoUrl?.toString()
+                it.copy(displayName = name, photoUrl = photo)
+            } ?: firebaseUser?.let { fb ->
+                com.reprush.app.data.local.entity.UserEntity(
+                    id = uid,
+                    displayName = fb.displayName ?: "Member",
+                    email = fb.email ?: "",
+                    photoUrl = fb.photoUrl?.toString(),
+                    role = "member",
+                    fitnessLevel = null,
+                    primaryGoal = null,
+                    availableEquipment = null,
+                    injuries = null,
+                    membershipStatus = "pending",
+                    packageId = null,
+                    membershipStartDate = null,
+                    membershipEndDate = null,
+                    createdAt = System.currentTimeMillis()
+                )
+            }
+            _user.postValue(mergedUser)
 
             val gameResult = gameRepository.getUserData(uid)
             val gameUserData = (gameResult as? Result.Success)?.data

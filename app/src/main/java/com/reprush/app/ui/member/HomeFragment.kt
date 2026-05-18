@@ -69,6 +69,7 @@ class HomeFragment : Fragment() {
     @Inject lateinit var planDayDao: PlanDayDao
 
     private var todayPlanDayId: String? = null
+    private var todayDayLabel: String = ""
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
@@ -84,12 +85,20 @@ class HomeFragment : Fragment() {
                 findNavController().navigate(R.id.action_homeFragment_to_librarySyncFragment)
                 return@launch
             }
+            val onboarded = appPreferences.isMemberOnboardingComplete.first()
+            if (!onboarded && isAdded) {
+                findNavController().navigate(R.id.action_homeFragment_to_memberOnboardingFragment)
+                return@launch
+            }
             checkForIncompleteSession()
             loadTodayPlanDay()
         }
 
         binding.buttonStartWorkout.setOnClickListener {
-            val bundle = Bundle().apply { putString("planDayId", todayPlanDayId ?: "") }
+            val bundle = Bundle().apply {
+                putString("planDayId", todayPlanDayId ?: "")
+                putString("dayLabel", todayDayLabel)
+            }
             findNavController().navigate(R.id.action_homeFragment_to_activeSessionFragment, bundle)
         }
 
@@ -387,6 +396,7 @@ class HomeFragment : Fragment() {
         val todayIndex = daysSinceStart % plan.daysPerWeek
         val todayDay = planDays.getOrNull(todayIndex) ?: planDays.first()
         todayPlanDayId = todayDay.id
+        todayDayLabel = todayDay.dayLabel
         if (isAdded) binding.textViewTodayDayLabel.text = todayDay.dayLabel
     }
 

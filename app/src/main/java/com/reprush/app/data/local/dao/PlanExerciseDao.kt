@@ -13,4 +13,13 @@ interface PlanExerciseDao {
 
     @Query("SELECT * FROM plan_exercises WHERE dayId = :dayId ORDER BY orderIndex ASC")
     suspend fun getExercisesForDay(dayId: String): List<PlanExerciseEntity>
+
+    @Update
+    suspend fun updatePlanExercise(planExercise: PlanExerciseEntity)
+
+    @Query("DELETE FROM plan_exercises WHERE id = :id")
+    suspend fun deletePlanExercise(id: String)
+
+    @Query("DELETE FROM plan_exercises WHERE dayId = :dayId")
+    suspend fun deletePlanExercisesForDay(dayId: String)
 }

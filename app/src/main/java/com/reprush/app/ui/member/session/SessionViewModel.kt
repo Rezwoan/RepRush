@@ -262,14 +262,45 @@ class SessionViewModel @Inject constructor(
         )
         exercises[exerciseIndex] = ex.copy(sets = updatedSets)
         publishSession(current.copy(exercises = exercises))
+    }
 
-        val restSeconds = if (ex.plannedRestSeconds > 0) ex.plannedRestSeconds else 60
-        Log.d("RestTimer", "ViewModel: emitting rest for ${ex.exerciseName}, ${restSeconds}s")
-        val emitted = _restTimerEvent.tryEmit(RestTimerData(
-            exerciseName = ex.exerciseName,
-            durationSeconds = restSeconds
-        ))
-        Log.d("RestTimer", "ViewModel: tryEmit returned $emitted")
+    fun logNextSet(): Boolean {
+        val current = sessionData ?: return false
+        for (exIdx in current.exercises.indices) {
+            val ex = current.exercises[exIdx]
+            for (setIdx in ex.sets.indices) {
+                val set = ex.sets[setIdx]
+                if (!set.isCompleted) {
+                    val hasWeight = set.isBodyweight || (set.weight != null && set.weight > 0)
+                    val hasReps = set.reps != null && set.reps > 0
+                    if (!hasWeight || !hasReps) return false
+                    completeSet(exIdx, setIdx)
+                    return true
+                }
+            }
+        }
+        return false
+    }
+
+    fun completeAllReadySets() {
+        val current = sessionData ?: return
+        val exercises = current.exercises.toMutableList()
+        var changed = false
+        exercises.forEachIndexed { exIdx, ex ->
+            val updatedSets = ex.sets.toMutableList()
+            ex.sets.forEachIndexed { setIdx, set ->
+                if (!set.isCompleted) {
+                    val hasWeight = set.isBodyweight || (set.weight != null && set.weight > 0)
+                    val hasReps = set.reps != null && set.reps > 0
+                    if (hasWeight && hasReps) {
+                        updatedSets[setIdx] = set.copy(isCompleted = true, loggedAt = System.currentTimeMillis())
+                        changed = true
+                    }
+                }
+            }
+            exercises[exIdx] = ex.copy(sets = updatedSets)
+        }
+        if (changed) publishSession(current.copy(exercises = exercises))
     }
 
     fun updateNotes(notes: String) {
