@@ -79,7 +79,35 @@
     <fragment
         android:id="@+id/profileFragment"
         android:name="com.reprush.app.ui.member.ProfileFragment"
-        android:label="Profile" />
+        android:label="Profile">
+        <action
+            android:id="@+id/action_profileFragment_to_profileEditFragment"
+            app:destination="@id/profileEditFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_chatFragment"
+            app:destination="@id/chatFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_notificationsFragment"
+            app:destination="@id/notificationsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/profileEditFragment"
+        android:name="com.reprush.app.ui.member.profile.ProfileEditFragment"
+        android:label="Edit Profile" />
+
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.reprush.app.ui.member.settings.SettingsFragment"
+        android:label="Settings" />
+
+    <fragment
+        android:id="@+id/chatFragment"
+        android:name="com.reprush.app.ui.member.chat.ChatFragment"
+        android:label="AI Trainer" />
 
     <fragment
         android:id="@+id/notificationsFragment"

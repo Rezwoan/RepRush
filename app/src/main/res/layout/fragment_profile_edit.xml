@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:clipToPadding="false"
+    android:paddingBottom="80dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/spacing_md">
+
+        <!-- Toolbar -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="@dimen/spacing_md">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_back"
+                style="@style/Widget.Material3.Button.IconButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:contentDescription="Go back"
+                app:icon="@drawable/ic_arrow_back"
+                xmlns:app="http://schemas.android.com/apk/res-auto" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="@dimen/spacing_sm"
+                android:text="Edit Profile"
+                android:textColor="@color/on_surface"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <!-- Fitness Level -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Fitness Level"
+            android:textColor="@color/on_surface"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="@dimen/spacing_xs" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipGroup_fitnessLevel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_md"
+            app:singleSelection="true"
+            xmlns:app="http://schemas.android.com/apk/res-auto">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_beginner"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Beginner" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_intermediate"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Intermediate" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_advanced"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Advanced" />
+
+        </com.google.android.material.chip.ChipGroup>
+
+        <!-- Primary Goal -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Primary Goal"
+            android:textColor="@color/on_surface"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="@dimen/spacing_xs" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipGroup_primaryGoal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_md"
+            app:singleSelection="true"
+            xmlns:app="http://schemas.android.com/apk/res-auto">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_muscleGain"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Muscle Gain" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_fatLoss"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Fat Loss" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_strength"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Strength" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_endurance"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Endurance" />
+
+        </com.google.android.material.chip.ChipGroup>
+
+        <!-- Available Equipment -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Available Equipment"
+            android:textColor="@color/on_surface"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="@dimen/spacing_xs" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipGroup_equipment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_md"
+            xmlns:app="http://schemas.android.com/apk/res-auto">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_fullGym"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Full Gym" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_dumbbells"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Dumbbells" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_barbell"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Barbell" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_bodyweightOnly"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Bodyweight" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_resistanceBands"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Resistance Bands" />
+
+        </com.google.android.material.chip.ChipGroup>
+
+        <!-- Injuries -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Injuries / Restrictions"
+            android:textColor="@color/on_surface"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="@dimen/spacing_xs" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_lg"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editText_injuries"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="e.g. lower back pain, knee injury"
+                android:inputType="textMultiLine"
+                android:minLines="3"
+                android:gravity="top" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_saveProfile"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="Save Changes" />
+
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>

@@ -6,17 +6,30 @@
     android:layout_height="match_parent"
     android:background="@color/background">
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_back"
+        style="@style/Widget.Material3.Button.IconButton"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="@dimen/spacing_xs"
+        android:layout_marginStart="@dimen/spacing_xs"
+        android:contentDescription="Go back"
+        app:icon="@drawable/ic_arrow_back"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
         android:id="@+id/textView_stepIndicator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/spacing_md"
-        android:layout_marginStart="@dimen/spacing_md"
+        android:layout_marginStart="@dimen/spacing_xs"
         android:text="Step 1 of 8"
         android:textColor="@color/on_surface_variant"
         android:textSize="14sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toEndOf="@id/button_back"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/button_back" />
 
     <ProgressBar
         android:id="@+id/progressBar_steps"

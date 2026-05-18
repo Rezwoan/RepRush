@@ -35,7 +35,7 @@
                     android:layout_height="48dp"
                     android:layout_margin="@dimen/spacing_sm"
                     android:contentDescription="Go back"
-                    app:icon="@android:drawable/ic_media_previous" />
+                    app:icon="@drawable/ic_arrow_back" />
 
             </FrameLayout>
 

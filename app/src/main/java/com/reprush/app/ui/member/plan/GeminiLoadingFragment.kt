@@ -26,6 +26,8 @@ class GeminiLoadingFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.buttonBack.setOnClickListener { findNavController().popBackStack() }
+
         viewModel.generationState.observe(viewLifecycleOwner) { state ->
             when (state) {
                 GenerationState.IDLE -> viewModel.generatePlan()

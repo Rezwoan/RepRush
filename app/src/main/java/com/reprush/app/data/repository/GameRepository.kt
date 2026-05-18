@@ -18,6 +18,11 @@ data class UserFirestoreData(
     val monthlyPoints: Int
 )
 
+data class ProfileFirestoreData(
+    val totalPoints: Int,
+    val currentStreak: Int
+)
+
 data class LeaderboardEntry(
     val uid: String = "",
     val displayName: String = "",
@@ -121,6 +126,20 @@ class GameRepository @Inject constructor(
             Result.Error(e.message ?: "Failed to get user data")
         }
     }
+
+    suspend fun getProfileFirestoreData(uid: String): Result<ProfileFirestoreData> =
+        withContext(Dispatchers.IO) {
+            try {
+                val doc = firestore.collection("users").document(uid).get().await()
+                Result.Success(ProfileFirestoreData(
+                    totalPoints = doc.getLong("totalPoints")?.toInt() ?: 0,
+                    currentStreak = doc.getLong("currentStreak")?.toInt() ?: 0
+                ))
+            } catch (e: Exception) {
+                Log.e("GameRepository", "getProfileFirestoreData: FAILED uid=$uid", e)
+                Result.Error(e.message ?: "Failed to load profile data")
+            }
+        }
 
     suspend fun getLeaderboard(): Result<List<LeaderboardEntry>> = withContext(Dispatchers.IO) {
         // Firestore path: leaderboard/monthly_{yyyy_MM}/entries/{uid}

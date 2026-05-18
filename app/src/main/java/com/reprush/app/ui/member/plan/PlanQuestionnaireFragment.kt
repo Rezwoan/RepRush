@@ -47,6 +47,8 @@ class PlanQuestionnaireFragment : Fragment() {
             override fun getItemCount() = steps.size
             override fun createFragment(position: Int) = steps[position] as Fragment
         }
+        binding.buttonBack.setOnClickListener { findNavController().popBackStack() }
+
         binding.viewPagerQuestionnaire.adapter = adapter
         binding.viewPagerQuestionnaire.isUserInputEnabled = false
 

@@ -26,42 +26,26 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/spacing_lg"
-        android:text="Setting up your exercise library..."
+        android:text="Loading exercise library..."
         android:textColor="@color/on_surface"
         android:textSize="18sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@id/progressBar_sync"
+        app:layout_constraintBottom_toTopOf="@id/progressIndicator_sync"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/textView_appTitle" />
 
-    <ProgressBar
-        android:id="@+id/progressBar_sync"
-        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-        android:layout_width="0dp"
-        android:layout_height="8dp"
-        android:layout_marginTop="@dimen/spacing_lg"
-        android:indeterminate="false"
-        android:max="100"
-        android:progress="0"
-        android:progressTint="@color/primary"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textView_syncStatus"
-        app:layout_constraintBottom_toTopOf="@id/textView_syncCount" />
-
-    <TextView
-        android:id="@+id/textView_syncCount"
+    <com.google.android.material.progressindicator.CircularProgressIndicator
+        android:id="@+id/progressIndicator_sync"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/spacing_sm"
-        android:text="Preparing exercise library..."
-        android:textColor="@color/on_surface_variant"
-        android:textSize="14sp"
+        android:layout_marginTop="@dimen/spacing_lg"
+        android:indeterminate="true"
+        app:indicatorColor="@color/primary"
+        app:layout_constraintBottom_toTopOf="@id/textView_syncError"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/progressBar_sync"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/textView_syncStatus" />
 
     <TextView
         android:id="@+id/textView_syncError"
@@ -75,7 +59,8 @@
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textView_syncCount" />
+        app:layout_constraintTop_toBottomOf="@id/progressIndicator_sync"
+        app:layout_constraintBottom_toTopOf="@id/button_retrySync" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/button_retrySync"
@@ -86,6 +71,7 @@
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textView_syncError" />
+        app:layout_constraintTop_toBottomOf="@id/textView_syncError"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

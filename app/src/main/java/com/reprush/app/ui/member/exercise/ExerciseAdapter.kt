@@ -5,11 +5,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.reprush.app.R
 import com.reprush.app.data.local.entity.ExerciseEntity
 import com.reprush.app.databinding.ItemExerciseBinding
-import java.io.File
+import com.reprush.app.utils.AssetImageLoader
 
 class ExerciseAdapter(
     private val onItemClick: (ExerciseEntity) -> Unit
@@ -23,18 +21,11 @@ class ExerciseAdapter(
             binding.textViewExerciseMuscle.text = exercise.primaryMuscle
             binding.textViewExerciseEquipment.text = exercise.equipment
 
-            val imageSource = exercise.imageUrl
-            if (!imageSource.isNullOrEmpty()) {
-                val file = File(imageSource)
-                Glide.with(binding.imageViewExerciseThumbnail)
-                    .load(if (file.exists()) file else imageSource)
-                    .placeholder(R.drawable.ic_exercise_placeholder)
-                    .error(R.drawable.ic_exercise_placeholder)
-                    .centerCrop()
-                    .into(binding.imageViewExerciseThumbnail)
-            } else {
-                binding.imageViewExerciseThumbnail.setImageResource(R.drawable.ic_exercise_placeholder)
-            }
+            AssetImageLoader.loadThumbnail(
+                binding.imageViewExerciseThumbnail.context,
+                exercise.thumbnailUrl,
+                binding.imageViewExerciseThumbnail
+            )
 
             binding.imageViewExerciseThumbnail.contentDescription =
                 "${exercise.name} exercise thumbnail"

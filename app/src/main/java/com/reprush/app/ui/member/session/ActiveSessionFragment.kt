@@ -24,12 +24,12 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
-import com.bumptech.glide.Glide
 import com.google.android.material.chip.Chip
 import com.reprush.app.R
 import com.reprush.app.data.repository.SessionExercise
 import com.reprush.app.data.repository.SessionSet
 import com.reprush.app.databinding.FragmentActiveSessionBinding
+import com.reprush.app.utils.AssetImageLoader
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -194,11 +194,7 @@ class ActiveSessionFragment : Fragment() {
 
         nameText.text = exercise.exerciseName
 
-        Glide.with(this)
-            .load(exercise.imageUrl)
-            .centerCrop()
-            .placeholder(android.R.color.darker_gray)
-            .into(imageView)
+        AssetImageLoader.load(requireContext(), exercise.imageUrl, imageView)
 
         var isCollapsed = false
         collapseBtn.setOnClickListener {

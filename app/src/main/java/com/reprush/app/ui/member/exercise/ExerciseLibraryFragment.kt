@@ -40,6 +40,8 @@ class ExerciseLibraryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.buttonBack.setOnClickListener { findNavController().popBackStack() }
+
         adapter = ExerciseAdapter { exercise ->
             findNavController().navigate(
                 R.id.action_exerciseLibraryFragment_to_exerciseDetailFragment,
