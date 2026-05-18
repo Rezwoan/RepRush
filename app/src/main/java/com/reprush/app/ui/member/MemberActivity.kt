@@ -12,6 +12,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.google.firebase.auth.FirebaseAuth
@@ -58,15 +59,19 @@ class MemberActivity : AppCompatActivity() {
             .findFragmentById(R.id.nav_host_member) as NavHostFragment
         val navController = navHost.navController
 
+        val clearHomeOpts = NavOptions.Builder()
+            .setPopUpTo(R.id.homeFragment, inclusive = true)
+            .build()
+
         when {
             pending -> {
                 binding.bottomNavMember.visibility = View.GONE
-                navController.navigate(R.id.pendingFragment)
+                navController.navigate(R.id.pendingFragment, null, clearHomeOpts)
             }
             blocked || rejected -> {
                 binding.bottomNavMember.visibility = View.GONE
                 val bundle = Bundle().apply { putBoolean("rejected", rejected) }
-                navController.navigate(R.id.statusBlockedFragment, bundle)
+                navController.navigate(R.id.statusBlockedFragment, bundle, clearHomeOpts)
             }
             else -> {
                 binding.bottomNavMember.setupWithNavController(navController)

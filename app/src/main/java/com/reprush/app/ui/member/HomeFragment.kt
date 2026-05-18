@@ -82,12 +82,14 @@ class HomeFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             val synced = appPreferences.isLibrarySynced.first()
-            if (!synced && isAdded) {
+            if (!isAdded || findNavController().currentDestination?.id != R.id.homeFragment) return@launch
+            if (!synced) {
                 findNavController().navigate(R.id.action_homeFragment_to_librarySyncFragment)
                 return@launch
             }
             val onboarded = appPreferences.isMemberOnboardingComplete.first()
-            if (!onboarded && isAdded) {
+            if (!isAdded || findNavController().currentDestination?.id != R.id.homeFragment) return@launch
+            if (!onboarded) {
                 findNavController().navigate(R.id.action_homeFragment_to_memberOnboardingFragment)
                 return@launch
             }
