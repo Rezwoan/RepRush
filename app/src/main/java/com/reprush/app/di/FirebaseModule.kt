@@ -47,4 +47,5 @@ object FirebaseModule {
     @Provides fun provideAchievementDao(db: AppDatabase): AchievementDao = db.achievementDao()
     @Provides fun provideMembershipPackageDao(db: AppDatabase): MembershipPackageDao = db.membershipPackageDao()
     @Provides fun provideBodyWeightLogDao(db: AppDatabase): BodyWeightLogDao = db.bodyWeightLogDao()
+    @Provides fun provideChatMessageDao(db: AppDatabase): ChatMessageDao = db.chatMessageDao()
 }

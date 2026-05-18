@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.reprush.app.data.local.datastore.AppPreferences
 import com.reprush.app.data.repository.ExerciseRepository
 import com.reprush.app.data.repository.GeminiRepository
 import com.reprush.app.data.repository.ImportedPlan
@@ -21,7 +22,8 @@ enum class GenerationState { IDLE, GENERATING, DONE, ERROR }
 class PlanGenerationViewModel @Inject constructor(
     private val geminiRepository: GeminiRepository,
     private val exerciseRepository: ExerciseRepository,
-    private val planImportRepository: PlanImportRepository
+    private val planImportRepository: PlanImportRepository,
+    private val appPreferences: AppPreferences
 ) : ViewModel() {
 
     var goal: String = ""
@@ -48,10 +50,11 @@ class PlanGenerationViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             val exercises = exerciseRepository.getExercisesForEquipment(equipment)
             val exerciseNames = exercises.map { it.name }
+            val profile = appPreferences.getMemberProfile()
 
             when (val geminiResult = geminiRepository.generatePlan(
                 goal, daysPerWeek, splitType, sessionDuration,
-                equipment, fitnessLevel, weeks, injuries, exerciseNames
+                equipment, fitnessLevel, weeks, injuries, exerciseNames, profile
             )) {
                 is Result.Error -> {
                     _errorMessage.postValue(geminiResult.message)

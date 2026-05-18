@@ -16,15 +16,30 @@
         android:orientation="vertical"
         android:padding="@dimen/spacing_sm">
 
-        <TextView
-            android:id="@+id/textView_prBadge"
+        <LinearLayout
+            android:id="@+id/layout_prBadge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="🏆 PR"
-            android:textColor="@color/pr_green"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="@dimen/spacing_xs" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="@dimen/spacing_xs">
+
+            <ImageView
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:src="@drawable/ic_trophy"
+                android:layout_marginEnd="4dp"
+                android:contentDescription="" />
+
+            <TextView
+                android:id="@+id/textView_prBadge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="PR"
+                android:textColor="@color/pr_green"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/textView_prExerciseName"

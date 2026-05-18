@@ -23,6 +23,7 @@ import com.kizitonwose.calendar.core.DayPosition
 import com.kizitonwose.calendar.view.MonthDayBinder
 import com.kizitonwose.calendar.view.MonthHeaderFooterBinder
 import com.kizitonwose.calendar.view.ViewContainer
+import android.widget.TextView
 import com.reprush.app.R
 import com.reprush.app.databinding.FragmentProgressOverviewBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -86,6 +87,13 @@ class ProgressOverviewFragment : Fragment() {
                     setColor(color)
                 }
                 container.cellView.background = drawable
+
+                if (data.position == DayPosition.MonthDate) {
+                    container.dayText.text = data.date.dayOfMonth.toString()
+                    container.dayText.visibility = View.VISIBLE
+                } else {
+                    container.dayText.visibility = View.INVISIBLE
+                }
             }
         }
 
@@ -202,6 +210,7 @@ class ProgressOverviewFragment : Fragment() {
 
     private inner class HeatmapDayContainer(view: View) : ViewContainer(view) {
         val cellView: View = view.findViewById(R.id.view_heatmap_cell)
+        val dayText: TextView = view.findViewById(R.id.text_heatmap_day)
     }
 
     private inner class MonthHeaderContainer(view: View) : ViewContainer(view) {

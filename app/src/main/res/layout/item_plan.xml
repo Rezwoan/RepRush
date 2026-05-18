@@ -56,6 +56,16 @@
             android:layout_marginTop="@dimen/spacing_sm">
 
             <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_viewDetail"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:text="View"
+                android:textSize="12sp" />
+
+            <View android:layout_width="@dimen/spacing_xs" android:layout_height="1dp" />
+
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/button_setActive"
                 style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="wrap_content"
@@ -63,7 +73,7 @@
                 android:text="Set Active"
                 android:textSize="12sp" />
 
-            <View android:layout_width="@dimen/spacing_sm" android:layout_height="1dp" />
+            <View android:layout_width="@dimen/spacing_xs" android:layout_height="1dp" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/button_deletePlan"

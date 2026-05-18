@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingStart="@dimen/spacing_sm"
+    android:paddingEnd="@dimen/spacing_sm"
+    android:paddingTop="@dimen/spacing_xs"
+    android:paddingBottom="@dimen/spacing_xs">
+
+    <!-- User message (right-aligned) -->
+    <LinearLayout
+        android:id="@+id/layout_userMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/textView_userContent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/primary_container"
+            android:textColor="@color/on_primary_container"
+            android:textSize="14sp"
+            android:padding="@dimen/spacing_sm"
+            android:maxWidth="280dp" />
+
+    </LinearLayout>
+
+    <!-- AI message (left-aligned) -->
+    <LinearLayout
+        android:id="@+id/layout_aiMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start"
+        android:orientation="horizontal"
+        android:gravity="top"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_robot"
+            android:layout_marginEnd="@dimen/spacing_xs"
+            android:layout_marginTop="@dimen/spacing_xs"
+            android:contentDescription="AI Trainer" />
+
+        <TextView
+            android:id="@+id/textView_aiContent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/surface_variant"
+            android:textColor="@color/on_surface"
+            android:textSize="14sp"
+            android:padding="@dimen/spacing_sm"
+            android:maxWidth="280dp" />
+
+    </LinearLayout>
+
+</FrameLayout>

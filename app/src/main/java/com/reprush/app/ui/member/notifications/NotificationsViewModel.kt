@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.ListenerRegistration
 import com.reprush.app.data.repository.NotificationItem
 import com.reprush.app.data.repository.NotificationRepository
 import com.reprush.app.data.repository.Result
@@ -28,25 +29,35 @@ class NotificationsViewModel @Inject constructor(
     private val _unreadCount = MutableLiveData(0)
     val unreadCount: LiveData<Int> = _unreadCount
 
-    fun loadNotifications() {
+    private var unreadCountListener: ListenerRegistration? = null
+
+    init {
+        startUnreadCountListener()
+    }
+
+    private fun startUnreadCountListener() {
         val uid = auth.currentUser?.uid ?: return
-        _isLoading.value = true
-        viewModelScope.launch(Dispatchers.IO) {
-            when (val result = notificationRepository.getNotifications(uid)) {
-                is Result.Success -> _notifications.postValue(result.data)
-                is Result.Error -> _notifications.postValue(emptyList())
-            }
-            _isLoading.postValue(false)
+        unreadCountListener?.remove()
+        unreadCountListener = notificationRepository.listenUnreadCount(uid) { count ->
+            _unreadCount.postValue(count)
         }
     }
 
-    fun loadUnreadCount() {
+    fun loadNotifications() {
         val uid = auth.currentUser?.uid ?: return
+        _isLoading.postValue(true)
         viewModelScope.launch(Dispatchers.IO) {
-            when (val result = notificationRepository.getUnreadCount(uid)) {
-                is Result.Success -> _unreadCount.postValue(result.data)
-                is Result.Error -> {}
+            when (val result = notificationRepository.getNotifications(uid)) {
+                is Result.Success -> {
+                    _notifications.postValue(result.data)
+                    _unreadCount.postValue(result.data.count { !it.isRead })
+                }
+                is Result.Error -> {
+                    _notifications.postValue(emptyList())
+                    _unreadCount.postValue(0)
+                }
             }
+            _isLoading.postValue(false)
         }
     }
 
@@ -55,7 +66,6 @@ class NotificationsViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             notificationRepository.markAsRead(uid, notificationId)
             loadNotifications()
-            loadUnreadCount()
         }
     }
 
@@ -64,7 +74,11 @@ class NotificationsViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             notificationRepository.markAllAsRead(uid)
             loadNotifications()
-            loadUnreadCount()
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        unreadCountListener?.remove()
     }
 }

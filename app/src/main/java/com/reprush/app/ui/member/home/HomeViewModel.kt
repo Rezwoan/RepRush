@@ -13,6 +13,7 @@ import com.reprush.app.data.local.dao.UserDao
 import com.reprush.app.data.local.entity.StreakEntity
 import com.reprush.app.data.repository.GameRepository
 import com.reprush.app.data.repository.Result
+import com.reprush.app.data.repository.SessionRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -41,6 +42,7 @@ class HomeViewModel @Inject constructor(
     private val userDao: UserDao,
     private val membershipPackageDao: MembershipPackageDao,
     private val gameRepository: GameRepository,
+    private val sessionRepository: SessionRepository,
     private val auth: FirebaseAuth
 ) : ViewModel() {
 
@@ -59,9 +61,17 @@ class HomeViewModel @Inject constructor(
     private val _userRank = MutableLiveData<Int>()
     val userRank: LiveData<Int> = _userRank
 
+    private val _userName = MutableLiveData<String>()
+    val userName: LiveData<String> = _userName
+
+    private val _userPhotoUrl = MutableLiveData<String?>()
+    val userPhotoUrl: LiveData<String?> = _userPhotoUrl
+
     fun loadData() {
         val uid = auth.currentUser?.uid ?: return
         viewModelScope.launch(Dispatchers.IO) {
+            sessionRepository.syncSessionsFromFirestore(uid)
+
             _streak.postValue(streakDao.getStreakForUser(uid))
 
             // Resolve exercise names for recent PRs (Bug 5)
@@ -75,6 +85,9 @@ class HomeViewModel @Inject constructor(
             // Read Room user first, then Firestore for anything missing
             val roomUser = userDao.getUserById(uid)
             val fsData = (gameRepository.getUserData(uid) as? Result.Success)?.data
+
+            _userName.postValue(roomUser?.displayName ?: fsData?.displayName ?: "")
+            _userPhotoUrl.postValue(roomUser?.photoUrl ?: auth.currentUser?.photoUrl?.toString())
 
             // Monthly points from Firestore (Bug 3)
             _monthlyPoints.postValue(fsData?.monthlyPoints ?: 0)

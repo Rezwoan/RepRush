@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="@dimen/spacing_lg">
+
+    <FrameLayout
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_marginBottom="@dimen/spacing_md">
+
+        <ImageView
+            android:id="@+id/imageView_dialogBadgeIcon"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@drawable/ic_medal"
+            android:contentDescription="Achievement" />
+
+        <ImageView
+            android:id="@+id/imageView_dialogLockOverlay"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="bottom|end"
+            android:src="@drawable/ic_lock"
+            android:visibility="gone"
+            android:contentDescription="Locked" />
+
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/textView_dialogBadgeName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/on_surface"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:gravity="center" />
+
+    <TextView
+        android:id="@+id/textView_dialogDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_xs"
+        android:textColor="@color/on_surface_variant"
+        android:textSize="14sp"
+        android:gravity="center" />
+
+    <TextView
+        android:id="@+id/textView_dialogCondition"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_xs"
+        android:textColor="@color/on_surface_variant"
+        android:textSize="13sp"
+        android:gravity="center" />
+
+    <TextView
+        android:id="@+id/textView_dialogUnlockDate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_sm"
+        android:textSize="13sp"
+        android:gravity="center" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_dialogDismiss"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_md"
+        android:text="Dismiss" />
+
+</LinearLayout>

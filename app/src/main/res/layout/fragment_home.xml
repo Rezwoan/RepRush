@@ -13,15 +13,37 @@
         android:padding="@dimen/spacing_md">
 
         <!-- Greeting -->
-        <TextView
-            android:id="@+id/textView_memberGreeting"
-            android:layout_width="wrap_content"
+        <RelativeLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Good morning!"
-            android:textColor="@color/on_surface"
-            android:textSize="22sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="@dimen/spacing_md" />
+            android:layout_marginBottom="@dimen/spacing_md">
+
+            <TextView
+                android:id="@+id/textView_memberGreeting"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_alignParentStart="true"
+                android:layout_toStartOf="@id/imageView_memberAvatar"
+                android:layout_marginEnd="@dimen/spacing_sm"
+                android:text=""
+                android:textColor="@color/on_surface"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/imageView_memberAvatar"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_person"
+                app:shapeAppearanceOverlay="@style/ShapeAppearance.RepRush.Circle"
+                app:strokeColor="@color/outline"
+                app:strokeWidth="1dp" />
+
+        </RelativeLayout>
 
         <!-- Streak row (hidden if streak == 0) -->
         <LinearLayout
@@ -35,11 +57,10 @@
             android:background="@color/surface"
             android:visibility="gone">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="🔥"
-                android:textSize="20sp"
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_fire"
                 android:layout_marginEnd="@dimen/spacing_xs" />
 
             <TextView

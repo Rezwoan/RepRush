@@ -30,10 +30,10 @@ class LibrarySyncFragment : Fragment() {
             when (state) {
                 SyncState.IDLE -> syncViewModel.startSync()
                 SyncState.SYNCING -> {
-                    binding.textViewSyncStatus.text = "Downloading exercises..."
+                    binding.textViewSyncStatus.text = "Loading exercise library..."
                     binding.buttonRetrySync.visibility = View.GONE
                     binding.textViewSyncError.visibility = View.GONE
-                    binding.progressBarSync.isIndeterminate = false
+                    binding.progressIndicatorSync.visibility = View.VISIBLE
                 }
                 SyncState.DONE -> {
                     findNavController().navigate(R.id.action_librarySyncFragment_to_homeFragment)
@@ -42,19 +42,9 @@ class LibrarySyncFragment : Fragment() {
                     binding.textViewSyncStatus.text = "Could not load exercise library."
                     binding.textViewSyncError.visibility = View.VISIBLE
                     binding.buttonRetrySync.visibility = View.VISIBLE
-                    binding.progressBarSync.visibility = View.GONE
+                    binding.progressIndicatorSync.visibility = View.GONE
                 }
                 null -> {}
-            }
-        }
-
-        syncViewModel.syncProgress.observe(viewLifecycleOwner) { progress ->
-            if (progress.totalCount > 0) {
-                binding.progressBarSync.max = progress.totalCount
-                binding.progressBarSync.progress = progress.currentCount
-                binding.textViewSyncCount.text = "Downloading images: ${progress.currentCount} / ${progress.totalCount}"
-            } else {
-                binding.textViewSyncCount.text = "Preparing exercise library..."
             }
         }
 

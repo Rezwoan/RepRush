@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:clipToPadding="false"
+    android:paddingBottom="32dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/spacing_md">
+
+        <!-- Header -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="@dimen/spacing_xs">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_back"
+                style="@style/Widget.Material3.Button.IconButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:contentDescription="Go back"
+                app:icon="@drawable/ic_arrow_back" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="@dimen/spacing_xs"
+                android:text="Build Workout Plan"
+                android:textColor="@color/on_surface"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <!-- Plan Name -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/inputLayout_planName"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_md"
+            android:hint="Plan name (e.g. My Push-Pull Plan)">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editText_planName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:maxLines="1" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Goal -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Goal"
+            android:textColor="@color/on_surface"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="@dimen/spacing_sm" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipGroup_goal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_md"
+            app:singleSelection="true">
+
+            <com.google.android.material.chip.Chip style="@style/Widget.Material3.Chip.Filter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Strength" />
+            <com.google.android.material.chip.Chip style="@style/Widget.Material3.Chip.Filter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Hypertrophy" />
+            <com.google.android.material.chip.Chip style="@style/Widget.Material3.Chip.Filter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Fat Loss" />
+            <com.google.android.material.chip.Chip style="@style/Widget.Material3.Chip.Filter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Endurance" />
+            <com.google.android.material.chip.Chip style="@style/Widget.Material3.Chip.Filter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="General Fitness" />
+
+        </com.google.android.material.chip.ChipGroup>
+
+        <!-- Plan Duration -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Plan Duration"
+            android:textColor="@color/on_surface"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="@dimen/spacing_sm" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipGroup_weeks"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_md"
+            app:singleSelection="true">
+
+            <com.google.android.material.chip.Chip style="@style/Widget.Material3.Chip.Filter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="4 weeks" />
+            <com.google.android.material.chip.Chip style="@style/Widget.Material3.Chip.Filter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="8 weeks" />
+            <com.google.android.material.chip.Chip style="@style/Widget.Material3.Chip.Filter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="12 weeks" />
+
+        </com.google.android.material.chip.ChipGroup>
+
+        <!-- Days Per Week -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Days per Week"
+            android:textColor="@color/on_surface"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="@dimen/spacing_sm" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipGroup_days"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_lg"
+            app:singleSelection="true">
+
+            <com.google.android.material.chip.Chip style="@style/Widget.Material3.Chip.Filter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="3" />
+            <com.google.android.material.chip.Chip style="@style/Widget.Material3.Chip.Filter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="4" />
+            <com.google.android.material.chip.Chip style="@style/Widget.Material3.Chip.Filter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="5" />
+            <com.google.android.material.chip.Chip style="@style/Widget.Material3.Chip.Filter" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="6" />
+
+        </com.google.android.material.chip.ChipGroup>
+
+        <!-- Dynamic day sections container -->
+        <LinearLayout
+            android:id="@+id/container_days"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="@dimen/spacing_md" />
+
+        <!-- Save button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_save_plan"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:enabled="false"
+            android:text="Save Plan"
+            android:textColor="@color/on_primary"
+            app:backgroundTint="@color/primary" />
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

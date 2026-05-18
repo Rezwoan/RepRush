@@ -13,60 +13,60 @@
             android:id="@+id/toolbar_postAnnouncement"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
+            app:menu="@menu/menu_post_announcement"
             app:navigationIcon="?attr/homeAsUpIndicator"
             app:title="New Announcement" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <LinearLayout
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="16dp"
         app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/textInputLayout_title"
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:hint="Title">
+            android:orientation="vertical"
+            android:padding="16dp">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editText_announcementTitle"
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/textInputLayout_title"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textCapSentences"
-                android:maxLines="2" />
+                android:layout_marginBottom="16dp"
+                android:hint="Title">
 
-        </com.google.android.material.textfield.TextInputLayout>
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editText_announcementTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textCapSentences"
+                    android:maxLines="2" />
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/textInputLayout_body"
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
-            android:hint="Message">
+            </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editText_announcementBody"
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/textInputLayout_body"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="top"
-                android:inputType="textCapSentences|textMultiLine"
-                android:minLines="5" />
+                android:hint="Message">
 
-        </com.google.android.material.textfield.TextInputLayout>
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editText_announcementBody"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="top"
+                    android:inputType="textCapSentences|textMultiLine"
+                    android:minLines="5" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/button_postAnnouncement"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Send to All Active Members" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-    </LinearLayout>
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
 
     <com.google.android.material.progressindicator.CircularProgressIndicator
         android:id="@+id/progressBar_announcement"

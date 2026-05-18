@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.reprush.app.data.repository.ExerciseRepository
-import com.reprush.app.data.repository.SyncProgress
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -21,9 +20,6 @@ class ExerciseSyncViewModel @Inject constructor(
     private val _syncState = MutableLiveData(SyncState.IDLE)
     val syncState: LiveData<SyncState> = _syncState
 
-    private val _syncProgress = MutableLiveData(SyncProgress(0, 0))
-    val syncProgress: LiveData<SyncProgress> = _syncProgress
-
     private val _errorMessage = MutableLiveData<String?>()
     val errorMessage: LiveData<String?> = _errorMessage
 
@@ -31,9 +27,7 @@ class ExerciseSyncViewModel @Inject constructor(
         if (_syncState.value == SyncState.SYNCING) return
         _syncState.value = SyncState.SYNCING
         viewModelScope.launch(Dispatchers.IO) {
-            val result = exerciseRepository.syncExercises { progress ->
-                _syncProgress.postValue(progress)
-            }
+            val result = exerciseRepository.syncExercises()
             when (result) {
                 is com.reprush.app.data.repository.Result.Success -> {
                     _syncState.postValue(SyncState.DONE)

@@ -1,18 +1,18 @@
 package com.reprush.app.ui.member.plan
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import androidx.viewpager2.adapter.FragmentStateAdapter
-import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.chip.Chip
+import com.google.android.material.chip.ChipGroup
 import com.reprush.app.R
 import com.reprush.app.databinding.FragmentPlanQuestionnaireBinding
-import com.reprush.app.ui.member.plan.questionnaire.*
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -22,19 +22,6 @@ class PlanQuestionnaireFragment : Fragment() {
     private val binding get() = _binding!!
     private val viewModel: PlanGenerationViewModel by activityViewModels()
 
-    private val steps: List<QuestionnaireStep> by lazy {
-        listOf(
-            PlanStep1GoalFragment(),
-            PlanStep2DaysFragment(),
-            PlanStep3SplitFragment(),
-            PlanStep4DurationFragment(),
-            PlanStep5EquipmentFragment(),
-            PlanStep6LevelFragment(),
-            PlanStep7WeeksFragment(),
-            PlanStep8InjuriesFragment()
-        )
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentPlanQuestionnaireBinding.inflate(inflater, container, false)
         return binding.root
@@ -43,80 +30,75 @@ class PlanQuestionnaireFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val adapter = object : FragmentStateAdapter(this) {
-            override fun getItemCount() = steps.size
-            override fun createFragment(position: Int) = steps[position] as Fragment
-        }
-        binding.viewPagerQuestionnaire.adapter = adapter
-        binding.viewPagerQuestionnaire.isUserInputEnabled = false
+        binding.buttonBack.setOnClickListener { findNavController().popBackStack() }
 
-        // Register selection-changed callbacks on every step so the host knows when to enable Next.
-        steps.forEachIndexed { index, step ->
-            step.onSelectionChanged = {
-                if (binding.viewPagerQuestionnaire.currentItem == index) {
-                    refreshNextButton(index)
-                }
-            }
-        }
+        val changeListener = ChipGroup.OnCheckedStateChangeListener { _, _ -> updateUI() }
+        binding.chipGroupGoal.setOnCheckedStateChangeListener(changeListener)
+        binding.chipGroupDays.setOnCheckedStateChangeListener(changeListener)
+        binding.chipGroupSplit.setOnCheckedStateChangeListener(changeListener)
+        binding.chipGroupDuration.setOnCheckedStateChangeListener(changeListener)
+        binding.chipGroupEquipment.setOnCheckedStateChangeListener(changeListener)
+        binding.chipGroupLevel.setOnCheckedStateChangeListener(changeListener)
+        binding.chipGroupWeeks.setOnCheckedStateChangeListener(changeListener)
 
-        updateStepIndicator(0)
-        refreshNextButton(0)
-
-        binding.viewPagerQuestionnaire.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                updateStepIndicator(position)
-                updateButtons(position)
-                refreshNextButton(position)
-            }
+        binding.editTextInjuries.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) { updateUI() }
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
 
-        binding.buttonPrevious.setOnClickListener {
-            val current = binding.viewPagerQuestionnaire.currentItem
-            if (current > 0) {
-                binding.viewPagerQuestionnaire.currentItem = current - 1
-            } else {
-                findNavController().popBackStack()
-            }
-        }
+        binding.buttonGenerate.setOnClickListener { submitToAi() }
 
-        binding.buttonNext.setOnClickListener {
-            val current = binding.viewPagerQuestionnaire.currentItem
-            val step = steps[current]
-
-            if (!step.isSelectionMade()) {
-                Toast.makeText(requireContext(), "Please make a selection to continue", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            step.saveSelection(viewModel)
-
-            if (current < steps.size - 1) {
-                binding.viewPagerQuestionnaire.currentItem = current + 1
-            } else {
-                findNavController().navigate(R.id.action_planQuestionnaireFragment_to_geminiLoadingFragment)
-            }
-        }
+        updateUI()
     }
 
-    private fun refreshNextButton(position: Int) {
-        val isMade = steps[position].isSelectionMade()
-        binding.buttonNext.isEnabled = isMade
-        binding.buttonNext.alpha = if (isMade) 1.0f else 0.5f
+    private fun chipText(group: ChipGroup): String? {
+        val id = group.checkedChipId
+        if (id == View.NO_ID) return null
+        return group.findViewById<Chip>(id)?.text?.toString()
     }
 
-    private fun updateStepIndicator(position: Int) {
-        binding.textViewStepIndicator.text = "Step ${position + 1} of 8"
-        binding.progressBarSteps.progress = position + 1
+    private fun isComplete(): Boolean =
+        chipText(binding.chipGroupGoal) != null &&
+        chipText(binding.chipGroupDays) != null &&
+        chipText(binding.chipGroupSplit) != null &&
+        chipText(binding.chipGroupDuration) != null &&
+        chipText(binding.chipGroupEquipment) != null &&
+        chipText(binding.chipGroupLevel) != null &&
+        chipText(binding.chipGroupWeeks) != null
+
+    private fun updateUI() {
+        val complete = isComplete()
+
+        binding.textSummaryGoal.text = chipText(binding.chipGroupGoal) ?: "—"
+        binding.textSummaryDays.text = chipText(binding.chipGroupDays) ?: "—"
+        binding.textSummarySplit.text = chipText(binding.chipGroupSplit) ?: "—"
+        binding.textSummaryDuration.text = chipText(binding.chipGroupDuration) ?: "—"
+        binding.textSummaryEquipment.text = chipText(binding.chipGroupEquipment) ?: "—"
+        binding.textSummaryLevel.text = chipText(binding.chipGroupLevel) ?: "—"
+        binding.textSummaryWeeks.text = chipText(binding.chipGroupWeeks) ?: "—"
+        val injuries = binding.editTextInjuries.text?.toString()?.trim() ?: ""
+        binding.textSummaryInjuries.text = injuries.ifEmpty { "None" }
+
+        binding.cardSummary.visibility = if (complete) View.VISIBLE else View.GONE
+        binding.buttonGenerate.isEnabled = complete
+        binding.buttonGenerate.alpha = if (complete) 1f else 0.5f
     }
 
-    private fun updateButtons(position: Int) {
-        binding.buttonPrevious.text = if (position == 0) "Cancel" else "Back"
-        binding.buttonNext.text = if (position == steps.size - 1) "Generate Plan" else "Next"
+    private fun submitToAi() {
+        viewModel.goal = chipText(binding.chipGroupGoal) ?: return
+        viewModel.daysPerWeek = chipText(binding.chipGroupDays)?.filter { it.isDigit() }?.toIntOrNull() ?: 3
+        viewModel.splitType = chipText(binding.chipGroupSplit) ?: return
+        viewModel.sessionDuration = chipText(binding.chipGroupDuration)?.filter { it.isDigit() }?.toIntOrNull() ?: 60
+        viewModel.equipment = chipText(binding.chipGroupEquipment) ?: "Full Gym"
+        viewModel.fitnessLevel = chipText(binding.chipGroupLevel) ?: return
+        viewModel.weeks = chipText(binding.chipGroupWeeks)?.filter { it.isDigit() }?.toIntOrNull() ?: 8
+        viewModel.injuries = binding.editTextInjuries.text?.toString()?.trim() ?: ""
+        viewModel.resetState()
+        findNavController().navigate(R.id.action_planQuestionnaireFragment_to_geminiLoadingFragment)
     }
 
     override fun onDestroyView() {
-        // Clear callbacks to avoid leaking references to this Fragment's binding.
-        steps.forEach { it.onSelectionChanged = null }
         super.onDestroyView()
         _binding = null
     }

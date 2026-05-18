@@ -18,6 +18,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.CalendarMonth
@@ -47,6 +48,7 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
@@ -68,6 +70,7 @@ class HomeFragment : Fragment() {
     @Inject lateinit var planDayDao: PlanDayDao
 
     private var todayPlanDayId: String? = null
+    private var todayDayLabel: String = ""
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
@@ -79,8 +82,15 @@ class HomeFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             val synced = appPreferences.isLibrarySynced.first()
-            if (!synced && isAdded) {
+            if (!isAdded || findNavController().currentDestination?.id != R.id.homeFragment) return@launch
+            if (!synced) {
                 findNavController().navigate(R.id.action_homeFragment_to_librarySyncFragment)
+                return@launch
+            }
+            val onboarded = appPreferences.isMemberOnboardingComplete.first()
+            if (!isAdded || findNavController().currentDestination?.id != R.id.homeFragment) return@launch
+            if (!onboarded) {
+                findNavController().navigate(R.id.action_homeFragment_to_memberOnboardingFragment)
                 return@launch
             }
             checkForIncompleteSession()
@@ -88,12 +98,37 @@ class HomeFragment : Fragment() {
         }
 
         binding.buttonStartWorkout.setOnClickListener {
-            val bundle = Bundle().apply { putString("planDayId", todayPlanDayId ?: "") }
+            val bundle = Bundle().apply {
+                putString("planDayId", todayPlanDayId ?: "")
+                putString("dayLabel", todayDayLabel)
+            }
             findNavController().navigate(R.id.action_homeFragment_to_activeSessionFragment, bundle)
         }
 
         binding.buttonViewLeaderboard.setOnClickListener {
             findNavController().navigate(R.id.action_homeFragment_to_leaderboardFragment)
+        }
+
+        binding.textViewMemberGreeting.text = getGreeting()
+        homeViewModel.userName.observe(viewLifecycleOwner) { name ->
+            if (name.isNotBlank()) {
+                val firstName = name.split(" ").firstOrNull() ?: name
+                binding.textViewMemberGreeting.text = "${getGreeting().removeSuffix("!")}, $firstName!"
+            } else {
+                binding.textViewMemberGreeting.text = getGreeting()
+            }
+        }
+
+        homeViewModel.userPhotoUrl.observe(viewLifecycleOwner) { url ->
+            Glide.with(this)
+                .load(url)
+                .circleCrop()
+                .placeholder(R.drawable.ic_person)
+                .into(binding.imageViewMemberAvatar)
+        }
+
+        binding.imageViewMemberAvatar.setOnClickListener {
+            findNavController().navigate(R.id.action_homeFragment_to_settingsFragment)
         }
 
         observeGamification()
@@ -126,6 +161,13 @@ class HomeFragment : Fragment() {
                     setColor(color)
                 }
                 container.cellView.background = drawable
+
+                if (data.position == DayPosition.MonthDate) {
+                    container.dayText.text = date.dayOfMonth.toString()
+                    container.dayText.visibility = View.VISIBLE
+                } else {
+                    container.dayText.visibility = View.INVISIBLE
+                }
 
                 val label = buildCellContentDescription(date, intensityMap, detailMap)
                 container.cellView.contentDescription = label
@@ -334,13 +376,14 @@ class HomeFragment : Fragment() {
     // ── Session recovery ─────────────────────────────────────────────────────
 
     private fun checkForIncompleteSession() {
+        if (!isAdded || view == null) return
         val userId = auth.currentUser?.uid ?: return
         val alreadyActive = sessionViewModel.sessionState.value is SessionState.Active
         if (alreadyActive) return
 
         viewLifecycleOwner.lifecycleScope.launch {
             val incompleteSession = sessionRepository.getIncompleteSession(userId)
-            if (incompleteSession != null && isAdded) {
+            if (incompleteSession != null && isAdded && view != null) {
                 val startDateStr = SimpleDateFormat("MMM dd, hh:mm a", Locale.getDefault())
                     .format(Date(incompleteSession.startTime))
                 AlertDialog.Builder(requireContext())
@@ -350,6 +393,7 @@ class HomeFragment : Fragment() {
                         "Would you like to resume or discard it?"
                     )
                     .setPositiveButton("Resume") { _, _ ->
+                        if (!isAdded || view == null) return@setPositiveButton
                         viewLifecycleOwner.lifecycleScope.launch {
                             val recoveredState = sessionRepository.recoverSession(incompleteSession)
                             sessionViewModel.resumeSession(recoveredState)
@@ -359,6 +403,7 @@ class HomeFragment : Fragment() {
                         }
                     }
                     .setNegativeButton("Discard") { _, _ ->
+                        if (!isAdded || view == null) return@setNegativeButton
                         viewLifecycleOwner.lifecycleScope.launch {
                             sessionRepository.discardIncompleteSession(incompleteSession.id)
                         }
@@ -378,7 +423,18 @@ class HomeFragment : Fragment() {
         val todayIndex = daysSinceStart % plan.daysPerWeek
         val todayDay = planDays.getOrNull(todayIndex) ?: planDays.first()
         todayPlanDayId = todayDay.id
+        todayDayLabel = todayDay.dayLabel
         if (isAdded) binding.textViewTodayDayLabel.text = todayDay.dayLabel
+    }
+
+    private fun getGreeting(): String {
+        val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+        return when {
+            hour < 12 -> "Good morning!"
+            hour < 17 -> "Good afternoon!"
+            hour < 21 -> "Good evening!"
+            else -> "Good night!"
+        }
     }
 
     override fun onDestroyView() {
@@ -390,6 +446,7 @@ class HomeFragment : Fragment() {
 
     private inner class HeatmapDayContainer(view: View) : ViewContainer(view) {
         val cellView: View = view.findViewById(R.id.view_heatmap_cell)
+        val dayText: TextView = view.findViewById(R.id.text_heatmap_day)
     }
 
     private inner class MonthHeaderContainer(view: View) : ViewContainer(view) {

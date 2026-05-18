@@ -104,13 +104,23 @@
 
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Debug: Seed Demo Data -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_seedDemoData"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Seed Demo Data"
+            android:visibility="gone" />
+
         <!-- Sign Out -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/button_signOut"
             style="@style/Widget.Material3.Button.OutlinedButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="8dp"
             android:text="Sign Out"
             android:textColor="?attr/colorError" />
 

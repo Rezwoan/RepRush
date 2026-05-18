@@ -1,75 +1,476 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<androidx.core.widget.NestedScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background">
-
-    <TextView
-        android:id="@+id/textView_stepIndicator"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/spacing_md"
-        android:layout_marginStart="@dimen/spacing_md"
-        android:text="Step 1 of 8"
-        android:textColor="@color/on_surface_variant"
-        android:textSize="14sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <ProgressBar
-        android:id="@+id/progressBar_steps"
-        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-        android:layout_width="0dp"
-        android:layout_height="6dp"
-        android:layout_marginHorizontal="@dimen/spacing_md"
-        android:layout_marginTop="@dimen/spacing_xs"
-        android:max="8"
-        android:progress="1"
-        android:progressTint="@color/primary"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textView_stepIndicator" />
-
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/viewPager_questionnaire"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="@dimen/spacing_sm"
-        app:layout_constraintBottom_toTopOf="@id/layout_buttons"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/progressBar_steps" />
+    android:background="@color/background"
+    android:clipToPadding="false"
+    android:paddingBottom="32dp">
 
     <LinearLayout
-        android:id="@+id/layout_buttons"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="@dimen/spacing_md"
-        android:gravity="center_vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        android:orientation="vertical"
+        android:padding="@dimen/spacing_md">
+
+        <!-- Header -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="@dimen/spacing_xs">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_back"
+                style="@style/Widget.Material3.Button.IconButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:contentDescription="Go back"
+                app:icon="@drawable/ic_arrow_back" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="@dimen/spacing_xs"
+                android:text="AI Workout Plan"
+                android:textColor="@color/on_surface"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Answer a few questions and AI will build your personalized program."
+            android:textColor="@color/on_surface_variant"
+            android:textSize="14sp"
+            android:layout_marginBottom="@dimen/spacing_lg" />
+
+        <!-- ── Goal ─────────────────────────────────────────────────────── -->
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Your Goal"
+            android:textColor="@color/on_surface"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="@dimen/spacing_sm" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipGroup_goal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_lg"
+            app:singleSelection="true">
+
+            <com.google.android.material.chip.Chip
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Strength" />
+
+            <com.google.android.material.chip.Chip
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Hypertrophy" />
+
+            <com.google.android.material.chip.Chip
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Fat Loss" />
+
+            <com.google.android.material.chip.Chip
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Endurance" />
+
+            <com.google.android.material.chip.Chip
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="General Fitness" />
+
+        </com.google.android.material.chip.ChipGroup>
+
+        <!-- ── Days per Week ─────────────────────────────────────────────── -->
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Days per Week"
+            android:textColor="@color/on_surface"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="@dimen/spacing_sm" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipGroup_days"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_lg"
+            app:singleSelection="true">
+
+            <com.google.android.material.chip.Chip
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="3 days" />
+
+            <com.google.android.material.chip.Chip
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="4 days" />
+
+            <com.google.android.material.chip.Chip
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="5 days" />
+
+            <com.google.android.material.chip.Chip
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="6 days" />
+
+        </com.google.android.material.chip.ChipGroup>
+
+        <!-- ── Split Type ─────────────────────────────────────────────────── -->
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Split Type"
+            android:textColor="@color/on_surface"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="@dimen/spacing_sm" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipGroup_split"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_lg"
+            app:singleSelection="true">
+
+            <com.google.android.material.chip.Chip
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Push-Pull-Legs" />
+
+            <com.google.android.material.chip.Chip
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Upper-Lower" />
+
+            <com.google.android.material.chip.Chip
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Full Body" />
+
+            <com.google.android.material.chip.Chip
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Bro Split" />
+
+            <com.google.android.material.chip.Chip
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Custom" />
+
+        </com.google.android.material.chip.ChipGroup>
+
+        <!-- ── Session Duration ───────────────────────────────────────────── -->
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Session Duration"
+            android:textColor="@color/on_surface"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="@dimen/spacing_sm" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipGroup_duration"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_lg"
+            app:singleSelection="true">
+
+            <com.google.android.material.chip.Chip
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="45 minutes" />
+
+            <com.google.android.material.chip.Chip
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="60 minutes" />
+
+            <com.google.android.material.chip.Chip
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="90 minutes" />
+
+        </com.google.android.material.chip.ChipGroup>
+
+        <!-- ── Equipment ─────────────────────────────────────────────────── -->
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Available Equipment"
+            android:textColor="@color/on_surface"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="@dimen/spacing_sm" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipGroup_equipment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_lg"
+            app:singleSelection="true">
+
+            <com.google.android.material.chip.Chip
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Full Gym" />
+
+            <com.google.android.material.chip.Chip
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Barbell+Dumbbells" />
+
+            <com.google.android.material.chip.Chip
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Dumbbells Only" />
+
+            <com.google.android.material.chip.Chip
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Bodyweight" />
+
+        </com.google.android.material.chip.ChipGroup>
+
+        <!-- ── Fitness Level ─────────────────────────────────────────────── -->
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Fitness Level"
+            android:textColor="@color/on_surface"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="@dimen/spacing_sm" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipGroup_level"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_lg"
+            app:singleSelection="true">
+
+            <com.google.android.material.chip.Chip
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Beginner" />
+
+            <com.google.android.material.chip.Chip
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Intermediate" />
+
+            <com.google.android.material.chip.Chip
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Advanced" />
+
+        </com.google.android.material.chip.ChipGroup>
+
+        <!-- ── Plan Duration ─────────────────────────────────────────────── -->
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Plan Duration"
+            android:textColor="@color/on_surface"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="@dimen/spacing_sm" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipGroup_weeks"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_lg"
+            app:singleSelection="true">
+
+            <com.google.android.material.chip.Chip
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="4 weeks" />
+
+            <com.google.android.material.chip.Chip
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="8 weeks" />
+
+            <com.google.android.material.chip.Chip
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="12 weeks" />
+
+        </com.google.android.material.chip.ChipGroup>
+
+        <!-- ── Injuries / Restrictions ───────────────────────────────────── -->
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Injuries / Restrictions"
+            android:textColor="@color/on_surface"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="@dimen/spacing_xs" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Optional — leave blank if none"
+            android:textColor="@color/on_surface_variant"
+            android:textSize="12sp"
+            android:layout_marginBottom="@dimen/spacing_sm" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/inputLayout_injuries"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_xl"
+            android:hint="e.g. bad knees, shoulder injury">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editText_injuries"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textMultiLine"
+                android:minLines="2"
+                android:maxLines="4"
+                android:gravity="top" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- ── Summary Card ──────────────────────────────────────────────── -->
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_summary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/spacing_md"
+            android:visibility="gone"
+            app:cardBackgroundColor="@color/surface"
+            app:cardCornerRadius="@dimen/shape_md"
+            app:strokeColor="@color/primary"
+            app:strokeWidth="2dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/spacing_md">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Your Plan Summary"
+                    android:textColor="@color/on_surface"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="@dimen/spacing_sm" />
+
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="4dp">
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Goal" android:textColor="@color/on_surface_variant" android:textSize="13sp" />
+                    <TextView android:id="@+id/text_summary_goal" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="—" android:textColor="@color/on_surface" android:textSize="13sp" android:textStyle="bold" android:gravity="end" />
+                </LinearLayout>
+
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="4dp">
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Days / Week" android:textColor="@color/on_surface_variant" android:textSize="13sp" />
+                    <TextView android:id="@+id/text_summary_days" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="—" android:textColor="@color/on_surface" android:textSize="13sp" android:textStyle="bold" android:gravity="end" />
+                </LinearLayout>
+
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="4dp">
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Split" android:textColor="@color/on_surface_variant" android:textSize="13sp" />
+                    <TextView android:id="@+id/text_summary_split" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="—" android:textColor="@color/on_surface" android:textSize="13sp" android:textStyle="bold" android:gravity="end" />
+                </LinearLayout>
+
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="4dp">
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Duration" android:textColor="@color/on_surface_variant" android:textSize="13sp" />
+                    <TextView android:id="@+id/text_summary_duration" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="—" android:textColor="@color/on_surface" android:textSize="13sp" android:textStyle="bold" android:gravity="end" />
+                </LinearLayout>
+
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="4dp">
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Equipment" android:textColor="@color/on_surface_variant" android:textSize="13sp" />
+                    <TextView android:id="@+id/text_summary_equipment" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="—" android:textColor="@color/on_surface" android:textSize="13sp" android:textStyle="bold" android:gravity="end" />
+                </LinearLayout>
+
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="4dp">
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Level" android:textColor="@color/on_surface_variant" android:textSize="13sp" />
+                    <TextView android:id="@+id/text_summary_level" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="—" android:textColor="@color/on_surface" android:textSize="13sp" android:textStyle="bold" android:gravity="end" />
+                </LinearLayout>
+
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="4dp">
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Plan Length" android:textColor="@color/on_surface_variant" android:textSize="13sp" />
+                    <TextView android:id="@+id/text_summary_weeks" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="—" android:textColor="@color/on_surface" android:textSize="13sp" android:textStyle="bold" android:gravity="end" />
+                </LinearLayout>
+
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Restrictions" android:textColor="@color/on_surface_variant" android:textSize="13sp" />
+                    <TextView android:id="@+id/text_summary_injuries" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="None" android:textColor="@color/on_surface" android:textSize="13sp" android:textStyle="bold" android:gravity="end" />
+                </LinearLayout>
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- ── Generate Button ───────────────────────────────────────────── -->
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/button_previous"
-            style="@style/Widget.Material3.Button.OutlinedButton"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_weight="1"
-            android:text="Back" />
-
-        <View android:layout_width="@dimen/spacing_md" android:layout_height="1dp" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/button_next"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_weight="1"
-            android:text="Next" />
+            android:id="@+id/button_generate"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:text="Generate Plan"
+            android:enabled="false"
+            android:textColor="@color/on_primary"
+            app:backgroundTint="@color/primary" />
 
     </LinearLayout>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.core.widget.NestedScrollView>

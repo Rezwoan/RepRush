@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background">
+
+    <!-- Toolbar -->
+    <LinearLayout
+        android:id="@+id/layout_chatToolbar"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="@dimen/spacing_sm"
+        android:background="@color/surface"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_chatBack"
+            style="@style/Widget.Material3.Button.IconButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:contentDescription="Go back"
+            app:icon="@drawable/ic_arrow_back" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="@dimen/spacing_xs"
+            android:text="AI Trainer"
+            android:textColor="@color/on_surface"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <!-- Chat RecyclerView -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView_chat"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:paddingTop="@dimen/spacing_sm"
+        android:paddingBottom="@dimen/spacing_sm"
+        app:layout_constraintTop_toBottomOf="@id/layout_chatToolbar"
+        app:layout_constraintBottom_toTopOf="@id/layout_typingIndicator"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Empty state -->
+    <TextView
+        android:id="@+id/textView_chatEmpty"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Hi! I'm your AI trainer.\nAsk me anything about your workouts."
+        android:textColor="@color/on_surface_variant"
+        android:textSize="15sp"
+        android:gravity="center"
+        android:padding="@dimen/spacing_xl"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/layout_chatToolbar"
+        app:layout_constraintBottom_toTopOf="@id/layout_inputBar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/layout_typingIndicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="@dimen/spacing_sm"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/layout_inputBar"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/ic_robot"
+            android:layout_marginEnd="@dimen/spacing_xs"
+            android:contentDescription="AI Trainer" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="AI trainer is typing…"
+            android:textColor="@color/on_surface_variant"
+            android:textSize="13sp" />
+
+    </LinearLayout>
+
+    <!-- Input bar -->
+    <LinearLayout
+        android:id="@+id/layout_inputBar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="@dimen/spacing_sm"
+        android:background="@color/surface_variant"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_marginEnd="@dimen/spacing_sm">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editText_chatInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Ask your trainer…"
+                android:imeOptions="actionSend"
+                android:inputType="textMultiLine|textCapSentences"
+                android:maxLines="4" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <ImageButton
+            android:id="@+id/button_sendChat"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_chevron_right"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Send message"
+            app:tint="@color/primary" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

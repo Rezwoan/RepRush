@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.reprush.app.databinding.FragmentLeaderboardBinding
@@ -31,6 +32,8 @@ class LeaderboardFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        binding.buttonBack.setOnClickListener { findNavController().popBackStack() }
 
         binding.recyclerViewLeaderboard.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerViewLeaderboard.adapter = adapter

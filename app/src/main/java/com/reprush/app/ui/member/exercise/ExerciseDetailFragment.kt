@@ -7,11 +7,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.bumptech.glide.Glide
-import com.reprush.app.R
 import com.reprush.app.databinding.FragmentExerciseDetailBinding
+import com.reprush.app.utils.AssetImageLoader
 import dagger.hilt.android.AndroidEntryPoint
-import java.io.File
 
 @AndroidEntryPoint
 class ExerciseDetailFragment : Fragment() {
@@ -51,19 +49,8 @@ class ExerciseDetailFragment : Fragment() {
             binding.chipCustomBadge.visibility = if (exercise.isCustom == 1) View.VISIBLE else View.GONE
             binding.chipUnverifiedBadge.visibility = if (exercise.isVerified == 0) View.VISIBLE else View.GONE
 
-            val imageSource = exercise.imageUrl
             binding.imageViewExerciseFull.contentDescription = "${exercise.name} exercise demonstration"
-            if (!imageSource.isNullOrEmpty()) {
-                val file = File(imageSource)
-                Glide.with(this)
-                    .load(if (file.exists()) file else imageSource)
-                    .placeholder(R.drawable.ic_exercise_placeholder)
-                    .error(R.drawable.ic_exercise_placeholder)
-                    .centerCrop()
-                    .into(binding.imageViewExerciseFull)
-            } else {
-                binding.imageViewExerciseFull.setImageResource(R.drawable.ic_exercise_placeholder)
-            }
+            AssetImageLoader.load(requireContext(), exercise.imageUrl, binding.imageViewExerciseFull)
 
             binding.textViewNoPrYet.visibility = View.VISIBLE
             binding.textViewInsufficientData.visibility = View.VISIBLE

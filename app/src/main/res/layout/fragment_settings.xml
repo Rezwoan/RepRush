@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:clipToPadding="false"
+    android:paddingBottom="80dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/spacing_md">
+
+        <!-- Toolbar -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="@dimen/spacing_lg">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_back"
+                style="@style/Widget.Material3.Button.IconButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:contentDescription="Go back"
+                app:icon="@drawable/ic_arrow_back" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="@dimen/spacing_sm"
+                android:text="Settings"
+                android:textColor="@color/on_surface"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <!-- Rest Timer section -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="REST TIMER"
+            android:textColor="@color/on_surface_variant"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="@dimen/spacing_sm" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="@dimen/spacing_xs">
+
+            <SeekBar
+                android:id="@+id/seekBar_restTimer"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:max="270"
+                android:progress="60"
+                android:layout_marginEnd="@dimen/spacing_sm" />
+
+            <TextView
+                android:id="@+id/textView_restTimerValue"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:text="90s"
+                android:textColor="@color/on_surface"
+                android:textSize="14sp"
+                android:gravity="center" />
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Default rest between sets (30–300 seconds)"
+            android:textColor="@color/on_surface_variant"
+            android:textSize="12sp"
+            android:layout_marginBottom="@dimen/spacing_md" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/surface_variant"
+            android:layout_marginBottom="@dimen/spacing_md" />
+
+        <!-- Auto-start timer row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="@dimen/spacing_md">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Auto-start Timer"
+                    android:textColor="@color/on_surface"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Start timer automatically after logging a set"
+                    android:textColor="@color/on_surface_variant"
+                    android:textSize="12sp"
+                    android:layout_marginTop="@dimen/spacing_xs" />
+
+            </LinearLayout>
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/switch_autoTimer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/surface_variant"
+            android:layout_marginBottom="@dimen/spacing_md" />
+
+        <!-- Weight Unit section -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="WEIGHT UNIT"
+            android:textColor="@color/on_surface_variant"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="@dimen/spacing_sm" />
+
+        <RadioGroup
+            android:id="@+id/radioGroup_weightUnit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="@dimen/spacing_md">
+
+            <RadioButton
+                android:id="@+id/radioButton_kg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="kg"
+                android:textColor="@color/on_surface"
+                android:layout_marginEnd="@dimen/spacing_lg" />
+
+            <RadioButton
+                android:id="@+id/radioButton_lbs"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="lbs"
+                android:textColor="@color/on_surface" />
+
+        </RadioGroup>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/surface_variant"
+            android:layout_marginBottom="@dimen/spacing_md" />
+
+        <!-- Leaderboard visibility row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="@dimen/spacing_md">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Leaderboard Visibility"
+                    android:textColor="@color/on_surface"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Show my name on the public leaderboard"
+                    android:textColor="@color/on_surface_variant"
+                    android:textSize="12sp"
+                    android:layout_marginTop="@dimen/spacing_xs" />
+
+            </LinearLayout>
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/switch_leaderboardOptIn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/surface_variant"
+            android:layout_marginBottom="@dimen/spacing_md" />
+
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>

@@ -11,7 +11,8 @@ import com.reprush.app.databinding.ItemPlanBinding
 
 class PlanListAdapter(
     private val onSetActive: (WorkoutPlanEntity) -> Unit,
-    private val onDelete: (WorkoutPlanEntity) -> Unit
+    private val onDelete: (WorkoutPlanEntity) -> Unit,
+    private val onViewDetail: (WorkoutPlanEntity) -> Unit
 ) : ListAdapter<WorkoutPlanEntity, PlanListAdapter.ViewHolder>(DiffCallback()) {
 
     inner class ViewHolder(private val binding: ItemPlanBinding) :
@@ -22,6 +23,7 @@ class PlanListAdapter(
             binding.textViewPlanGoal.text = "${plan.goal} · ${plan.totalWeeks} weeks"
             binding.chipActiveBadge.visibility = if (plan.isActive == 1) View.VISIBLE else View.GONE
             binding.buttonSetActive.visibility = if (plan.isActive == 1) View.GONE else View.VISIBLE
+            binding.buttonViewDetail.setOnClickListener { onViewDetail(plan) }
             binding.buttonSetActive.setOnClickListener { onSetActive(plan) }
             binding.buttonDeletePlan.setOnClickListener { onDelete(plan) }
         }

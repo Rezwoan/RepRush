@@ -65,6 +65,8 @@ class FinishWorkoutFragment : Fragment() {
             }
         }
 
+        binding.buttonBack.setOnClickListener { findNavController().popBackStack() }
+
         binding.buttonConfirmFinish.setOnClickListener {
             viewModel.finishWorkout()
         }

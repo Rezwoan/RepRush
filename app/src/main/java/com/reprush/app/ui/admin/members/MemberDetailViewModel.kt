@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.reprush.app.data.model.MembershipPackage
 import com.reprush.app.data.repository.AttendanceRecord
 import com.reprush.app.data.repository.AttendanceRepository
 import com.reprush.app.data.repository.MemberDetail
@@ -43,6 +44,9 @@ class MemberDetailViewModel @Inject constructor(
     private val _attendance = MutableLiveData<List<AttendanceRecord>>()
     val attendance: LiveData<List<AttendanceRecord>> = _attendance
 
+    private val _activePackages = MutableLiveData<List<MembershipPackage>>()
+    val activePackages: LiveData<List<MembershipPackage>> = _activePackages
+
     fun loadMember(uid: String) {
         viewModelScope.launch(Dispatchers.IO) {
             _isLoading.postValue(true)
@@ -76,7 +80,10 @@ class MemberDetailViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             when (val result = attendanceRepository.getMemberAttendance(memberId)) {
                 is Result.Success -> _attendance.postValue(result.data)
-                is Result.Error -> _attendance.postValue(emptyList())
+                is Result.Error -> {
+                    _attendance.postValue(emptyList())
+                    _error.postValue(result.message)
+                }
             }
         }
     }
@@ -107,6 +114,25 @@ class MemberDetailViewModel @Inject constructor(
             val result = memberRepository.removeMember(uid)
             _operationResult.postValue(result)
             _isLoading.postValue(false)
+        }
+    }
+
+    fun loadActivePackages() {
+        viewModelScope.launch(Dispatchers.IO) {
+            when (val result = packageRepository.getActivePackages()) {
+                is Result.Success -> _activePackages.postValue(result.data)
+                is Result.Error -> {}
+            }
+        }
+    }
+
+    fun assignPackage(uid: String, pkg: MembershipPackage) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _isLoading.postValue(true)
+            val result = memberRepository.assignPackage(uid, pkg.id, pkg.durationDays)
+            _operationResult.postValue(result)
+            if (result is Result.Success) loadMember(uid)
+            else _isLoading.postValue(false)
         }
     }
 }
