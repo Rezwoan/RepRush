@@ -374,13 +374,14 @@ class HomeFragment : Fragment() {
     // ── Session recovery ─────────────────────────────────────────────────────
 
     private fun checkForIncompleteSession() {
+        if (!isAdded || view == null) return
         val userId = auth.currentUser?.uid ?: return
         val alreadyActive = sessionViewModel.sessionState.value is SessionState.Active
         if (alreadyActive) return
 
         viewLifecycleOwner.lifecycleScope.launch {
             val incompleteSession = sessionRepository.getIncompleteSession(userId)
-            if (incompleteSession != null && isAdded) {
+            if (incompleteSession != null && isAdded && view != null) {
                 val startDateStr = SimpleDateFormat("MMM dd, hh:mm a", Locale.getDefault())
                     .format(Date(incompleteSession.startTime))
                 AlertDialog.Builder(requireContext())
@@ -390,6 +391,7 @@ class HomeFragment : Fragment() {
                         "Would you like to resume or discard it?"
                     )
                     .setPositiveButton("Resume") { _, _ ->
+                        if (!isAdded || view == null) return@setPositiveButton
                         viewLifecycleOwner.lifecycleScope.launch {
                             val recoveredState = sessionRepository.recoverSession(incompleteSession)
                             sessionViewModel.resumeSession(recoveredState)
@@ -399,6 +401,7 @@ class HomeFragment : Fragment() {
                         }
                     }
                     .setNegativeButton("Discard") { _, _ ->
+                        if (!isAdded || view == null) return@setNegativeButton
                         viewLifecycleOwner.lifecycleScope.launch {
                             sessionRepository.discardIncompleteSession(incompleteSession.id)
                         }
